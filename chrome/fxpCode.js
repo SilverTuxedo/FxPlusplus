@@ -25,9 +25,9 @@ Kudos!
 
 */
 
-version = "0.0.18";
-versionTitle = "עדכון 0.0.17 + 0.0.18";
-versionDescription = '<blockquote class="twitter-tweet" data-lang="he"><p lang="iw" dir="rtl">התראות! ועוד כמה דברים. גרסה 0.0.17 כבר באוויר.<a href="https://t.co/6jBs9AiKlO">https://t.co/6jBs9AiKlO</a></p>&mdash; FxPlus+ (@FxPlusplus) <a href="https://twitter.com/FxPlusplus/status/750728553663238144">6 ביולי 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
+version = "0.0.19";
+versionTitle = "עדכון 0.0.19";
+versionDescription = '<blockquote class="twitter-tweet" data-lang="he"><p lang="iw" dir="rtl">דיווחתם שהתוסף מאט את האתר. גרסה 0.0.19 אמורה לטפל בזה!<a href="https://t.co/jlFxwhM8Bf">https://t.co/jlFxwhM8Bf</a></p>&mdash; FxPlus+ (@FxPlusplus) <a href="https://twitter.com/FxPlusplus/status/752447667469443076">11 ביולי 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
 
 var d1 = new Date();
 var startExecution = d1.getTime();

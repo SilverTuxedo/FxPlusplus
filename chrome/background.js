@@ -161,18 +161,22 @@ function activateNotificationListeners() {
     //the fxp notifications socket
     var socket = io.connect('https://socket.fxp.co.il/', { reconnection: true });
 
-    //connect to the fxp notification socket
-    function connect_to_server() {
+    socket.on('connect', function () {
         getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id) {
-            socket.on('connect', function () {
-                send = '{"userid":"' + id + '","froum":"f-21"}';
-                socket.send(send);
-                console.log(id);
-            });
+            send = '{"userid":"' + id + '","froum":"f-fe7fdfa8be5eb96fc56f318738a6410e"}';
+            socket.send(send);
+            console.log('user connect');
         });
-    }
+    });
 
-    connect_to_server();
+    socket.on('reconnecting', function () {
+        getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id) {
+            send = '{"userid":"' + id + '","froum":"f-fe7fdfa8be5eb96fc56f318738a6410e"}';
+            socket.send(send);
+            console.log('user reconnect');
+        });
+    })
+    
 
     //get unread notifications
     chrome.storage.sync.get("BackgroundNotifications", function (dataC) {
@@ -264,7 +268,7 @@ function activateNotificationListeners() {
                             //the user was not quoted
                             FxpPushNotification('התראה חדשה!', 'המשתמש ' + data.username + '  הגיב באשכול ' + data.title, 'https://www.fxp.co.il/showthread.php?t=' + data.thread_id + '&goto=newpost')
                         }
-                        connect_to_server();
+                        
 
 
                     }
@@ -290,7 +294,7 @@ function activateNotificationListeners() {
                     if (tablink.indexOf("fxp.co.il") == -1) {
                         //no fxp tab is open
                         FxpPushNotification('דואר נכנס!', 'קיבלת הודעה פרטית חדשה מהמשתמש ' + data.username, 'https://www.fxp.co.il/private.php?do=showpm&pmid=' + data.pmid);
-                        connect_to_server();
+                        
                     }
                 });
             }
@@ -314,7 +318,7 @@ function activateNotificationListeners() {
                     if (tablink.indexOf("fxp.co.il") == -1) {
                         //no fxp tab is open
                         FxpPushNotification('לייק חדש!', 'המשתמש ' + data.username + ' אהב את ההודעה שלך!', 'https://www.fxp.co.il/showthread.php?p=' + data.postid + '#post' + data.postid);
-                        connect_to_server();
+                        
                     }
                 });
             }
@@ -341,14 +345,6 @@ function activateNotificationListeners() {
         }
 
     });
-
-
-
-    reconnection = window.setInterval(function () {
-        socket = io.connect('https://socket.fxp.co.il/', { reconnection: true });
-        connect_to_server();
-        updateNotificationCounter();
-    }, 60000);
 }
 
 
