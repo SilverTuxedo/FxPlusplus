@@ -1,9 +1,50 @@
 ﻿
+var storageSyncSupport;
+if (chrome.storage.sync) {
+    //browser supports chrome.storage.sync (eg. chrome)
+    storageSyncSupport = true;
+} else {
+    //browser does not support chrome.storage.sync (eg. firefox)
+    storageSyncSupport = false;
+}
+
+//set a value in the extension's storage
+function setStorage(type, storageObject, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    }
+}
+//get a value from the extension's storage
+function getStorage(type, name, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    }
+}
+
+
 function getDomainCookies(domain, name, callback) { //gets a cookie that is on an online site
     chrome.cookies.get({ "url": domain, "name": name }, function (cookie) {
-	console.log("a");
         if (callback) {
-	console.log("a");
             if (cookie == null) {
                 $("#allList").html("אופס! נראה שאתה לא מחובר לאתר.")
             } else {
@@ -14,24 +55,19 @@ function getDomainCookies(domain, name, callback) { //gets a cookie that is on a
 }
 
 chrome.browserAction.setBadgeBackgroundColor({ color: "#3491ef" });
-console.log("a");
 
 var shouldUpdateBadge = false;
-console.log("a");
+
 function updateBadge(number) {
-console.log("a");
     if (number > 0 && shouldUpdateBadge)
-console.log("a");
         chrome.browserAction.setBadgeText({ text: number + "" });
     else
         chrome.browserAction.setBadgeText({ text: "" });
 }
 
-chrome.storage.sync.get("BackgroundNotifications", function (data) {
-console.log("a");
+getStorage("sync", "BackgroundNotifications", function (data) {
     var bgn = data.BackgroundNotifications;
     if (bgn) {
-	console.log("a");
         $("#sendBackground").prop("checked", true);
         shouldUpdateBadge = true;
         console.log(shouldUpdateBadge);
@@ -39,7 +75,7 @@ console.log("a");
 });
 
 $("#sendBackground").change(function () { //changed the state in the background notification checkbox
-    chrome.storage.sync.set({ "BackgroundNotifications": $("#sendBackground").prop("checked") }, function () {
+    setStorage("sync", { "BackgroundNotifications": $("#sendBackground").prop("checked") }, function () {
         $("#sendBackground").fadeOut(250, function () {
             $(this).fadeIn(250);
         });

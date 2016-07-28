@@ -1,6 +1,49 @@
 ﻿$("html").append('<body><div style="top:0;left:0;position:fixed;width:100%;height:100%;z-index:10000000000;background: #fbfbfb url(http://i.imgur.com/yV7gTKc.gif) no-repeat center;"></div></body>');
 var noOverflow = setInterval(function () { $("body").css("overflow", "hidden"); $("img[alt=fxp]").remove(); }, 100); //make sure there is no overflow while loading
 
+var storageSyncSupport;
+if (chrome.storage.sync) {
+    //browser supports chrome.storage.sync (eg. chrome)
+    storageSyncSupport = true;
+} else {
+    //browser does not support chrome.storage.sync (eg. firefox)
+    storageSyncSupport = false;
+}
+
+//set a value in the extension's storage
+function setStorage(type, storageObject, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    }
+}
+//get a value from the extension's storage
+function getStorage(type, name, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    }
+}
+
+
 var oldSmile = [
     "https://images.fxp.co.il/smilies3/124_40x.png", //replace mad
     "https://images.fxp.co.il/smilies3/6_40x.png",   //replace wink
@@ -13,7 +56,9 @@ var oldSmile = [
     "https://images.fxp.co.il/smilies3/204_40x.png", //replace smile
     "https://images.fxp.co.il/smilies3/173_40x.png", //replace devil
     "https://images.fxp.co.il/smilies3/202_40x.png", //replace kiss
-    "https://images.fxp.co.il/smilies3/131_40x.png"  //replace cool
+    "https://images.fxp.co.il/smilies3/131_40x.png", //replace cool
+    "https://images.fxp.co.il/smilies3g/206.gif",    //replace i love u
+    "https://images.fxp.co.il/smilies3g/207.gif"     //replace tongue 2
 ]
 
 var newSmile = [
@@ -28,7 +73,9 @@ var newSmile = [
     "http://i.imgur.com/lPepnzd.png", //replace smile
     "http://i.imgur.com/Y0xWnOV.png", //replace devil
     "http://i.imgur.com/yDHz3MY.png", //replace kiss
-    "http://i.imgur.com/FekEBW4.png" //replace cool
+    "http://i.imgur.com/FekEBW4.png", //replace cool
+    "http://i.imgur.com/1htCYLi.gif", //replace i love u
+    "http://i.imgur.com/WzfVnDk.gif"  //replace tongue 2
 ]
 
 function setCookie(cname, cvalue, exdays) {
@@ -40,7 +87,7 @@ function setCookie(cname, cvalue, exdays) {
 
 setCookie("peekUse", true, 5);
 
-chrome.storage.sync.get("replaceIcons", function (dataR) {
+getStorage("sync", "replaceIcons", function (dataR) {
     $(document).ready(function () {
         window.clearInterval(noOverflow);
         $("head").append('<style>#cometchat_base {display: none !important}</style>');
@@ -72,7 +119,7 @@ chrome.storage.sync.get("replaceIcons", function (dataR) {
                 comments.push([
                     $(".postbit:eq(" + j + ") .username").text(),
                     $(".postbit:eq(" + j + ") blockquote.postcontent").html(),
-                    parseInt($(".postbit:eq(" + j + ") .postfoot a.countlike").text()),
+                    parseInt($(".postbit:eq(" + j + ") .postfoot .countlike").text()),
                     $(".postbit:eq(" + j + ") .username").attr("href").split("?u=")[1]
                 ]);
             }
@@ -109,9 +156,10 @@ chrome.storage.sync.get("replaceIcons", function (dataR) {
         if (comments.length === 0) //no comments = thread removed
             output = '<div class="comment">התוכן המבוקש (אשכול) הינו שגוי - רוב הסיכויים שמנהל מחק אותו. אם עשיתם הכל כהלכה, דווחו על הבעיה בפורום משוב.</div>';
 
-        chrome.storage.sync.get("nightmode", function (data) {
+        getStorage("sync", "nightmode", function (data) {
 
             function buildPage() {
+                window.stop();
                 $("html").html("<head></head><body></body>");
                 $("body").css({
                     "-moz-transform": "rotate(180deg) scale(1,-1)",
@@ -120,7 +168,7 @@ chrome.storage.sync.get("replaceIcons", function (dataR) {
                     "-webkit-transform": "rotate(180deg) scale(1,-1)",
                     "transform": "rotate(180deg) scale(1,-1)"
                 });
-                $("head").append("<style>html,body {font-family: Arial; font-size:13px; max-width: 100%; overflow-x: hidden; overflow-y: visible; margin: 0; background: #fff} img {max-width: 100%} .comment {padding: 10px; padding-bottom: 15px; box-sizing: border-box;} .comment:nth-child(odd) {background: #f7f7f7} .smilesfxp[src^='http:https://images.fxp.co.il/smilies3'] {max-width: 20px !important;} .invertedImg {-webkit-filter: invert(100%) brightness(1); -moz-transition: 0.2s; -o-transition: 0.2s; -webkit-transition: 0.2s; transition: 0.2s;} .joinDiscussion {width: 20px; height: 20px; position: absolute; left: 2px; bottom: 10px; background: url(http://i.imgur.com/W7SiAm8.png) no-repeat; background-size: contain; opacity: 0.5} .joinDiscussion:hover {opacity: 1} #cometchat_base {display: none !important}</style>");
+                $("head").append("<style>html,body {font-family: Arial; font-size:13px; max-width: 100%; overflow-x: hidden; overflow-y: visible; margin: 0; background: #fff} img {max-width: 100%} .comment {padding: 10px; padding-bottom: 15px; box-sizing: border-box;} .comment:nth-child(odd) {background: #f7f7f7} .smilesfxp[src^='http:https://images.fxp.co.il/smilies3'] {max-width: 20px !important;} .invertedImg {-webkit-filter: invert(100%) brightness(1); -moz-transition: 0.2s; -o-transition: 0.2s; -webkit-transition: 0.2s; transition: 0.2s;} .joinDiscussion {width: 20px; height: 20px; position: absolute; left: 2px; bottom: 10px; background: url(http://i.imgur.com/W7SiAm8.png) no-repeat; background-size: contain; opacity: 0.5} .joinDiscussion:hover {opacity: 1} #cometchat_base {display: none !important} .smilesfxp[src*='_40x.png'] {max-width: 20px !important;}</style>");
                 if (window.location.href.search("showpm") > -1) {
                     $("head").append('<style id="noOverflowBecauseResize">html,body {overflow: hidden}</style>');
                 }
@@ -140,7 +188,7 @@ chrome.storage.sync.get("replaceIcons", function (dataR) {
                     } else {
                         $("body").append('<div class="comment" style="font-size: 9px;font-style: italic; margin-bottom: 0;">- סוף האשכול -</div>');
                     }
-                    if (comments.length > 0) $("body").append('<a href="' + window.location.href.split("&")[0] + '#quick_reply' + '" target="_top"><div class="joinDiscussion" title="הגב לאשכול זה"></div></a>');
+                    if (comments.length > 0) $("body").append('<a href="' + window.location.href.split("&")[0] + '#quick_reply' + '" target="_blank"><div class="joinDiscussion" title="הגב לאשכול זה"></div></a>');
                 }
                 if (data.nightmode) nightModeEffects();
             }
@@ -159,6 +207,7 @@ chrome.storage.sync.get("replaceIcons", function (dataR) {
             });
 
 
+
             function nightModeEffects() {
                 $("img").addClass("invertedImg");
                 $("iframe").css("-webkit-filter", "invert(100%)");
@@ -166,30 +215,10 @@ chrome.storage.sync.get("replaceIcons", function (dataR) {
 
             if (data.nightmode) nightModeEffects();
 
+            $("head").append("<style>.invertedImg:hover {-webkit-filter: invert(100%) brightness(1)}</style>"); //stop epilepsy
+            $("#noOverflowBecauseResize").remove();
+
             var forgiveness = 0;
-            $(window).load(function () { //make sure FXP doesn't have its shit on this
-                var overkiller = setInterval(function () {
-                    buildPage();
-                    $(".klik").css("cursor", "pointer").unbind().click(function () {
-                        for (k = 4; k < comments.length; k++) {
-                            output += '<div class="comment"><span style="font-weight: bold;">' + comments[k][0] + "</span>";
-                            if (comments[k][2] > 0) {
-                                output += ' <div style="display: inline-block; direction: rtl">(' + comments[k][2] + ' לייקים)</div>';
-                            }
-                            output += '<div style="margin-bottom:6px;"></div>' + comments[k][1] + '</div>';
-                            buildPage();
-                        }
-                    });
-                    if (data.nightmode) nightModeEffects();
-                    forgiveness++;
-                    if (forgiveness > 10) {
-                        $("head").append("<style>.invertedImg:hover {-webkit-filter: invert(100%) brightness(1)}</style>"); //stop epilepsy
-                        $("#noOverflowBecauseResize").remove();
-                        window.clearInterval(overkiller); //run for 10 times, and then stop (overkill)
-                    }
-                }, 100);
-            });
-            buildPage();
         });
     });
 });

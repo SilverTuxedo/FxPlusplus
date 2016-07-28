@@ -1,7 +1,50 @@
-﻿chrome.storage.sync.get("readTimeUser", function (data) {
+﻿
+var storageSyncSupport;
+if (chrome.storage.sync) {
+    //browser supports chrome.storage.sync (eg. chrome)
+    storageSyncSupport = true;
+} else {
+    //browser does not support chrome.storage.sync (eg. firefox)
+    storageSyncSupport = false;
+}
+
+//set a value in the extension's storage
+function setStorage(type, storageObject, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    }
+}
+//get a value from the extension's storage
+function getStorage(type, name, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    }
+}
+
+getStorage("sync", "readTimeUser", function (data) {
     var readTimeUser = data.readTimeUser;
     if (isNaN(readTimeUser)) {
-        chrome.storage.sync.set({ "readTimeUser": 220 }, function () { location.reload() });
+        setStorage("sync", { "readTimeUser": 220 }, function () { location.reload() });
     } else {
         var msg = "";
         var readtime = 0;

@@ -1,6 +1,48 @@
 ﻿
+var storageSyncSupport;
+if (chrome.storage.sync) {
+    //browser supports chrome.storage.sync (eg. chrome)
+    storageSyncSupport = true;
+} else {
+    //browser does not support chrome.storage.sync (eg. firefox)
+    storageSyncSupport = false;
+}
+
+//set a value in the extension's storage
+function setStorage(type, storageObject, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    }
+}
+//get a value from the extension's storage
+function getStorage(type, name, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    }
+}
+
 function customBackgroundSet(isNight) {
-    chrome.storage.sync.get("customBg", function (data) {
+    getStorage("sync", "customBg", function (data) {
         var customBg = data.customBg;
         if (customBg == undefined) customBg = ["", ""];
         if (customBg[0] != "" || customBg[1] != "") {
@@ -19,7 +61,7 @@ function setCookie(cname, cvalue, exdays) {
 
 //this part makes sure that the screen is black while loading in night-mode.
 
-chrome.storage.sync.get("nightmode", function (data) {
+getStorage("sync", "nightmode", function (data) {
     var nightmode = data.nightmode;
     if (nightmode) {
         $("html").append('<body><div class="utterBlack" style="width: 100%; height: 100%; top:0; left:0; position:fixed; z-index: 10000000; background-color: #000"></div></body>');

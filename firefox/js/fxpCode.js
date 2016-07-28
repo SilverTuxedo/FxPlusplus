@@ -25,12 +25,55 @@ Kudos!
 
 */
 
-version = "0.0.18";
-versionTitle = "עדכון 0.0.17 + 0.0.18";
-versionDescription = '<blockquote class="twitter-tweet" data-lang="he"><p lang="iw" dir="rtl">התראות! ועוד כמה דברים. גרסה 0.0.17 כבר באוויר.<a href="https://t.co/6jBs9AiKlO">https://t.co/6jBs9AiKlO</a></p>&mdash; FxPlus+ (@FxPlusplus) <a href="https://twitter.com/FxPlusplus/status/750728553663238144">6 ביולי 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
+version = "0.0.19";
+versionTitle = "עדכון 0.0.19";
+versionDescription = '<blockquote class="twitter-tweet" data-lang="he"><p lang="iw" dir="rtl">דיווחתם שהתוסף מאט את האתר. גרסה 0.0.19 אמורה לטפל בזה!<a href="https://t.co/jlFxwhM8Bf">https://t.co/jlFxwhM8Bf</a></p>&mdash; FxPlus+ (@FxPlusplus) <a href="https://twitter.com/FxPlusplus/status/752447667469443076">11 ביולי 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
 
 var d1 = new Date();
 var startExecution = d1.getTime();
+
+var storageSyncSupport;
+if (chrome.storage.sync) {
+    //browser supports chrome.storage.sync (eg. chrome)
+    storageSyncSupport = true;
+} else {
+    //browser does not support chrome.storage.sync (eg. firefox)
+    storageSyncSupport = false;
+}
+
+//set a value in the extension's storage
+function setStorage(type, storageObject, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    }
+}
+//get a value from the extension's storage
+function getStorage(type, name, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    }
+}
+
 
 var variableNames = [ //names of things in localStorage
     'savedThreads',
@@ -129,14 +172,14 @@ function saveToSyncStorage() {
         if (i != 0) exportOutput += "&*&*&";
         exportOutput += variableNames[i] + "&*&IS&*&" + localStorage.getItem(variableNames[i]);
     }
-    chrome.storage.sync.set({ "backupData": exportOutput }, function () {
+    setStorage("sync", { "backupData": exportOutput }, function () {
         console.log("backed up to sync storage:   " + exportOutput);
     });
 }
 
 function exportFromSyncStorage() {
     var backedUpData = [];
-    chrome.storage.sync.get("backupData", function (data) {
+    getStorage("sync", "backupData", function (data) {
         var process = data.backupData;
         var exportArray = process.split("&*&*&");
         var exportMatrix = [];
@@ -458,7 +501,7 @@ function Update(focusUpdate) {
         })
     }
 
-    chrome.storage.sync.get("nightmode", function (data) {
+    getStorage("sync", "nightmode", function (data) {
         var nightmode = data.nightmode;
         if (nightmode) {
             $("#postlist img").addClass("invertedImg");
@@ -563,7 +606,7 @@ function Update(focusUpdate) {
         }
     });
 
-    chrome.storage.sync.get("replaceIcons", function (data) {
+    getStorage("sync", "replaceIcons", function (data) {
         var replace = data.replaceIcons;
         if (replace) {
             replaceOldWithNewSmiles($("body"));
@@ -578,12 +621,21 @@ Update(false); //initiate on page ready
 $(window).load(function () { //make sure everything's fine after picture & others loading.
     Update(true);
 
+    console.log("SIGNATURE2");
     if (window.location.href.search("editsignature") > -1 || window.location.href.search("updatesignature") > -1) {
-        $("#vB_Editor_001").before('<div id="addCreditSign">הוסף קרדיט עבור <div class="ltrInline">FxPlus+</div><br/><button type="button" id="sign1">500x276</button> <button type="button" id="sign2">128x128</button> <button type="button" id="sign3">48x48</button> <button type="button" id="sign4">טקסט</button></div>')
+        console.log("SIGNATURE");
+        $('form[action*="signature"] .wysiwyg_block').prepend('<div id="addCreditSign">הוסף קרדיט עבור <div class="ltrInline">FxPlus+</div><br/><button type="button" id="sign1">500x276</button> <button type="button" id="sign2">128x128</button> <button type="button" id="sign3">48x48</button> <button type="button" id="sign4">טקסט</button></div>');
         $("#sign1").click(function () { $(".cke_contents:last iframe").contents().find("body").append('<div style="text-align: center;"><a href="https://www.fxp.co.il/showthread.php?t=16859147"><img src="http://www.imgweave.com/view/1114.png" /></a></div>') });
         $("#sign2").click(function () { $(".cke_contents:last iframe").contents().find("body").append('<div style="text-align: center;"><a href="https://www.fxp.co.il/showthread.php?t=16859147"><img src="http://i.imgur.com/bsVtJ5o.png" /></a></div>') });
         $("#sign3").click(function () { $(".cke_contents:last iframe").contents().find("body").append('<div style="text-align: center;"><a href="https://www.fxp.co.il/showthread.php?t=16859147"><img src="http://i.imgur.com/O7FsbY8.png" /></a></div>') });
         $("#sign4").click(function () { $(".cke_contents:last iframe").contents().find("body").append('<div style="text-align: center;"><a href="https://www.fxp.co.il/showthread.php?t=16859147">+FxPlus</a></div>') });
+    }
+
+    if (localStorage.getItem("signatureResize") == "true") {
+        if ($("#lazyload_fxp.onset.ofset").length > 0) {
+            notify.push('<b>הקטנת חתימות אוטומטית פועלת.</b> אנא כבה טעינת תמונות בגלילה.'); //remind to turn off scroll-load
+            $("#lazyload_fxp").parents('div:eq(0)').css({ "background": "#ff4400", "font-weight": "bold" });
+        }
     }
 
     if (window.location.href.search("updatepost") > -1 || window.location.href.search("private.php?") > -1 || window.location.href.search("newthread.php") > -1) { //add save interface
@@ -592,10 +644,10 @@ $(window).load(function () { //make sure everything's fine after picture & other
         $("#pinnedThreadInterface .pinBtn").click(function () {
             var pinName = $("#newPinName").html();
             if (pinName.replace(/&nbsp;| /g, '').length > 0) { //save only if there's a thing in the title
-                chrome.storage.local.get("pinnedThreads", function (data) {
+                getStorage("local", "pinnedThreads", function (data) {
                     var pinnedThreads = data.pinnedThreads;
                     if (pinnedThreads == undefined) { //set if not present
-                        chrome.storage.local.set({ "pinnedThreads": [] });
+                        setStorage("local", { "pinnedThreads": [] });
                         pinnedThreads = [];
                     }
                     for (i = 0; i < pinnedThreads.length; i++) {
@@ -605,7 +657,7 @@ $(window).load(function () { //make sure everything's fine after picture & other
                         }
                     }
                     pinnedThreads.push([pinName, $(".cke_editor iframe").contents().find("body").html()]);
-                    chrome.storage.local.set({ "pinnedThreads": pinnedThreads }, function () { updatePinnedThreadsList(); }); //save change and update list
+                    setStorage("local", { "pinnedThreads": pinnedThreads }, function () { updatePinnedThreadsList(); }); //save change and update list
 
                 });
             }
@@ -620,10 +672,10 @@ $(window).load(function () { //make sure everything's fine after picture & other
 });
 
 function updatePinnedThreadsList() {
-    chrome.storage.local.get("pinnedThreads", function (data) {
+    getStorage("local", "pinnedThreads", function (data) {
         var pinnedThreads = data.pinnedThreads;
         if (pinnedThreads == undefined) { //set if not present
-            chrome.storage.local.set({ "pinnedThreads": [] });
+            setStorage("local", { "pinnedThreads": [] });
             pinnedThreads = [];
         }
 
@@ -653,7 +705,7 @@ function updatePinnedThreadsList() {
                     i--;
                     $(this).parents(".entry").hide(200);
                     setTimeout(function () {
-                        chrome.storage.local.set({ "pinnedThreads": pinnedThreads }, function () { updatePinnedThreadsList(); }); //save change and update list
+                        setStorage("local", { "pinnedThreads": pinnedThreads }, function () { updatePinnedThreadsList(); }); //save change and update list
                     }, 200);
 
                 }
@@ -661,13 +713,6 @@ function updatePinnedThreadsList() {
         });
 
     });
-}
-
-if (localStorage.getItem("signatureResize") == "true") {
-    if ($("#lazyload_fxp.onset.ofset").length > 0) {
-        notify.push('<b>הקטנת חתימות אוטומטית פועלת.</b> אנא כבה טעינת תמונות בגלילה.'); //remind to turn off scroll-load
-        $("#lazyload_fxp").parents('div:eq(0)').css({ "background": "#ff4400", "font-weight": "bold" });
-    }
 }
 
 var nightLocalArray = JSON.parse(localStorage.getItem("nightMode"));
@@ -682,7 +727,7 @@ if (nightLocalArray[0]) {
     if (nightLocalArray[1] <= nightLocalArray[2]) {
         if (hour >= nightLocalArray[1] && hour < nightLocalArray[2]) {
             if (localStorage.getItem("nightByStart") != "true") {
-                chrome.storage.sync.set({ "nightmode": true });
+                setStorage("sync", { "nightmode": true });
                 localStorage.setItem("nightByStart", "true");
                 localStorage.setItem("nightByEnd", "false");
                 location.reload(); //reload to show effect
@@ -690,7 +735,7 @@ if (nightLocalArray[0]) {
             }
         } else {
             if (localStorage.getItem("nightByEnd") != "true") {
-                chrome.storage.sync.set({ "nightmode": false });
+                setStorage("sync", { "nightmode": false });
                 localStorage.setItem("nightByEnd", "true");
                 localStorage.setItem("nightByStart", "false");
                 $("#postlist img").css("-webkit-filter", "invert(0)");
@@ -701,14 +746,14 @@ if (nightLocalArray[0]) {
     } else {
         if (hour >= nightLocalArray[1] || hour < nightLocalArray[2]) {
             if (localStorage.getItem("nightByStart") != "true") {
-                chrome.storage.sync.set({ "nightmode": true });
+                setStorage("sync", { "nightmode": true });
                 localStorage.setItem("nightByStart", "true");
                 localStorage.setItem("nightByEnd", "false");
                 location.reload();
             }
         } else {
             if (localStorage.getItem("nightByEnd") != "true") {
-                chrome.storage.sync.set({ "nightmode": false });
+                setStorage("sync", { "nightmode": false });
                 localStorage.setItem("nightByEnd", "true");
                 localStorage.setItem("nightByStart", "false");
                 $("#postlist img").css("-webkit-filter", "invert(0)");
@@ -748,40 +793,46 @@ if (!JSON.parse(localStorage.getItem("hideRules"))) {
     }
 }
 
-$('.threads').bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified', function (event) { //update if thread list content changes
-    if (updateCooldown < 1) {
+// create an observer instance for threads
+var threadObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        //thread list content has changed
         Update(true);
         console.info('%cUPDATE via DOM update.', 'color: #ff00ff; font-weight: bold; font-size: 20px');
-    }
+    });
 });
 
-var OldCommentCount = 9999;
-setInterval(function () {     //update if comment list content increases
-    if ($(".postbit").length > OldCommentCount) {
-        if (updateCooldown < 1) {
-            OldCommentCount = $(".postbit").length;
-            Update(true);
-            console.info('%cUPDATE via comment update.', 'color: #ff0000; font-weight: bold; font-size: 20px');
-            //$('.postbit:last .username[href="member.php?u=1131848"]')
-            for (i = 0; i < lowPriorityComment.length; i++) { //mark low priority commenters and hind content
-                $('.postbit:last .username[href="member.php?u=' + lowPriorityComment[i] + '"]').parents(".postbit").addClass("lowPriorityComment");
-                $('.postbit:last .username[href="member.php?u=' + lowPriorityComment[i] + '"]').parents(".postbit").addClass("fadeComment");
-                $(".lowPriorityComment:last").find(".userinfo_noavatar").attr("title", "לחץ כדי להציג או להסתיר את התגובה.");
-                $(".lowPriorityComment:last").find(".postbody").slideUp(100);
-                $(".lowPriorityComment:last").find(".userinfo_noavatar").unbind('click.collapse').bind('click.collapse', function () {
-                    if ($(this).parents(".postbit").find(".postbody").is(':visible')) {
-                        $(this).parents(".postbit").find(".postbody").slideUp();
-                        $(this).parents(".postbit").addClass("fadeComment");
-                    } else {
-                        $(this).parents(".postbit").find(".postbody").slideDown();
-                        $(this).parents(".postbit").removeClass("fadeComment");
-                    }
-                });
-            }
+if ($('.threads')[0])
+    threadObserver.observe($('.threads')[0], { attributes: true, childList: true, characterData: true }); //observe thread changes
+
+
+var postbitObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        //comment list content has changed
+        Update(true);
+        console.info('%cUPDATE via comment update.', 'color: #ff0000; font-weight: bold; font-size: 20px');
+        //$('.postbit:last .username[href="member.php?u=1131848"]')
+        for (i = 0; i < lowPriorityComment.length; i++) { //mark low priority commenters and hide content
+            $('.postbit:last .username[href="member.php?u=' + lowPriorityComment[i] + '"]').parents(".postbit").addClass("lowPriorityComment");
+            $('.postbit:last .username[href="member.php?u=' + lowPriorityComment[i] + '"]').parents(".postbit").addClass("fadeComment");
+            $(".lowPriorityComment:last").find(".userinfo_noavatar").attr("title", "לחץ כדי להציג או להסתיר את התגובה.");
+            $(".lowPriorityComment:last").find(".postbody").slideUp(100);
+            $(".lowPriorityComment:last").find(".userinfo_noavatar").unbind('click.collapse').bind('click.collapse', function () {
+                if ($(this).parents(".postbit").find(".postbody").is(':visible')) {
+                    $(this).parents(".postbit").find(".postbody").slideUp();
+                    $(this).parents(".postbit").addClass("fadeComment");
+                } else {
+                    $(this).parents(".postbit").find(".postbody").slideDown();
+                    $(this).parents(".postbit").removeClass("fadeComment");
+                }
+            });
         }
-    }
-    OldCommentCount = $(".postbit").length;
-}, 100);
+    });
+});
+
+if ($('#postlist #posts')[0])
+    postbitObserver.observe($('#postlist #posts')[0], { attributes: true, childList: true, characterData: true }); //observe thread changes
+
 
 $(document).ready(function () {
     $([window, document]).focusin(function () {
@@ -825,7 +876,9 @@ var oldSmile = [
     "https://images.fxp.co.il/smilies3/204_40x.png", //replace smile
     "https://images.fxp.co.il/smilies3/173_40x.png", //replace devil
     "https://images.fxp.co.il/smilies3/202_40x.png", //replace kiss
-    "https://images.fxp.co.il/smilies3/131_40x.png"  //replace cool
+    "https://images.fxp.co.il/smilies3/131_40x.png", //replace cool
+    "https://images.fxp.co.il/smilies3g/206.gif",    //replace i love u
+    "https://images.fxp.co.il/smilies3g/207.gif"     //replace tongue 2
 ]
 
 var newSmile = [
@@ -840,7 +893,9 @@ var newSmile = [
     "http://i.imgur.com/lPepnzd.png", //replace smile
     "http://i.imgur.com/Y0xWnOV.png", //replace devil
     "http://i.imgur.com/yDHz3MY.png", //replace kiss
-    "http://i.imgur.com/FekEBW4.png" //replace cool
+    "http://i.imgur.com/FekEBW4.png", //replace cool
+    "http://i.imgur.com/1htCYLi.gif", //replace i love u
+    "http://i.imgur.com/WzfVnDk.gif"  //replace tongue 2
 ]
 
 function replaceOldWithNewSmiles(affectedContainer) {
@@ -851,100 +906,114 @@ function replaceOldWithNewSmiles(affectedContainer) {
     }
 }
 
-var designer;
-chrome.storage.sync.get("replaceIcons", function (data) {
+//should the textbox be modified by anything
+var textboxModifyWorthy =
+    window.location.href.search("showthread") > -1 ||
+    window.location.href.search("private.php?") > -1 ||
+    window.location.href.search("newthread.php") > -1 ||
+    window.location.href.search("member.php") > -1 ||
+    window.location.href.search("newreply.php") > -1;
+
+function bindDefaultStyle() {
+    console.log("BOUND");
     defaultStyle = JSON.parse(localStorage.getItem("defaultStyle"));
-    var replace = data.replaceIcons;
-    var imgCountPrev = 0;
-
-    if (((window.location.href.search("showthread") > -1 || window.location.href.search("private.php?") > -1 || window.location.href.search("newthread.php") > -1 || window.location.href.search("member.php") > -1 || window.location.href.search("newreply.php") > -1) && (defaultStyle[0] == true || replace))) {
-        designer = setInterval(
-        function () {
-            if (defaultStyle[0]) {
-                $(".cke_contents:not(.affected) iframe").contents().find("body:not(.affectedBody)").attr("tabindex", 1).unbind().focus(function () {
-                    console.log("focused");
-                    if (defaultStyle[0] == true && $("label[for='vB_Editor_QE_1_edit_reason']").length < 1) {
-                        var opening = "";
-                        var closing = "";
-                        if (defaultStyle[1]) {
-                            opening += '<strong>';
-                            closing += '</strong>';
-                        }
-                        if (defaultStyle[2]) {
-                            opening += '<em>';
-                            closing += '</em>';
-                        }
-                        if (defaultStyle[3]) {
-                            opening += '<u>';
-                            closing += '</u>';
-                        }
-                        if (defaultStyle[4] != "none" && defaultStyle[4] != "Arial" && window.location.href.search("member.php") < 0) { //exclude if font is the same as fxp's default, or a friend message
-                            opening += '<span style="font-family: ' + defaultStyle[4] + '">';
-                            closing += '</span>';
-                        }
-                        if (defaultStyle[5] != "#333333") { //exclude if color is the same as fxp's default
-                            opening += '<span style="color: ' + defaultStyle[5] + '">';
-                            closing += '</span>';
-                        }
-                        finalOutput = "";
-                        var prevText = $(this).html();
-                        var splitCharacters = Array.from(prevText);
-                        var splitHistory = "";
-                        for (var i = 0; i < splitCharacters.length; i++) {
-                            finalOutput += splitCharacters[i];
-
-                            splitHistory += splitCharacters[i];
-                            if (splitHistory.length > 4) { //make sure the length is 4 characters max
-                                splitHistory = splitHistory.substr(splitHistory.length - 4);
-                            }
-
-                            if (splitHistory == "<br>") { //detected break row
-                                //add style before the broken row
-                                finalOutput = finalOutput.substr(0, finalOutput.length - 4) + opening + "&#8203;" + closing + "<br>";
-                            }
-                        }
-                        finalOutput += opening + "&#8203;" + closing;
-
-                        $(this).html(finalOutput);
-                        $(".cke_contents").addClass("affected");
-                        $(this).unbind();
-                    }
-                }).addClass("affectedBody");
-
-            }
-            if (replace) {
-                var commentEditBody = $(".cke_contents iframe").contents().find("body");
-
-                if (commentEditBody.html().length > imgCountPrev) {
-                    for (i = 0; i < oldSmile.length; i++) {
-                        commentEditBody.find('img[src="' + oldSmile[i] + '"]').removeClass("inlineimg smilesfxp").removeAttr("smilieid"); //remove traces of smilies
-                    }
-                    replaceOldWithNewSmiles(commentEditBody);
-                    imgCountPrev = commentEditBody.html().length;
+    if (textboxModifyWorthy && defaultStyle[0] == true) {
+        $(".cke_contents:not(.affected) iframe").contents().find("body:not(.affectedBody)").attr("tabindex", 1).unbind().focus(function () {
+            console.log("focused");
+            if (defaultStyle[0] == true && $("label[for='vB_Editor_QE_1_edit_reason']").length < 1) {
+                var opening = "";
+                var closing = "";
+                if (defaultStyle[1]) {
+                    opening += '<strong>';
+                    closing += '</strong>';
                 }
-                $(".cke_smile").unbind("click").click(function () {
-                    setTimeout(function () {
-                        for (i = 0; i < oldSmile.length; i++) {
-                            commentEditBody.find('img[src="' + oldSmile[i] + '"]').removeClass("inlineimg smilesfxp").removeAttr("smilieid"); //remove traces of smilies
-                        }
-                        replaceOldWithNewSmiles(commentEditBody);
-                        console.log("CHANGED SMILIES I THINK");
-                    }, 500);
-                });
+                if (defaultStyle[2]) {
+                    opening += '<em>';
+                    closing += '</em>';
+                }
+                if (defaultStyle[3]) {
+                    opening += '<u>';
+                    closing += '</u>';
+                }
+                if (defaultStyle[4] != "none" && defaultStyle[4] != "Arial" && window.location.href.search("member.php") < 0) { //exclude if font is the same as fxp's default, or a friend message
+                    opening += '<span style="font-family: ' + defaultStyle[4] + '">';
+                    closing += '</span>';
+                }
+                if (defaultStyle[5] != "#333333") { //exclude if color is the same as fxp's default
+                    opening += '<span style="color: ' + defaultStyle[5] + '">';
+                    closing += '</span>';
+                }
+                finalOutput = "";
+                var prevText = $(this).html();
+                var splitCharacters = Array.from(prevText);
+                var splitHistory = "";
+                for (var i = 0; i < splitCharacters.length; i++) {
+                    finalOutput += splitCharacters[i];
+
+                    splitHistory += splitCharacters[i];
+                    if (splitHistory.length > 4) { //make sure the length is 4 characters max
+                        splitHistory = splitHistory.substr(splitHistory.length - 4);
+                    }
+
+                    if (splitHistory == "<br>") { //detected break row
+                        //add style before the broken row
+                        finalOutput = finalOutput.substr(0, finalOutput.length - 4) + opening + "&#8203;" + closing + "<br>";
+                    }
+                }
+                finalOutput += opening + "&#8203;" + closing;
+
+                $(this).html(finalOutput);
+                $(".cke_contents").addClass("affected");
+                $(this).unbind();
             }
-        }
-        , 100);
+        }).addClass("affectedBody");
     }
+}
+bindDefaultStyle();
+
+
+var styleObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (mutation.addedNodes.length > 0) {
+            //a new comment textbox appeared
+            bindDefaultStyle();
+        }
+    });
 });
+
+if ($(".editor_textbox")[0])
+    styleObserver.observe($(".editor_textbox")[0], { attributes: true, childList: true, characterData: true, subtree: true }); //observe comment textbox changes
+
+
+var changedIconsTime = new Date().getTime();
+var commentTextObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        var currentTime = new Date().getTime();
+        if (currentTime - changedIconsTime >= 100) { //buffer for too many updates
+            changedIconsTime = currentTime;
+
+            var commentEditBody = $(".cke_contents iframe").contents().find("body");
+            for (i = 0; i < oldSmile.length; i++) {
+                commentEditBody.find('img[src="' + oldSmile[i] + '"]').removeClass("inlineimg smilesfxp").removeAttr("smilieid"); //remove traces of smilies
+            }
+            replaceOldWithNewSmiles(commentEditBody);
+        }
+    });
+});
+
+$(window).load(function () {
+    getStorage("sync", "replaceIcons", function (data) {
+        var replace = data.replaceIcons;
+        if (replace && $(".editor_textbox iframe").contents().find("body")[0])
+            commentTextObserver.observe($(".editor_textbox iframe").contents().find("body")[0], { childList: true, characterData: true, subtree: true })
+    });
+});
+
+
 $(".newreply").click(function () { $(".cke_contents").removeClass("affected"); })
 $(".quickreply").click(function () { $(".cke_contents").removeClass("affected"); })
 $(".quickreply").click(function () { $(".cke_contents").removeClass("affected"); })
 $("#qr_defaultcontainer .group input.button").click(function () { $(".cke_contents").removeClass("affected"); })
-
-
-$(window).load(function () {
-    if ($(".cke_contents iframe").length < 1) window.clearInterval(designer);
-});
 
 $(".titleshowt").find("h1").after('<div id="titleShortcuts"></div>');
 
@@ -1050,6 +1119,15 @@ function KeyPress(e) { //key combination handler
                 localStorage.clear();
                 alert("Chrome storage and local storage cleared.");
                 break;
+            case "log storage":
+                chrome.storage.local.get(null, function (data) {
+                    console.log(data);
+                });
+                chrome.storage.sync.get(null, function (data) {
+                    console.log(data);
+                });
+                alert("the chrome sync/local storage has been logged to the console.");
+                break;
             case "test":
                 alert("Command line is working properly.");
                 break;
@@ -1123,7 +1201,7 @@ function KeyPress(e) { //key combination handler
                 $('head style:first').append('#scrolling{animation:scroll ' + timeToScroll + 's linear 13s;-moz-transform:perspective(300px) rotateX(25deg);-ms-transform:perspective(300px) rotateX(25deg);-o-transform:perspective(300px) rotateX(25deg);-webkit-transform:perspective(300px) rotateX(25deg);transform:perspective(300px) rotateX(25deg)}@keyframes scroll{0%{top:100%;opacity:1}95%{opacity:1}100%{top:' + outOfBoundsPercent + '%;opacity:0}}');
 
                 setTimeout(function () { //music
-                    $('body').append('<iframe style="display: none;" src="https://player.vimeo.com/video/153600657?autoplay=1&loop=1&title=0&byline=0&portrait=0"></iframe>')
+                    $('body').append('<iframe style="opacity: 0;" src="https://player.vimeo.com/video/153600657?autoplay=1&loop=1&title=0&byline=0&portrait=0"></iframe>')
                 }, 8200);
 
                 setTimeout(function () { //reload normal page after done scrolling
@@ -1174,7 +1252,7 @@ $("#blackage").click(function () { //close quick access on click-elsewhere
     $("#blackage").fadeOut(200);
 });
 
-chrome.storage.sync.get("nightmode", function (data) {
+getStorage("sync", "nightmode", function (data) {
     var nightmode = data.nightmode;
     if (nightmode) {
         $(".nightmode").addClass("nighton").attr("title", "לחץ כדי לכבות את מצב הלילה"); //active night button
@@ -1187,11 +1265,11 @@ $(".nightmode").click(function () {
     if ($(this).hasClass("nighton")) {
         $("body").append('<div class="nightEffect" style="left:0; top:0; position:fixed; z-index: 9999999; width:100%; height:100%; background-color: #fff; display: none;"></div>');
         $(".nightEffect").slideDown(500); //slide down screen effect
-        chrome.storage.sync.set({ "nightmode": false }, function () { location.reload(); }); //reload tab
+        setStorage("sync", { "nightmode": false }, function () { location.reload(); }); //reload tab
     } else {
         $("body").append('<div class="nightEffect" style="left:0; top:0; position:fixed; z-index: 9999999; width:100%; height:100%; background-color: #000; display: none;"></div>');
         $(".nightEffect").slideDown(500);
-        chrome.storage.sync.set({ "nightmode": true }, function () { location.reload(); });
+        setStorage("sync", { "nightmode": true }, function () { location.reload(); });
     }
 });
 
@@ -1419,11 +1497,11 @@ function sortCommentsByLikes(cmnts) {
 $("head").append('<script id="editorScript" src="//cdn.tinymce.com/4/tinymce.min.js"></script>');
 
 if (window.location.href.search("member.php") > -1) {
-    chrome.storage.sync.get("notes", function (data) {
+    getStorage("local", "notes", function (data) {
         var notes = data.notes;
         if (notes == undefined) { //set defaults
             notes = [["967488", '<p style="direction: rtl;" data-mce-style="direction: rtl;">איש מגניב <strong>במיוחד</strong>.</p>'], ["30976", '<p style=\"direction: rtl; text-align: center;\" data-mce-style=\"direction: rtl; text-align: center;\">&nbsp;<span class=\"mce-preview-object mce-object-iframe\" contenteditable=\"false\" data-mce-object=\"iframe\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"><iframe src=\"//www.youtube.com/embed/JSgeAFTwg0U\" width=\"560\" height=\"314\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" data-mce-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"></iframe></span><br></p>']];
-            chrome.storage.sync.set({ "notes": [["967488", '<p style="direction: rtl;" data-mce-style="direction: rtl;">איש מגניב <strong>במיוחד</strong>.</p>'], ["30976", '<p style=\"direction: rtl; text-align: center;\" data-mce-style=\"direction: rtl; text-align: center;\">&nbsp;<span class=\"mce-preview-object mce-object-iframe\" contenteditable=\"false\" data-mce-object=\"iframe\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"><iframe src=\"//www.youtube.com/embed/JSgeAFTwg0U\" width=\"560\" height=\"314\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" data-mce-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"></iframe></span><br></p>']] });
+            setStorage("local", { "notes": [["967488", '<p style="direction: rtl;" data-mce-style="direction: rtl;">איש מגניב <strong>במיוחד</strong>.</p>'], ["30976", '<p style=\"direction: rtl; text-align: center;\" data-mce-style=\"direction: rtl; text-align: center;\">&nbsp;<span class=\"mce-preview-object mce-object-iframe\" contenteditable=\"false\" data-mce-object=\"iframe\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"><iframe src=\"//www.youtube.com/embed/JSgeAFTwg0U\" width=\"560\" height=\"314\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" data-mce-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"></iframe></span><br></p>']] });
         }
 
         $(".tabslight dd a").click(function () { $("#view-notes").removeClass("selected_view_section").addClass("view_section"); });
@@ -1456,7 +1534,7 @@ if (window.location.href.search("member.php") > -1) {
                 }
             }
             notes.push([userId, noteContent]);
-            chrome.storage.sync.set({ "notes": notes }, function () {
+            setStorage("local", { "notes": notes }, function () {
                 $("#saveNote").text("השינויים נשמרו.");
                 setTimeout(function () { $("#saveNote").text("שמור שינויים") }, 3000);
                 console.log(notes);
@@ -1675,7 +1753,7 @@ var pages = { //html for pages
     general: '<div class="SettingsTitle">כללי</div> <br /> <input type="checkbox" class="SettingsCheckbox" id="BackgroundNotifications"> שלח התראות גם כאשר האתר סגור<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id="testNotif">שלח הודעת בדיקה</a><br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="signatureResize"> הקטן אוטומטית חתימות גדולות<br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="newMessages"> הצג בסוגריים את מספר ההודעות שלא נקראו<br /> <br /> הסתר אשכולות נעוצים בני יותר מ-<select name="daysPinned"> <option value="3day">3 ימים</option> <option value="7day">שבוע</option> <option value="14day">שבועיים</option> <option value="28day">חודש</option> <option value="never">אף פעם</option> </select><br />&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="SettingsCheckbox" id="hideRules"> כולל אשכולות חוקים<br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="showSpoilers"> הצג ספוילרים<br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="hideOutbrain"> הסתר את Taboola (אשכולות מוצעים)<br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="autonight"> הפעל מצב לילה אוטומטית מ-<select name="startNight"></select> עד <select name="endNight"></select> <br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="showNightIndicator"> הצג קיצור דרך למצב לילה<br/><br/>סגור הצצה לאשכולות <select name="peekCloseMethod"> <option value="auto">אוטומטית</option> <option value="doublePress">בלחיצה חוזרת על המעטפה</option></select><br /> <br /><input type="checkbox" class="SettingsCheckbox" id="useOldSmiles"> השתמש בסמיילים ישנים<br/><br/> <input type="checkbox" class="SettingsCheckbox" id="showStats"> הצג סטטיסטיקת פורומים<br/><br/> <button class="SettingsButton" id="changeBgSet">שנה את הרקע של FxP</button><br/><br/> <div class="settingsEndBtn cyan">שמור</div> <div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div> <br /> <br /> <br />',
     threads: '<div class="SettingsTitle">אשכולות</div><br /><span style="font-size:18px">פעולה לפי משתמש</span><br />המתן לטעינת הטבלה.<br /><table class="sThreadContainer" style="width: 100%;"><tr class="sThreadLine" style="font-weight: bold;"><th>מספר משתמש</th><th>הסתרה</th><th>הדגשה</th><th>שם משתמש</th><th>הסר</th></tr></table><br /><div class="settingsEndBtn green" style="width: 110px; margin-left: 40px; float:right;">הוסף שורה</div><div class="settingsEndBtn cyan" style="float:right;">שמור</div><br/><br/><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div><br /><br/><span style="font-size:18px">פעולה לפי מילים</span><br />בחר מה יקרה אם אשכול מסויים יכלול מילים אלה בכותרת. הפרד מילים ברווח.<br /><table class="sConvertContainer" style="width: 45%;"> <tr class="sConvertLine" style="font-weight: bold;"> <th style="width: 50%">הסתר</th> <th style="width: 50%">הדגש</th> </tr> <tr class="sConvertLine"> <th><textarea class="dataText"></textarea></th> <th><textarea class="dataText"></textarea></th> </tr> </table><br /><div class="settingsEndBtn cyan">שמור</div><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div><br/><span style="font-size:18px">זמן קריאה</span><br />בחר לאילו אשכולות יוצג זמן הקריאה המשוער. <span id="calculateReadTime"> מהירות הקריאה שלך כרגע היא <span id="placeReadSpeed"></span> מילים לדקה. לחץ כאן כדי לחשב מחדש.</span><br /><div class="tagItem" id="דיון"> דיון|</div><div class="tagItem" id="עזרה"> עזרה|</div><div class="tagItem" id="שאלה"> שאלה|</div><div class="tagItem" id="כתבה"> כתבה|</div><div class="tagItem" id="מדריך"> מדריך|</div><div class="tagItem" id="בעיה"> בעיה|</div><div class="tagItem" id="מידע"> מידע|</div><div class="tagItem" id="הצעה"> הצעה|</div><div class="tagItem" id="פרסום"> פרסום|</div><div class="tagItem" id="פתרון"> פתרון|</div><div class="tagItem" id="עקיבה"> עקיבה|</div><div class="tagItem" id="הכרזה"> הכרזה|</div><div class="tagItem" id="ספוילר"> ספוילר|</div><div class="tagItem" id="הורדה"> הורדה|</div><div class="tagItem" id="בקשה"> בקשה|</div><div class="tagItem" id="השוואה"> השוואה|</div><div class="tagItem" id="סיקור"> סיקור|</div><div class="tagItem" id="updateForums"> כתבות בפורומי עדכונים</div><br/><br/><div class="settingsEndBtn cyan">שמור</div><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div><br/><hr /><span style="font-size:16px;" class="convertTitleHighlight">המרה</span><br /><span class="convertHighlighter"> המר שם משתמש למספר משתמש (שבו תוכל להשתמש בטבלה העליונה)</span><br /><table class="sConvertContainer"><tr class="sConvertLine" style="font-weight: bold;"><th>שם משתמש</th><th>מספר משתמש</th><th>הוסף לטבלה</th></tr><tr class="sConvertLine"><th><input type="text" class="userName"></th><th><iframe src="https://www.fxp.co.il/member.php?username=PlaceHolderThisUserCantExist&getIdOnly" class="userIdFrame" /><div class="userIdFrame loadingBackground"></div></th><th><div class="addToTable" title="הוסף לטבלה"></div></th></tr></table>',
     comments: '<div class="SettingsTitle">תגובות ותת-ניקים</div> <br /><span style="font-size:18px">פעולה לפי משתמש</span> <br />המתן לטעינת הדף.<br /> <div class="containtersPlace"> </div> <br /> <div class="settingsEndBtn green" style="width: 110px; margin-left: 40px; float:right;">הוסף אריח</div> <div class="settingsEndBtn cyan" style="float:right;">שמור</div><br /><br /><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div> <br /> <br/> <span style="font-size:18px">עצב תגובות </span> <br />הגדר את העיצוב ההתחלתי של התגובות שלך.<br /><br/> <input type="checkbox" class="SettingsCheckbox enableDefaultStyle" /> אפשר <br/><div style="display: inline-block;"><div class="styleBar"> <div class="bold">B</div> <div class="italic">I</div> <div class="underline">U</div> <select class="font"><option value="unknown">almoni-dl</option> <option value="unknown">Arial</option> <option value="unknown">Arial Black</option> <option value="unknown">Arial Narrow</option> <option value="unknown">Book Antiqua</option> <option value="unknown">Century Gothic</option> <option value="unknown">Comic Sans MS</option> <option value="unknown">Courier New</option> <option value="unknown">Fixedsys</option> <option value="unknown">Franklin Gothic Medium</option> <option value="unknown">Garamond</option> <option value="unknown">Georgia</option> <option value="unknown">Gisha</option> <option value="unknown">Impact</option> <option value="unknown">Lucida Console</option> <option value="unknown">Lucida Sans Unicode</option> <option value="unknown">Micorosft Sans Serif</option> <option value="unknown">Palatino Linotype</option> <option value="unknown">rancho</option> <option value="unknown">Segoe UI</option> <option value="unknown">System</option> <option value="unknown">Tahoma</option> <option value="unknown">Times New Roman</option> <option value="unknown">Terbuchet MS</option> <option value="unknown">Verdana</option> </select><input type="color" class="textColor" value="#333333"> </div><br/> <div class="styleText"> טקסט זה כתוב בעברית.<br/> This text is written in English. </div></div><br /><br/><div class="settingsEndBtn cyan">שמור</div><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div> <br /><hr /> <span style="font-size:16px;" class="convertTitleHighlight">המרה</span><br /><span class="convertHighlighter"> המר שם משתמש למספר משתמש (שבו תוכל להשתמש באריחים העליונים)</span><br /><table class="sConvertContainer"><tr class="sConvertLine" style="font-weight: bold;"><th>שם משתמש</th><th>מספר משתמש</th><th>הוסף לטבלה</th></tr><tr class="sConvertLine"><th><input type="text" class="userName"></th><th><iframe src="https://www.fxp.co.il/member.php?username=PlaceHolderThisUsernameCantExist@@&getIdOnly" class="userIdFrame" /><div class="userIdFrame loadingBackground"></div></th><th><div class="addToTable" title="הוסף לטבלה"></div></th></tr></table>',
-    use: '<iframe src="' + chrome.runtime.getURL("howto.html") + '" class="howToFrame"></iframe>',
+    use: '<iframe src="' + chrome.runtime.getURL("html/howto.html") + '" class="howToFrame"></iframe>',
     touch: '<div class="SettingsTitle">תמיכה</div> <br/><span style="font-size:18px">ממני אליך</span> <br/>במידה ויש לך בעיה, הצעה או סתם בא לך ליצור איתי קשר, תוכל לעשות זאת בשני האופנים הבאים:<br /><br/> • באמצעות <a href="https://www.fxp.co.il/private.php?do=newpm&u=967488" style="color: #0000ff">הודעה פרטית ב-FXP</a><br/> • באמצעות Discord - רשום <a href="https://www.fxp.co.il/member.php?u=967488" style="color: #0000ff">בפרופיל שלי</a><br/><br/>אשמח לענות על שאלות ולעזור.<br/><br/><br/><span style="font-size:18px">ממך אל התוסף</span> <br/>התוסף הוא פחות מ-0.1% מהמשתמשים הפעילים ב-FxP. במידה ונהנית מהתוסף, <b>שתף את הכיף!™</b> - תוכל לעשות זאת בכמה אופנים: <br /><br/> • באמצעות תמיכה בתוסף ושיתוף שלו בחתימה שלך. <br/> • באמצעות שיתוף התוסף עם החברים שלך.<br/> • באמצעות השווצה בדברים שהתוסף יכול לעשות.<br/> • בכל אמצעי אחר שנראה לך שיועיל לפרסום התוסף.<br/><br/> אנצל את ההזדמנות הזו גם כדי לומר תודה על זה שהורדת את התוסף! אני מקווה שהוא מועיל לך ומשפר את חוויית הגלישה שלך. <br/><br/>'
 };
 
@@ -1762,12 +1840,12 @@ $(".generalTab").click(function () {
     $('[name=peekCloseMethod]').val(JSON.parse(localStorage.getItem("peekCloseMethod")));
     $("#showStats").prop("checked", JSON.parse(localStorage.getItem("showStats")));
 
-    chrome.storage.sync.get("replaceIcons", function (data) {
+    getStorage("sync", "replaceIcons", function (data) {
         var replace = data.replaceIcons;
         $("#useOldSmiles").prop("checked", replace);
     });
 
-    chrome.storage.sync.get("BackgroundNotifications", function (data) {
+    getStorage("sync", "BackgroundNotifications", function (data) {
         var bgn = data.BackgroundNotifications;
         $("#BackgroundNotifications").prop("checked", bgn);
     });
@@ -1777,7 +1855,7 @@ $(".generalTab").click(function () {
         chrome.runtime.sendMessage({ sendTestNotification: true });
     });
 
-    chrome.storage.sync.get("customBg", function (data) {
+    getStorage("sync", "customBg", function (data) {
         var customBg = data.customBg;
         if (customBg == undefined) customBg = ["", ""];
         var backgroundOptions = [ //default backgrounds
@@ -1826,7 +1904,7 @@ $(".generalTab").click(function () {
             $("#backgroundsHolder").after('<br/><br/><center>כל הרקעים שנמצאים ברשימה זו, מלבד האחרון, נלקחו מהאתר <a href="http://subtlepatterns.com/" target="_blank">subtlepatterns.com</a>. הרקעים השחורים יותר הם ניגודים של הרקעים שנלקחו מאתר זה.</center>')
 
             $("#resetBg").click(function () {
-                chrome.storage.sync.set({ "customBg": ["", ""] }, function () { location.reload(); });
+                setStorage("sync", { "customBg": ["", ""] }, function () { location.reload(); });
             })
 
             $(".customBackgroundInput").focusout(function () {
@@ -1842,9 +1920,9 @@ $(".generalTab").click(function () {
                 if (loc == backgroundOptions.length) { //custom background
                     var dayBg = $(".customBg .right .customBackgroundInput").val();
                     var nightBg = $(".customBg .left .customBackgroundInput").val();
-                    chrome.storage.sync.set({ "customBg": [dayBg, nightBg] }, function () { location.reload(); });
+                    setStorage("sync", { "customBg": [dayBg, nightBg] }, function () { location.reload(); });
                 } else {
-                    chrome.storage.sync.set({ "customBg": [backgroundOptions[loc][0], backgroundOptions[loc][1]] }, function () { location.reload(); });
+                    setStorage("sync", { "customBg": [backgroundOptions[loc][0], backgroundOptions[loc][1]] }, function () { location.reload(); });
                 }
             }).children().click(function (e) { //stop input boxes from setting
                 return false;
@@ -1910,9 +1988,9 @@ $(".generalTab").click(function () {
         localStorage.setItem("nightMode", JSON.stringify(nightArray));
         localStorage.setItem("peekCloseMethod", JSON.stringify($('[name=peekCloseMethod]').find(":selected").attr("value")));
         localStorage.setItem("showStats", JSON.stringify($("#showStats").prop("checked")));
-        chrome.storage.sync.set({ "replaceIcons": $("#useOldSmiles").prop("checked") });
+        setStorage("sync", { "replaceIcons": $("#useOldSmiles").prop("checked") });
 
-        chrome.storage.sync.set({ "BackgroundNotifications": $("#BackgroundNotifications").prop("checked") });
+        setStorage("sync", { "BackgroundNotifications": $("#BackgroundNotifications").prop("checked") });
 
 
         $(".saveSuccess").fadeIn(1).delay(3000).fadeOut(1000); //show success message
@@ -2070,14 +2148,14 @@ $(".threadsTab").click(function () {
                     '<br/><span id="finalTime" style="font-weight:bold; font-size:25px; color:red">' + readSpeed + '</span><br/>' +
                     '<b>מילים לדקה.</b><br/><br/>משום שנתון זה אינו תקין, התוסף לא יעשה בו שימוש ומהירות הקריאה נקבעה למהירות הקריאה הממוצעת, 220 מילים לדקה. בחר קטגוריה מהצד כדי לסגור דף זה.'
                     );
-                    chrome.storage.sync.set({ "readTimeUser": 220 });
+                    setStorage("sync", { "readTimeUser": 220 });
                     setCookie("readTime", '[["0",0]]', 14);
                 } else {
                     $(".calcInnerFace").html('מהירות הקריאה הממוצעת שלך היא:' +
                     '<br/><span id="finalTime" style="font-weight:bold; font-size:25px; color:green;">' + readSpeed + '</span><br/>' +
                     '<b>מילים לדקה.</b><br/><br/>מעכשיו התוסף ישתמש בנתון זה כאשר יחשב זמני קריאה לאשכולות. בחר קטגוריה מהצד כדי לסגור דף זה.'
                     );
-                    chrome.storage.sync.set({ "readTimeUser": readSpeed });
+                    setStorage("sync", { "readTimeUser": readSpeed });
                     setCookie("readTime", '[["0",0]]', 14);
                 }
                 var arrSplit = document.cookie.split(";");
@@ -2117,10 +2195,10 @@ $(".threadsTab").click(function () {
     }
     if (readTimeNews) $(".tagItem:contains('כתבות בפורומי עדכונים')").addClass("selectedItem");
 
-    chrome.storage.sync.get("readTimeUser", function (data) { //place current read speed
+    getStorage("sync", "readTimeUser", function (data) { //place current read speed
         var readSpeed = data.readTimeUser;
         if (isNaN(readSpeed)) {
-            chrome.storage.sync.set({ "readTimeUser": 220 });
+            setStorage("sync", { "readTimeUser": 220 });
             readSpeed = 220;
         }
         $("#placeReadSpeed").text(readSpeed);
@@ -2392,8 +2470,8 @@ $(".settingsBtn").click(function () {
 });
 
 //if (getCookie("ftrck") != "no") {
-//    chrome.storage.sync.get("replaceIcons", function (data) {
-//        chrome.storage.sync.get("customBg", function (data2) {
+//    getStorage("sync", "replaceIcons", function (data) {
+//        getStorage("sync", "customBg", function (data2) {
 //            var customBg = data2.customBg;
 //            var replaceIcons = data.replaceIcons;
 
@@ -2459,7 +2537,7 @@ $(".settingsBtn").click(function () {
 
 
 
-chrome.storage.local.get("loadedbefore", function (data) { //first visit check
+getStorage("local", "loadedbefore", function (data) { //first visit check
     var loaded = data.loadedbefore;
     console.log(loaded);
     if (!loaded) {
@@ -2469,7 +2547,7 @@ chrome.storage.local.get("loadedbefore", function (data) { //first visit check
         $("#firstVisit").find(".closeBtn").click(function () {
             $("#firstVisit").fadeOut(50, function () { $("#blackage").fadeOut(200); });
             var n = d.getTime();
-            chrome.storage.local.set({ "loadedbefore": true, "previousVersion": version, "installTime": n, "suggestedToRate": false });
+            setStorage("local", { "loadedbefore": true, "previousVersion": version, "installTime": n, "suggestedToRate": false });
         });
     } else {
         //var aprlfls = d.getMonth() == 3 && d.getDate() == 1 && getCookie("disableDavid") != "true";
@@ -2479,7 +2557,7 @@ chrome.storage.local.get("loadedbefore", function (data) { //first visit check
         //    $("body").append('<a href="https://www.youtube.com/watch?v=yhJJws3kgzY" target="_blank"><img src="http://i.imgur.com/yhQCIOE.png" id="davidBenGurionImg" /></a>');
         //    $("#davidBenGurionImg").css("left", "-200px").delay(3000).animate({ left: 0 }, 1000);
         //}
-        chrome.storage.local.get("previousVersion", function (data) { //show update notification on version change
+        getStorage("local", "previousVersion", function (data) { //show update notification on version change
             var prev = data.previousVersion;
             if (prev != version && !(chrome.runtime.lastError)) {
                 if (prev == "0.0.11") { //remove cookie explosion from this version
@@ -2489,25 +2567,25 @@ chrome.storage.local.get("loadedbefore", function (data) { //first visit check
                 $("#blackage").unbind().fadeIn(1000, function () {
                     $("#SpecialInfo").append('<div class="ribbon" style="display: none">' + versionTitle + '<i></i> <i></i> <i></i> <i></i> </div>')
                         .append(versionDescription + '<br/><div class="specialClose"></div>')
-                        .append('<audio autoplay> <source src="' + chrome.runtime.getURL("success.mp3") + '" type="audio/mpeg"> </audio>')
+                        .append('<audio autoplay> <source src="' + chrome.runtime.getURL("sound/success.mp3") + '" type="audio/mpeg"> </audio>')
                         .show().find(".ribbon").show();
 
                     $(".specialClose").click(function () {
                         $("#SpecialInfo").fadeOut(200, function () { $("#blackage").fadeOut(100); });
                         notify.push("<b>עצה:</b> בדוק מה השתנה בהגדרות!");
-                        chrome.storage.local.set({ "previousVersion": version });
+                        setStorage("local", { "previousVersion": version });
                     });
                 });
-            } else if (chrome.runtime.lastError) chrome.storage.local.set({ "previousVersion": version }); //fallback if no version
+            } else if (chrome.runtime.lastError) setStorage("local", { "previousVersion": version }); //fallback if no version
         });
     }
 });
 
 var daysSinceInstall = -1;
-chrome.storage.local.get("installTime", function (data) { //first visit check
+getStorage("local", "installTime", function (data) { //first visit check
     if (chrome.runtime.lastError || data.installTime == undefined) {
         var n = d.getTime();
-        chrome.storage.local.set({ "installTime": n, "suggestedToRate": false });
+        setStorage("local", { "installTime": n, "suggestedToRate": false });
     } else {
         var insTime = data.installTime;
         var n = d.getTime();
@@ -2515,7 +2593,7 @@ chrome.storage.local.get("installTime", function (data) { //first visit check
         console.log("daysSinceInstall : " + daysSinceInstall);
         console.log("n : " + n);
         console.log("insTime : " + insTime);
-        chrome.storage.local.get("suggestedToRate", function (data2) {
+        getStorage("local", "suggestedToRate", function (data2) {
             var sugToRate = data2.suggestedToRate;
             if (daysSinceInstall >= 3 && !sugToRate) {
                 $("#blackage").unbind().fadeIn(1000, function () {
@@ -2527,7 +2605,7 @@ chrome.storage.local.get("installTime", function (data) { //first visit check
 
                     $(".closeBtn").click(function () {
                         $("#experiencedUserScreen").fadeOut(200, function () { $("#blackage").fadeOut(100); });
-                        chrome.storage.local.set({ "suggestedToRate": true });
+                        setStorage("local", { "suggestedToRate": true });
                     });
                 });
             }
@@ -2540,7 +2618,7 @@ if (fxpLogo.css("z-index")) { //itay's design makes FXP's logo too high - fix
     fxpLogo.css("z-index", "10001");
 }
 
-chrome.storage.sync.get("BackgroundNotifications", function (data) {
+getStorage("sync", "BackgroundNotifications", function (data) {
     var bgn = data.BackgroundNotifications;
     if (bgn) {
         console.log(bgn)

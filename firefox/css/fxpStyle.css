@@ -1002,7 +1002,6 @@ div.userIdFrame {
 
   -webkit-animation: main 250ms;
   -moz-animation: main 250ms;
-  -ms-animation: main 250ms;
   animation: main 250ms;
 }
 
@@ -1020,7 +1019,6 @@ div.userIdFrame {
 
   -webkit-animation: edge 500ms;
   -moz-animation: edge 500ms;
-  -ms-animation: edge 500ms;
   animation: edge 500ms;
 }
 
@@ -1041,7 +1039,6 @@ div.userIdFrame {
 
   -webkit-animation: back 600ms;
   -moz-animation: back 600ms;
-  -ms-animation: back 600ms;
   animation: back 600ms;
 
   -webkit-transform-origin: 100% 0;
@@ -1064,34 +1061,70 @@ div.userIdFrame {
 }
 
 @-webkit-keyframes main {
-  0% { -webkit-transform: scaleX(0); }
-  100% { -webkit-transform: scaleX(1); }
+    0% {
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+    }
+    100% {
+        -webkit-transform: scaleX(1);
+        transform: scaleX(1);
+    }
 }
 
 @-webkit-keyframes edge {
-  0%, 50% { -webkit-transform: scaleY(0); }
-  100% { -webkit-transform: scaleY(1); }
+    0%, 50% {
+        -webkit-transform: scaleY(0);
+        transform: scaleY(0);
+    }
+    100% {
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+    }
 }
 
 @-webkit-keyframes back {
-  0%, 75% { -webkit-transform: scaleX(0); }
-  100% { -webkit-transform: scaleX(1); }
+    0%, 75% {
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+    }
+    100% {
+        -webkit-transform: scaleX(1);
+        transform: scaleX(1);
+    }
 }
 
 
 @-moz-keyframes main {
-  0% { -moz-transform: scaleX(0); }
-  100% { -moz-transform: scaleX(1); }
+    0% {
+        -moz-transform: scaleX(0);
+        transform: scaleX(0);
+    }
+    100% {
+        -moz-transform: scaleX(1);
+        transform: scaleX(1);
+    }
 }
 
 @-moz-keyframes edge {
-  0%, 50% { -moz-transform: scaleY(0); }
-  100% { -moz-transform: scaleY(1); }
+    0%, 50% {
+        -moz-transform: scaleY(0);
+        transform: scaleY(0);
+    }
+    100% {
+        -moz-transform: scaleY(1);
+        transform: scaleY(1);
+    }
 }
 
 @-moz-keyframes back {
-  0%, 75% { -moz-transform: scaleX(0); }
-  100% { -moz-transform: scaleX(1); }
+    0%, 75% {
+        -moz-transform: scaleX(0);
+        transform: scaleX(0);
+    }
+    100% {
+        -moz-transform: scaleX(1);
+        transform: scaleX(1);
+    }
 }
 
 

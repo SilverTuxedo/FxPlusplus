@@ -5,24 +5,24 @@
   "short_name": "FxPlus+",
   "author": "SilverTuxedo",
   "description": "שפר את FxP והפוך אותו לשלך, באמצעות הגדרות ססגוניות ואפשרויות רבות אחרות.",
-  "version": "0.0.18",
+  "version": "0.0.19",
 
-"applications": {
-  "gecko": {
-    "id": "FxPlus@FxPlus.com"
-  }
-},
+  "applications": {
+    "gecko": {
+      "id": "tuxedosilver@gmail.com"
+    }
+  },
 
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
   },
 
   "browser_action": {
-    "default_icon": "icon.png",
+    "default_icon": "images/icon.png",
     "default_title": "פתח התראות - FxPlus+",
-    "default_popup": "popup.html"
+    "default_popup": "html/popup.html"
   },
   "permissions": [
     "https://www.fxp.co.il/*",
@@ -34,52 +34,53 @@
   ],
 
   "background": {
-    "page": "background.html"
+    "page": "html/background.html"
   },
 
   "content_scripts": [
     {
       "matches": [ "https://www.fxp.co.il/*" ],
-      "js": [ "jquery-2.1.4.min.js" ],
+      "js": [ "js/jquery-2.1.4.min.js" ],
       "run_at": "document_start",
       "all_frames": true
     },
     {
       "matches": [ "https://www.fxp.co.il/*" ],
-      "js": [ "happyEyes.js" ],
+      "js": [ "js/happyEyes.js" ],
       "run_at": "document_start"
     },
     {
       "matches": [ "https://www.fxp.co.il/*" ],
-      "js": [ "fxpCode.js", "tinymce.min.js" ],
-      "css": [ "fxpStyle.css" ]
+      "js": [ "js/fxpCode.js", "js/tinymce.min.js" ],
+      "css": [ "css/fxpStyle.css" ],
+      "run_at": "document_end"
     },
     {
       "matches": [ "https://www.fxp.co.il/*" ],
-      "js": [ "thisPageLoadedMarker.js" ],
+      "js": [ "js/thisPageLoadedMarker.js" ],
       "all_frames": true,
       "run_at": "document_end"
     },
     {
       "matches": [ "https://www.fxp.co.il/member.php?u*" ],
-      "js": [ "getNames.js" ],
+      "js": [ "js/getNames.js" ],
       "all_frames": true,
       "run_at": "document_end"
     },
     {
       "matches": [ "https://www.fxp.co.il/*&frstmsg" ],
-      "js": [ "peek.js" ],
+      "js": [ "js/peek.js" ],
       "all_frames": true,
       "run_at": "document_start"
     },
     {
       "matches": [ "https://www.fxp.co.il/showthread.php?t=*&readTime" ],
-      "js": [ "readTime.js" ],
+      "js": [ "js/readTime.js" ],
       "all_frames": true,
       "run_at": "document_start"
     }
   ],
 
-  "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
-  "web_accessible_resources": [ "howto.html", "success.mp3"]
+  "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'; https://socket.fxp.co.il",
+  "web_accessible_resources": [ "html/howto.html", "sound/success.mp3"]
 }

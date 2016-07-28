@@ -30,10 +30,13 @@
 
         body {
             margin: 0;
+            padding: 0;
             width: 350px;
             text-align: center;
             font-family: "almoni-dl", "Segoe UI", Tahoma, sans-serif;
+            font-size: 75%;
             cursor: default;
+            overflow-x: hidden;
         }
 
         #title {
@@ -230,7 +233,7 @@
 </head>
 <body>
     <div id="title">התראות</div>
-    <a href="https://www.fxp.co.il" target="_blank">
+    <a href="https://www.fxp.co.il" target="_blank" style="text-decoration:none;">
         <div id="flexList">
             <div>
                 <span id="likeCount">0</span> לייקים
@@ -254,7 +257,7 @@
         <input type="checkbox" id="sendBackground"> שלח התראות גם כאשר האתר סגור
     </div>
 
-    <script src="jquery-2.1.4.min.js"></script>
-    <script src="popup.js"></script>
+    <script src="../js/jquery-2.1.4.min.js"></script>
+    <script src="../js/popup.js"></script>
 </body>
 </html>

@@ -1,6 +1,50 @@
 ﻿
 chrome.browserAction.setBadgeBackgroundColor({ color: "#3491ef" });
 
+
+var storageSyncSupport;
+if (chrome.storage.sync) {
+    //browser supports chrome.storage.sync (eg. chrome)
+    storageSyncSupport = true;
+} else {
+    //browser does not support chrome.storage.sync (eg. firefox)
+    storageSyncSupport = false;
+}
+
+//set a value in the extension's storage
+function setStorage(type, storageObject, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.set(storageObject, function () {
+            if (callback)
+                callback();
+        });
+    }
+}
+//get a value from the extension's storage
+function getStorage(type, name, callback) {
+    if (type == "sync" && storageSyncSupport) {
+        //sync has been called and browser supports sync
+        chrome.storage.sync.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    } else {
+        //local has been called and/or browser does not support sync
+        chrome.storage.local.get(name, function (data) {
+            if (callback)
+                callback(data);
+        });
+    }
+}
+
+
 (function (i, s, o, g, r, a, m) { //analytics
     i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
         (i[r].q = i[r].q || []).push(arguments)
@@ -15,7 +59,6 @@ ga('send', 'pageview', '/background.html');
 
 var d = new Date();
 var today = { day: d.getUTCDate(), month: d.getUTCMonth() + 1, year: d.getUTCFullYear() };
-
 
 //chrome.runtime.sendMessage({ sendTestNotification: true });
 chrome.runtime.onMessage.addListener(
@@ -34,13 +77,13 @@ chrome.runtime.onMessage.addListener(
           var randomId = Math.random().toString(36).substr(2, 10); //generates a random 10 character id
           chrome.notifications.create(randomId, {
               type: 'basic',
-              iconUrl: '/notificationImg.png',
+              iconUrl: '../images/notificationImg.png',
               title: "הודעת בדיקה!",
               message: "הידעת? הגולש הממוצע באינטרנט ממצמץ רק 7 פעמים בדקה! ממוצע המצמוץ הנורמלי הוא 20 - כמעט פי 3.",
               isClickable: false
           });
           //play notification sound
-          var audio = new Audio('/notice.mp3');
+          var audio = new Audio('../sound/notice.mp3');
           audio.play();
       } else if (!isNaN(request.checkNotiCount)) {
           var newCount = request.checkNotiCount;
@@ -51,7 +94,7 @@ chrome.runtime.onMessage.addListener(
               console.log(result);
               if (newCount < parseInt(result)) { //the number on the display is higher than the actual number
                   updateNotificationCounter();
-                  console.log("ICCORILATION!");
+                  console.log("recount");
               }
           });
       }
@@ -67,16 +110,14 @@ chrome.runtime.onMessage.addListener(
 //chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
 chrome.storage.onChanged.addListener(function (changes, areaName) {//tracks changes in variables
-    if (areaName == "sync") {
-        if (changes.BackgroundNotifications) {
+    if (changes.BackgroundNotifications) {
 
-            if (changes.BackgroundNotifications.newValue && !changes.BackgroundNotifications.oldValue) {
-                //value of background notifications was changed from false to true
-                checkForCookieAccess();
-            } else if (!changes.BackgroundNotifications.newValue && changes.BackgroundNotifications.oldValue) {
-                //value of background notifications was changed from true to false
-                window.clearInterval(reconnection);
-            }
+        if (changes.BackgroundNotifications.newValue && !changes.BackgroundNotifications.oldValue) {
+            //value of background notifications was changed from false to true
+            checkForCookieAccess();
+        } else if (!changes.BackgroundNotifications.newValue && changes.BackgroundNotifications.oldValue) {
+            //value of background notifications was changed from true to false
+            window.clearInterval(reconnection);
         }
     }
 });
@@ -106,14 +147,14 @@ function FxpPushNotification(title, message, url) {
     var randomId = Math.random().toString(36).substr(2, 10); //generates a random 10 character id
     chrome.notifications.create(randomId, {
         type: 'basic',
-        iconUrl: '/notificationImg.png',
+        iconUrl: '../images/notificationImg.png',
         title: title,
         message: message,
         isClickable: true
     });
 
     //play notification sound
-    var audio = new Audio('/notice.mp3');
+    var audio = new Audio('../sound/notice.mp3');
     audio.play();
 
     chrome.notifications.onClicked.addListener(function (notificationId) {
@@ -142,12 +183,12 @@ function checkForCookieAccess() {
     console.log("Attempting to get cookies");
     //attempt to get cookies (sometimes chrome can't do that)
     chrome.cookies.get({ "url": "https://www.fxp.co.il", "name": "bb_livefxpext" }, function (cookie) {
-	console.log("Attempting to get cookies");
         if (chrome.runtime.lastError) {
             console.log("Failed to get cookies: " + chrome.runtime.lastError.message);
             setTimeout(checkForCookieAccess, 5000);
         } else {
             activateNotificationListeners();
+            console.log("Successfully got cookies");
         }
     });
 }
@@ -158,29 +199,28 @@ checkForCookieAccess();
 
 var reconnection;
 function activateNotificationListeners() {
-	console.log("Successfully got cookies");
     //the fxp notifications socket
     var socket = io.connect('https://socket.fxp.co.il/', { reconnection: true });
-console.log("Successfully got cookies");
 
-    //connect to the fxp notification socket
-    function connect_to_server() {
-console.log("Successfully got cookies");
+    socket.on('connect', function () {
         getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id) {
-            socket.on('connect', function () {
-                send = '{"userid":"' + id + '","froum":"f-21"}';
-console.log("Successfully got cookies");
-                socket.send(send);
-                console.log(id);
-console.log("Successfully got cookies");
-            });
+            send = '{"userid":"' + id + '","froum":"f-fe7fdfa8be5eb96fc56f318738a6410e"}';
+            socket.send(send);
+            console.log('user connect');
         });
-    }
+    });
 
-    connect_to_server();
+    socket.on('reconnecting', function () {
+        getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id) {
+            send = '{"userid":"' + id + '","froum":"f-fe7fdfa8be5eb96fc56f318738a6410e"}';
+            socket.send(send);
+            console.log('user reconnect');
+        });
+    })
+    
 
     //get unread notifications
-    chrome.storage.sync.get("BackgroundNotifications", function (dataC) {
+    getStorage("sync", "BackgroundNotifications", function (dataC) {
         var bgnC = dataC.BackgroundNotifications;
         if (bgnC || bgnC == undefined) {
             var notificationList;
@@ -213,17 +253,23 @@ console.log("Successfully got cookies");
 
                     if (notificationList.length > 0) { //user actually misses some notifications
                         var randomId = Math.random().toString(36).substr(2, 10); //generates a random 10 character id
+                        //fallback for when the "list" type is unsupported
+                        var text = "";
+                        for (var i = 0; i < notificationList.length; i++) {
+                            if (i > 0) text += "\n";
+                            text += notificationList[i].title + " " + notificationList[i].message;
+                        }
                         chrome.notifications.create(randomId, {
                             type: 'list',
-                            iconUrl: '/notificationImg.png',
+                            iconUrl: '../images/notificationImg.png',
                             title: "בזמן שלא היית מחובר...",
-                            message: "",
+                            message: text,
                             items: notificationList,
                             isClickable: true
                         });
 
                         //play notification sound
-                        var audio = new Audio('/notice.mp3');
+                        var audio = new Audio('../sound/notice.mp3');
                         audio.play();
 
                         chrome.notifications.onClicked.addListener(function (notificationId) {
@@ -247,20 +293,14 @@ console.log("Successfully got cookies");
 
     //new reply to a thread
     socket.on('newreply', function (data) {
-        chrome.storage.sync.get("BackgroundNotifications", function (dataC) {
+        getStorage("sync", "BackgroundNotifications", function (dataC) {
             var bgnC = dataC.BackgroundNotifications;
             if (bgnC || bgnC == undefined) {
                 updateNotificationCounter();
                 //checks if an fxp tab is open
-                var tablink;
-                chrome.tabs.getSelected(null, function (tab) {
-                    if (tab == undefined) {
-                        tablink = "";
-                    } else {
-                        tablink = tab.url;
-                    }
-
-                    if (tablink.indexOf("fxp.co.il") == -1) {
+                chrome.tabs.query({ url: "https://www.fxp.co.il/*" }, function (query) {
+                    var openFxpTabs = query.length; //number of open FxP tabs
+                    if (openFxpTabs < 1) {
                         //no fxp tab is open
                         if (data.quoted) {
                             //the user was quoted
@@ -269,9 +309,6 @@ console.log("Successfully got cookies");
                             //the user was not quoted
                             FxpPushNotification('התראה חדשה!', 'המשתמש ' + data.username + '  הגיב באשכול ' + data.title, 'https://www.fxp.co.il/showthread.php?t=' + data.thread_id + '&goto=newpost')
                         }
-                        connect_to_server();
-
-
                     }
                 });
             }
@@ -280,22 +317,16 @@ console.log("Successfully got cookies");
 
     //new private message
     socket.on('newpm', function (data) {
-        chrome.storage.sync.get("BackgroundNotifications", function (dataC) {
+        getStorage("sync", "BackgroundNotifications", function (dataC) {
             var bgnC = dataC.BackgroundNotifications;
             if (bgnC || bgnC == undefined) {
                 updateNotificationCounter();
                 //checks if an fxp tab is open
-                var tablink;
-                chrome.tabs.getSelected(null, function (tab) {
-                    if (tab == undefined) {
-                        tablink = "";
-                    } else {
-                        tablink = tab.url;
-                    }
-                    if (tablink.indexOf("fxp.co.il") == -1) {
+                chrome.tabs.query({ url: "https://www.fxp.co.il/*" }, function (query) {
+                    var openFxpTabs = query.length; //number of open FxP tabs
+                    if (openFxpTabs < 1) {
                         //no fxp tab is open
                         FxpPushNotification('דואר נכנס!', 'קיבלת הודעה פרטית חדשה מהמשתמש ' + data.username, 'https://www.fxp.co.il/private.php?do=showpm&pmid=' + data.pmid);
-                        connect_to_server();
                     }
                 });
             }
@@ -304,22 +335,16 @@ console.log("Successfully got cookies");
 
     //new like
     socket.on('new_like', function (data) {
-        chrome.storage.sync.get("BackgroundNotifications", function (dataC) {
+        getStorage("sync", "BackgroundNotifications", function (dataC) {
             var bgnC = dataC.BackgroundNotifications;
             if (bgnC || bgnC == undefined) {
                 updateNotificationCounter();
                 //checks if an fxp tab is open
-                var tablink;
-                chrome.tabs.getSelected(null, function (tab) {
-                    if (tab == undefined) {
-                        tablink = "";
-                    } else {
-                        tablink = tab.url;
-                    }
-                    if (tablink.indexOf("fxp.co.il") == -1) {
+                chrome.tabs.query({ url: "https://www.fxp.co.il/*" }, function (query) {
+                    var openFxpTabs = query.length; //number of open FxP tabs
+                    if (openFxpTabs < 1) {
                         //no fxp tab is open
                         FxpPushNotification('לייק חדש!', 'המשתמש ' + data.username + ' אהב את ההודעה שלך!', 'https://www.fxp.co.il/showthread.php?p=' + data.postid + '#post' + data.postid);
-                        connect_to_server();
                     }
                 });
             }
@@ -346,14 +371,6 @@ console.log("Successfully got cookies");
         }
 
     });
-
-
-
-    reconnection = window.setInterval(function () {
-        socket = io.connect('https://socket.fxp.co.il/', { reconnection: true });
-        connect_to_server();
-        updateNotificationCounter();
-    }, 60000);
 }
 
 
