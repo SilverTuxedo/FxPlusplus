@@ -1,36 +1,64 @@
 ﻿/*
-   _____ ____  _______     _______  _____ _____ _    _ _______   _   _  ____ _______ _____ _____ ______
-  / ____/ __ \|  __ \ \   / /  __ \|_   _/ ____| |  | |__   __| | \ | |/ __ \__   __|_   _/ ____|  ____|
- | |   | |  | | |__) \ \_/ /| |__) | | || |  __| |__| |  | |    |  \| | |  | | | |    | || |    | |__
- | |   | |  | |  ___/ \   / |  _  /  | || | |_ |  __  |  | |    | . ` | |  | | | |    | || |    |  __|
- | |___| |__| | |      | |  | | \ \ _| || |__| | |  | |  | |    | |\  | |__| | | |   _| || |____| |____
-  \_____\____/|_|      |_|  |_|  \_\_____\_____|_|  |_|  |_|    |_| \_|\____/  |_|  |_____\_____|______|
+  _      _____ _____ ______ _   _  _____ ______   _   _  ____ _______ _____ _____ ______ 
+ | |    |_   _/ ____|  ____| \ | |/ ____|  ____| | \ | |/ __ \__   __|_   _/ ____|  ____|
+ | |      | || |    | |__  |  \| | (___ | |__    |  \| | |  | | | |    | || |    | |__   
+ | |      | || |    |  __| | . ` |\___ \|  __|   | . ` | |  | | | |    | || |    |  __|  
+ | |____ _| || |____| |____| |\  |____) | |____  | |\  | |__| | | |   _| || |____| |____ 
+ |______|_____\_____|______|_| \_|_____/|______| |_| \_|\____/  |_|  |_____\_____|______|
 
-FxPlus+ by SilverTuxedo is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
-http://creativecommons.org/licenses/by-nc-sa/4.0/
+    Copyright 2016 SilverTuxedo
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 
 
+ ██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗
+ ██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔════╝
+ ██████╔╝██║     █████╗  ███████║███████╗█████╗
+ ██╔═══╝ ██║     ██╔══╝  ██╔══██║╚════██║██╔══╝
+ ██║     ███████╗███████╗██║  ██║███████║███████╗▄█╗
+ ╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝
 
-██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗
-██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔════╝
-██████╔╝██║     █████╗  ███████║███████╗█████╗
-██╔═══╝ ██║     ██╔══╝  ██╔══██║╚════██║██╔══╝
-██║     ███████╗███████╗██║  ██║███████║███████╗▄█╗
-╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝
-If you want to explore the code and copy parts of it to your own project, go ahead.
-But please appriciate the time and effort that I have put into this project, and consider giving proper credit.
-Regarding the code itself, if you see something here and you want to know what it means, contact me.
+   If you want to explore the code and copy parts of it to your own project, go ahead.
+   But please appriciate the time and effort that I have put into this project, and give proper credit, as the license orders you to.
+   Regarding the code itself, if you see something here and you want to know what it means, contact me.
 
-Kudos!
+   Kudos!
 
 */
 
-version = "0.0.19";
-versionTitle = "עדכון 0.0.19";
-versionDescription = '<blockquote class="twitter-tweet" data-lang="he"><p lang="iw" dir="rtl">דיווחתם שהתוסף מאט את האתר. גרסה 0.0.19 אמורה לטפל בזה!<a href="https://t.co/jlFxwhM8Bf">https://t.co/jlFxwhM8Bf</a></p>&mdash; FxPlus+ (@FxPlusplus) <a href="https://twitter.com/FxPlusplus/status/752447667469443076">11 ביולי 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
+version = "0.0.20";
+versionTitle = "עדכון 0.0.20";
+versionDescription = '<blockquote class="twitter-tweet" data-lang="he"><p lang="iw" dir="rtl">גרסה 0.0.20 היא הגרסה המשמעותית האחרונה לפני היציאה מהבטא! והיא כבר כאן.<a href="https://t.co/ot3mucWxIc">https://t.co/ot3mucWxIc</a></p>&mdash; FxPlus+ (@FxPlusplus) <a href="https://twitter.com/FxPlusplus/status/765965426249633792">17 באוגוסט 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
+primeVersion = true; //version is worth a notification on screen
 
 var d1 = new Date();
 var startExecution = d1.getTime();
+
+var storageSyncSupport;
+if (chrome.storage.sync) {
+    //browser supports chrome.storage.sync (eg. chrome)
+    storageSyncSupport = true;
+} else {
+    //browser does not support chrome.storage.sync (eg. firefox)
+    storageSyncSupport = false;
+}
+
+//if sync storage not supported, fallback to local.
+chrome.storage.sync = (function () {
+    return chrome.storage.sync ||
+           chrome.storage.local;
+})();
+
 
 var variableNames = [ //names of things in localStorage
     'savedThreads',
@@ -289,7 +317,17 @@ $(".notification").on("mouseleave", function () {
     timePaused = false;
 });
 
-$(".divhed div:first").css("z-index", "0"); //make FxP's logo not go over the black screen
+$("#topmenunew a[title=fxp] img").css("z-index", "10001"); //make FxP's logo not go over the black screen
+
+var imgObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        //image got a src value, which means it has been loaded
+        if (mutation.attributeName === "src") {
+            //update for signature resize and old smilies update
+            Update(true);
+        }
+    });
+});
 
 var updateCooldown = 0;
 var focusCooldown = 0;
@@ -416,13 +454,40 @@ function Update(focusUpdate) {
         $(".author > .label > a[href='member.php?u=" + importantPost[i] + "']").parents(".nonsticky").removeClass("lowPriorityPost");
         $(".author > .label > a[href='member.php?u=" + importantPost[i] + "']").parents(".nonsticky").addClass("highlightPost");
     }
-
+    var userIdentifier;
+    var previousSubnick;
+    var currentSubnickSelector;
     for (i = 0; i < subnick.length; i++) { //set subnicks
-        $("div.username_container a.username[href='member.php?u=" + subnick[i][0] + "'").parents("div.username_container").find(".usertitle").html('<span style="color: #' + subnick[i][2] + ';font-size:' + subnick[i][3] + '">' + subnick[i][1] + '</span>');
+        userIdentifier = $("div.username_container a.username[href='member.php?u=" + subnick[i][0] + "']");
+        previousSubnick = userIdentifier.parents("div.username_container").find(".usertitle:not(.affected)");
+        currentSubnickSelector = userIdentifier.parents("div.username_container").find(".usertitle");
+
+        if (previousSubnick.length > 0) {
+            userIdentifier.parents("div.username_container").find(".usertitle").after('<div class="prevUsertitle" style="display: none;">'
+                + previousSubnick.html() + '</div>'); //keep previous subnick
+            var previousSubnickPreview = userIdentifier.parents("div.username_container").find(".prevUsertitle");
+            userIdentifier.hover(function () {
+                //in
+                $(this).parents("div.username_container").find(".usertitle").slideUp(200);
+                $(this).parents("div.username_container").find(".prevUsertitle").slideDown(200);
+            },
+            function () {
+                //out
+                $(this).parents("div.username_container").find(".usertitle").slideDown(200);
+                $(this).parents("div.username_container").find(".prevUsertitle").slideUp(200);
+            });
+            previousSubnick.addClass("affected");
+        }
+        currentSubnickSelector.html('<span style="color: #' + subnick[i][2] + ';font-size:' + subnick[i][3] + '">' + subnick[i][1] + '</span>');
     }
 
     if (localStorage.getItem("signatureResize") == "true") { //resize big signatures
         $(".signaturecontainer").each(function () {
+            //make sure that previous resizes are not affecting the calculation
+            $(this).css({
+                "height": "auto",
+                "transform": "ininital"
+            });
             var signHeight = $(this).height();
             if (signHeight > 295) {
                 var outByScale = 295 / signHeight;
@@ -431,6 +496,7 @@ function Update(focusUpdate) {
                     "transform-origin": "top",
                     "transform": "scale(" + outByScale + ", " + outByScale + ")"
                 });
+                $(this).parents(".signature").css("overflow", "hidden");
                 $(this).attr("title", "חתימה זו הוקטנה באופן אוטומטי."); //show that this has been shrinked
             }
         });
@@ -570,6 +636,21 @@ function Update(focusUpdate) {
         }
     });
 
+    //lazyload images force update
+    if ($("img[original]").length > 0) {
+        //clear all previous listeners
+        imgObserver.disconnect();
+        //notify.push('<b>הקטנת חתימות אוטומטית פועלת.</b> אנא כבה טעינת תמונות בגלילה.'); //remind to turn off scroll-load
+        //$("#lazyload_fxp").parents('div:eq(0)').css({ "background": "#ff4400", "font-weight": "bold" });
+
+        for (var i = 0; i < $("img[original]").length; i++) {
+            //observe all images with an "original" value (lazyload) to update the page when they load
+            imgObserver.observe($("img[original]")[i], { attributes: true });
+
+        }
+
+    }
+
     updateCooldown = 5;
     console.log("Updated with focusUpdate = ", focusUpdate);
 }
@@ -578,8 +659,10 @@ Update(false); //initiate on page ready
 $(window).load(function () { //make sure everything's fine after picture & others loading.
     Update(true);
 
+    console.log("SIGNATURE2");
     if (window.location.href.search("editsignature") > -1 || window.location.href.search("updatesignature") > -1) {
-        $("#vB_Editor_001").before('<div id="addCreditSign">הוסף קרדיט עבור <div class="ltrInline">FxPlus+</div><br/><button type="button" id="sign1">500x276</button> <button type="button" id="sign2">128x128</button> <button type="button" id="sign3">48x48</button> <button type="button" id="sign4">טקסט</button></div>')
+        console.log("SIGNATURE");
+        $('form[action*="signature"] .wysiwyg_block').prepend('<div id="addCreditSign">הוסף קרדיט עבור <div class="ltrInline">FxPlus+</div><br/><button type="button" id="sign1">500x276</button> <button type="button" id="sign2">128x128</button> <button type="button" id="sign3">48x48</button> <button type="button" id="sign4">טקסט</button></div>');
         $("#sign1").click(function () { $(".cke_contents:last iframe").contents().find("body").append('<div style="text-align: center;"><a href="https://www.fxp.co.il/showthread.php?t=16859147"><img src="http://www.imgweave.com/view/1114.png" /></a></div>') });
         $("#sign2").click(function () { $(".cke_contents:last iframe").contents().find("body").append('<div style="text-align: center;"><a href="https://www.fxp.co.il/showthread.php?t=16859147"><img src="http://i.imgur.com/bsVtJ5o.png" /></a></div>') });
         $("#sign3").click(function () { $(".cke_contents:last iframe").contents().find("body").append('<div style="text-align: center;"><a href="https://www.fxp.co.il/showthread.php?t=16859147"><img src="http://i.imgur.com/O7FsbY8.png" /></a></div>') });
@@ -616,6 +699,38 @@ $(window).load(function () { //make sure everything's fine after picture & other
     $("input#subject").focusout(function () {
         if ($("#newPinName").text() == "") $("#newPinName").text($(this).val());
     })
+
+    //update usernamelist automatically
+
+    chrome.storage.local.get("usernameList", function (data) {
+        var usernameList = data.usernameList;
+
+        if (usernameList !== undefined) {
+            if (usernameList.length > 0) {
+                var id, name, index;
+                var namesUpdated = 0;
+                //check each username that is in the current page for matching user id and name, update if no match
+                $("a.username").each(function () {
+                    id = parseInt($(this).attr("href").split("u=")[1]);
+                    name = $(this).text().trim();
+                    if (!isNaN(id)) {
+                        index = usernameList.findIndex(x=> x.id === id);
+                        if (index !== -1) {
+                            if (usernameList[index].name !== name) {
+                                usernameList[index].name = name;
+                                console.log("updated " + id);
+                                namesUpdated++;
+                            }
+                        }
+                    }
+                });
+                //save changes if needed
+                if (namesUpdated > 0)
+                    chrome.storage.local.set({ usernameList: usernameList });
+
+            }
+        }
+    });
 
 });
 
@@ -661,13 +776,6 @@ function updatePinnedThreadsList() {
         });
 
     });
-}
-
-if (localStorage.getItem("signatureResize") == "true") {
-    if ($("#lazyload_fxp.onset.ofset").length > 0) {
-        notify.push('<b>הקטנת חתימות אוטומטית פועלת.</b> אנא כבה טעינת תמונות בגלילה.'); //remind to turn off scroll-load
-        $("#lazyload_fxp").parents('div:eq(0)').css({ "background": "#ff4400", "font-weight": "bold" });
-    }
 }
 
 var nightLocalArray = JSON.parse(localStorage.getItem("nightMode"));
@@ -748,40 +856,46 @@ if (!JSON.parse(localStorage.getItem("hideRules"))) {
     }
 }
 
-$('.threads').bind('DOMNodeInserted DOMNodeRemoved DOMSubtreeModified', function (event) { //update if thread list content changes
-    if (updateCooldown < 1) {
+// create an observer instance for threads
+var threadObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        //thread list content has changed
         Update(true);
         console.info('%cUPDATE via DOM update.', 'color: #ff00ff; font-weight: bold; font-size: 20px');
-    }
+    });
 });
 
-var OldCommentCount = 9999;
-setInterval(function () {     //update if comment list content increases
-    if ($(".postbit").length > OldCommentCount) {
-        if (updateCooldown < 1) {
-            OldCommentCount = $(".postbit").length;
-            Update(true);
-            console.info('%cUPDATE via comment update.', 'color: #ff0000; font-weight: bold; font-size: 20px');
-            //$('.postbit:last .username[href="member.php?u=1131848"]')
-            for (i = 0; i < lowPriorityComment.length; i++) { //mark low priority commenters and hind content
-                $('.postbit:last .username[href="member.php?u=' + lowPriorityComment[i] + '"]').parents(".postbit").addClass("lowPriorityComment");
-                $('.postbit:last .username[href="member.php?u=' + lowPriorityComment[i] + '"]').parents(".postbit").addClass("fadeComment");
-                $(".lowPriorityComment:last").find(".userinfo_noavatar").attr("title", "לחץ כדי להציג או להסתיר את התגובה.");
-                $(".lowPriorityComment:last").find(".postbody").slideUp(100);
-                $(".lowPriorityComment:last").find(".userinfo_noavatar").unbind('click.collapse').bind('click.collapse', function () {
-                    if ($(this).parents(".postbit").find(".postbody").is(':visible')) {
-                        $(this).parents(".postbit").find(".postbody").slideUp();
-                        $(this).parents(".postbit").addClass("fadeComment");
-                    } else {
-                        $(this).parents(".postbit").find(".postbody").slideDown();
-                        $(this).parents(".postbit").removeClass("fadeComment");
-                    }
-                });
-            }
+if ($('.threads')[0])
+    threadObserver.observe($('.threads')[0], { attributes: true, childList: true, characterData: true }); //observe thread changes
+
+
+var postbitObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        //comment list content has changed
+        Update(true);
+        console.info('%cUPDATE via comment update.', 'color: #ff0000; font-weight: bold; font-size: 20px');
+        //$('.postbit:last .username[href="member.php?u=1131848"]')
+        for (i = 0; i < lowPriorityComment.length; i++) { //mark low priority commenters and hide content
+            $('.postbit:last .username[href="member.php?u=' + lowPriorityComment[i] + '"]').parents(".postbit").addClass("lowPriorityComment");
+            $('.postbit:last .username[href="member.php?u=' + lowPriorityComment[i] + '"]').parents(".postbit").addClass("fadeComment");
+            $(".lowPriorityComment:last").find(".userinfo_noavatar").attr("title", "לחץ כדי להציג או להסתיר את התגובה.");
+            $(".lowPriorityComment:last").find(".postbody").slideUp(100);
+            $(".lowPriorityComment:last").find(".userinfo_noavatar").unbind('click.collapse').bind('click.collapse', function () {
+                if ($(this).parents(".postbit").find(".postbody").is(':visible')) {
+                    $(this).parents(".postbit").find(".postbody").slideUp();
+                    $(this).parents(".postbit").addClass("fadeComment");
+                } else {
+                    $(this).parents(".postbit").find(".postbody").slideDown();
+                    $(this).parents(".postbit").removeClass("fadeComment");
+                }
+            });
         }
-    }
-    OldCommentCount = $(".postbit").length;
-}, 100);
+    });
+});
+
+if ($('#postlist #posts')[0])
+    postbitObserver.observe($('#postlist #posts')[0], { attributes: true, childList: true, characterData: true }); //observe thread changes
+
 
 $(document).ready(function () {
     $([window, document]).focusin(function () {
@@ -825,7 +939,9 @@ var oldSmile = [
     "https://images.fxp.co.il/smilies3/204_40x.png", //replace smile
     "https://images.fxp.co.il/smilies3/173_40x.png", //replace devil
     "https://images.fxp.co.il/smilies3/202_40x.png", //replace kiss
-    "https://images.fxp.co.il/smilies3/131_40x.png"  //replace cool
+    "https://images.fxp.co.il/smilies3/131_40x.png", //replace cool
+    "https://images.fxp.co.il/smilies3g/206.gif",    //replace i love u
+    "https://images.fxp.co.il/smilies3g/207.gif"     //replace tongue 2
 ]
 
 var newSmile = [
@@ -840,7 +956,9 @@ var newSmile = [
     "http://i.imgur.com/lPepnzd.png", //replace smile
     "http://i.imgur.com/Y0xWnOV.png", //replace devil
     "http://i.imgur.com/yDHz3MY.png", //replace kiss
-    "http://i.imgur.com/FekEBW4.png" //replace cool
+    "http://i.imgur.com/FekEBW4.png", //replace cool
+    "http://i.imgur.com/1htCYLi.gif", //replace i love u
+    "http://i.imgur.com/WzfVnDk.gif"  //replace tongue 2
 ]
 
 function replaceOldWithNewSmiles(affectedContainer) {
@@ -851,100 +969,142 @@ function replaceOldWithNewSmiles(affectedContainer) {
     }
 }
 
-var designer;
-chrome.storage.sync.get("replaceIcons", function (data) {
+//should the textbox be modified by anything
+var textboxModifyWorthy =
+    window.location.href.search("showthread") > -1 ||
+    window.location.href.search("private.php?") > -1 ||
+    window.location.href.search("newthread.php") > -1 ||
+    window.location.href.search("member.php") > -1 ||
+    window.location.href.search("newreply.php") > -1;
+
+function bindDefaultStyle() {
+    console.log("BOUND");
     defaultStyle = JSON.parse(localStorage.getItem("defaultStyle"));
-    var replace = data.replaceIcons;
-    var imgCountPrev = 0;
-
-    if (((window.location.href.search("showthread") > -1 || window.location.href.search("private.php?") > -1 || window.location.href.search("newthread.php") > -1 || window.location.href.search("member.php") > -1 || window.location.href.search("newreply.php") > -1) && (defaultStyle[0] == true || replace))) {
-        designer = setInterval(
-        function () {
-            if (defaultStyle[0]) {
-                $(".cke_contents:not(.affected) iframe").contents().find("body:not(.affectedBody)").attr("tabindex", 1).unbind().focus(function () {
-                    console.log("focused");
-                    if (defaultStyle[0] == true && $("label[for='vB_Editor_QE_1_edit_reason']").length < 1) {
-                        var opening = "";
-                        var closing = "";
-                        if (defaultStyle[1]) {
-                            opening += '<strong>';
-                            closing += '</strong>';
-                        }
-                        if (defaultStyle[2]) {
-                            opening += '<em>';
-                            closing += '</em>';
-                        }
-                        if (defaultStyle[3]) {
-                            opening += '<u>';
-                            closing += '</u>';
-                        }
-                        if (defaultStyle[4] != "none" && defaultStyle[4] != "Arial" && window.location.href.search("member.php") < 0) { //exclude if font is the same as fxp's default, or a friend message
-                            opening += '<span style="font-family: ' + defaultStyle[4] + '">';
-                            closing += '</span>';
-                        }
-                        if (defaultStyle[5] != "#333333") { //exclude if color is the same as fxp's default
-                            opening += '<span style="color: ' + defaultStyle[5] + '">';
-                            closing += '</span>';
-                        }
-                        finalOutput = "";
-                        var prevText = $(this).html();
-                        var splitCharacters = Array.from(prevText);
-                        var splitHistory = "";
-                        for (var i = 0; i < splitCharacters.length; i++) {
-                            finalOutput += splitCharacters[i];
-
-                            splitHistory += splitCharacters[i];
-                            if (splitHistory.length > 4) { //make sure the length is 4 characters max
-                                splitHistory = splitHistory.substr(splitHistory.length - 4);
-                            }
-
-                            if (splitHistory == "<br>") { //detected break row
-                                //add style before the broken row
-                                finalOutput = finalOutput.substr(0, finalOutput.length - 4) + opening + "&#8203;" + closing + "<br>";
-                            }
-                        }
-                        finalOutput += opening + "&#8203;" + closing;
-
-                        $(this).html(finalOutput);
-                        $(".cke_contents").addClass("affected");
-                        $(this).unbind();
-                    }
-                }).addClass("affectedBody");
-
-            }
-            if (replace) {
-                var commentEditBody = $(".cke_contents iframe").contents().find("body");
-
-                if (commentEditBody.html().length > imgCountPrev) {
-                    for (i = 0; i < oldSmile.length; i++) {
-                        commentEditBody.find('img[src="' + oldSmile[i] + '"]').removeClass("inlineimg smilesfxp").removeAttr("smilieid"); //remove traces of smilies
-                    }
-                    replaceOldWithNewSmiles(commentEditBody);
-                    imgCountPrev = commentEditBody.html().length;
+    if (textboxModifyWorthy && defaultStyle[0] == true) {
+        $(".cke_contents:not(.affected) iframe").contents().find("body:not(.affectedBody)").attr("tabindex", 1).unbind().focus(function () {
+            console.log("focused");
+            if (defaultStyle[0] == true && $("label[for='vB_Editor_QE_1_edit_reason']").length < 1) {
+                var opening = "";
+                var closing = "";
+                if (defaultStyle[1]) {
+                    opening += '<strong>';
+                    closing += '</strong>';
                 }
-                $(".cke_smile").unbind("click").click(function () {
-                    setTimeout(function () {
-                        for (i = 0; i < oldSmile.length; i++) {
-                            commentEditBody.find('img[src="' + oldSmile[i] + '"]').removeClass("inlineimg smilesfxp").removeAttr("smilieid"); //remove traces of smilies
-                        }
-                        replaceOldWithNewSmiles(commentEditBody);
-                        console.log("CHANGED SMILIES I THINK");
-                    }, 500);
-                });
+                if (defaultStyle[2]) {
+                    opening += '<em>';
+                    closing += '</em>';
+                }
+                if (defaultStyle[3]) {
+                    opening += '<u>';
+                    closing += '</u>';
+                }
+                if (defaultStyle[4] != "none" && defaultStyle[4] != "Arial" && window.location.href.search("member.php") < 0) { //exclude if font is the same as fxp's default, or a friend message
+                    opening += '<span style="font-family: ' + defaultStyle[4] + '">';
+                    closing += '</span>';
+                }
+                if (defaultStyle[5] != "#333333") { //exclude if color is the same as fxp's default
+                    opening += '<span style="color: ' + defaultStyle[5] + '">';
+                    closing += '</span>';
+                }
+                finalOutput = "";
+                var prevText = $(this).html();
+                var splitCharacters = Array.from(prevText);
+                var splitHistory = "";
+                for (var i = 0; i < splitCharacters.length; i++) {
+                    finalOutput += splitCharacters[i];
+
+                    splitHistory += splitCharacters[i];
+                    if (splitHistory.length > 4) { //make sure the length is 4 characters max
+                        splitHistory = splitHistory.substr(splitHistory.length - 4);
+                    }
+
+                    if (splitHistory == "<br>") { //detected break row
+                        //add style before the broken row
+                        finalOutput = finalOutput.substr(0, finalOutput.length - 4) + opening + "&#8203;" + closing + "<br>";
+                    }
+                }
+                finalOutput += opening + "&#8203;" + closing;
+
+                $(this).html(finalOutput);
+                $(".cke_contents").addClass("affected");
+                $(this).unbind();
             }
-        }
-        , 100);
+        }).addClass("affectedBody");
+        //$(window).load(function () {
+        //    $(".cke_contents:last").parents(".wysiwyg_block").find('input[name="sbutton"]').attr("onclick", '').click(function () {
+        //        $(".cke_contents:last iframe").contents().find("body").append('test');
+        //    });
+        //});
     }
+}
+bindDefaultStyle();
+
+$(window).load(function () {
+    //quick reply submitted
+    $(".cke_contents:last").parents("form").find('input[name="sbutton"]').attr("onclick", '').click(function () {
+        //comment can be affected by styling defects, so remove them right before submitting.
+        var texteditorBody = $(".cke_contents:last iframe").contents().find("body");
+        //remove zero width space (8203)
+        texteditorBody.html(
+            texteditorBody.html().replace(/\u200B/g, '')
+            );
+        //remove empty elements
+        var emptySelectors = 'span:empty, u:empty, em:empty, strong:empty';
+        while (texteditorBody.find(emptySelectors).length > 0) {
+            texteditorBody.find(emptySelectors).remove();
+            console.log("cleanup");
+        }
+        //remove new lines at the end of the message
+        var innerHtml = texteditorBody.html();
+        while (texteditorBody.html() !== texteditorBody.html().replace(/<br>$|<br>\n$/g, '')) {
+            texteditorBody.html(texteditorBody.html().replace(/<br>$|<br>\n$/g, ''));
+            console.log("cleaned");
+        }
+    });
 });
+
+var styleObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (mutation.addedNodes.length > 0) {
+            //a new comment textbox appeared
+            bindDefaultStyle();
+        }
+    });
+});
+
+if ($(".editor_textbox")[0])
+    styleObserver.observe($(".editor_textbox")[0], { attributes: true, childList: true, characterData: true, subtree: true }); //observe comment textbox changes
+
+
+var changedIconsTime = new Date().getTime();
+var commentTextObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        var currentTime = new Date().getTime();
+        if (currentTime - changedIconsTime >= 100) { //buffer for too many updates
+            changedIconsTime = currentTime;
+
+            var commentEditBody = $(".cke_contents iframe").contents().find("body");
+            for (i = 0; i < oldSmile.length; i++) {
+                commentEditBody.find('img[src="' + oldSmile[i] + '"]').removeClass("inlineimg smilesfxp").removeAttr("smilieid"); //remove traces of smilies
+            }
+            replaceOldWithNewSmiles(commentEditBody);
+        }
+    });
+});
+
+$(window).load(function () {
+    chrome.storage.sync.get("replaceIcons", function (data) {
+        var replace = data.replaceIcons;
+        if (replace && $(".editor_textbox iframe").contents().find("body")[0])
+            commentTextObserver.observe($(".editor_textbox iframe").contents().find("body")[0], { childList: true, characterData: true, subtree: true })
+    });
+});
+
+
 $(".newreply").click(function () { $(".cke_contents").removeClass("affected"); })
 $(".quickreply").click(function () { $(".cke_contents").removeClass("affected"); })
 $(".quickreply").click(function () { $(".cke_contents").removeClass("affected"); })
 $("#qr_defaultcontainer .group input.button").click(function () { $(".cke_contents").removeClass("affected"); })
-
-
-$(window).load(function () {
-    if ($(".cke_contents iframe").length < 1) window.clearInterval(designer);
-});
 
 $(".titleshowt").find("h1").after('<div id="titleShortcuts"></div>');
 
@@ -1050,6 +1210,15 @@ function KeyPress(e) { //key combination handler
                 localStorage.clear();
                 alert("Chrome storage and local storage cleared.");
                 break;
+            case "log storage":
+                chrome.storage.local.get(null, function (data) {
+                    console.log(data);
+                });
+                chrome.storage.sync.get(null, function (data) {
+                    console.log(data);
+                });
+                alert("the chrome sync/local storage has been logged to the console.");
+                break;
             case "test":
                 alert("Command line is working properly.");
                 break;
@@ -1123,7 +1292,7 @@ function KeyPress(e) { //key combination handler
                 $('head style:first').append('#scrolling{animation:scroll ' + timeToScroll + 's linear 13s;-moz-transform:perspective(300px) rotateX(25deg);-ms-transform:perspective(300px) rotateX(25deg);-o-transform:perspective(300px) rotateX(25deg);-webkit-transform:perspective(300px) rotateX(25deg);transform:perspective(300px) rotateX(25deg)}@keyframes scroll{0%{top:100%;opacity:1}95%{opacity:1}100%{top:' + outOfBoundsPercent + '%;opacity:0}}');
 
                 setTimeout(function () { //music
-                    $('body').append('<iframe style="display: none;" src="https://player.vimeo.com/video/153600657?autoplay=1&loop=1&title=0&byline=0&portrait=0"></iframe>')
+                    $('body').append('<iframe style="opacity: 0;" src="https://player.vimeo.com/video/153600657?autoplay=1&loop=1&title=0&byline=0&portrait=0"></iframe>')
                 }, 8200);
 
                 setTimeout(function () { //reload normal page after done scrolling
@@ -1302,24 +1471,34 @@ if (readTimeNews) {
 
 
 
+var pagesElement = $("#yui-gen8");
 
 $("#titleShortcuts").append('<div id="sortByLikes" title="מיין תגובות לפי סימוני אהבתי"></div>'); //add to quick access button
-var pages = parseInt($("#yui-gen8").text().split(" מתוך ")[1]); //get number of pages from page indication
+var pages = parseInt(pagesElement.text().split(" מתוך ")[1]); //get number of pages from page indication
 if (isNaN(pages)) pages = 1; //1 page if no page indication
+
+var currentPage = 1; //the page that the user is viewing
+if (pages > 1) { //may not be the first page if there are multiple pages
+    currentPage = parseInt(pagesElement.text().split(" מתוך ")[0].replace("עמוד ", ""));
+}
+
+console.log("You're viewing page " + currentPage + " out of " + pages);
 
 if (!threadData.isThread) $("#sortByLikes").remove();
 
 var comments = [];
 $("#sortByLikes").click(function () {
     comments = [];
-    var pages = parseInt($("#yui-gen8").text().split(" מתוך ")[1]); //get number of pages from page indication
+    console.log("PAGES: " + pages);
     if (isNaN(pages)) pages = 1; //1 page if no page indication
     $(this).unbind().attr("title", "טוען תגובות...").css("background-image", "url(http://i.imgur.com/LjxMglI.png)"); //loading heart
-    if (pages == 1) {
+    if (pages === 1) {
         for (i = 0; i < $(".postbit").length; i++) {
             var commentWhole = $(".postbit:eq(" + i + ")").html();
-            var commentLikes = parseInt($(".postbit:eq(" + i + ") .postfoot a.countlike").text());
-            var thisComment = [commentLikes, commentWhole];
+            var commentLikes = parseInt($(".postbit:eq(" + i + ") .postfoot .countlike").text());
+            var commentIndex = parseInt($(".postbit:eq(" + i + ") .postcounter").text().substr(1));
+            //var thisComment = [commentLikes, commentWhole];
+            var thisComment = { html: commentWhole, likes: commentLikes, index: commentIndex };
             comments.push(thisComment);
         }
         sortCommentsByLikes(comments)
@@ -1343,7 +1522,9 @@ $("#sortByLikes").click(function () {
                             for (i = 0; i < targetedIframe.find(".postbit").length; i++) { //take comment data
                                 var commentWhole = targetedIframe.find(".postbit:eq(" + i + ")").html();
                                 var commentLikes = parseInt(targetedIframe.find(".postbit:eq(" + i + ") .postfoot .countlike").text());
-                                var thisComment = [commentLikes, commentWhole];
+                                var commentIndex = parseInt(targetedIframe.find(".postbit:eq(" + i + ") .postcounter").text().substr(1));
+                                //var thisComment = [commentLikes, commentWhole];
+                                var thisComment = { html: commentWhole, likes: commentLikes, index: commentIndex };
                                 comments.push(thisComment);
                             }
                             $(".likeFrame").remove(); //remove the inspected frame
@@ -1388,13 +1569,23 @@ $("#sortByLikes").click(function () {
 })
 
 function sortCommentsByLikes(cmnts) {
+    console.log(cmnts);
     setTimeout(function () { // 0.5s fallback
-        cmnts.sort(function (a, b) { return b[0] - a[0] }); //sort from high to low
+        //cmnts.sort(function (a, b) { return b[0] - a[0] }); //sort from high to low
+        cmnts.sort(function (a, b) {
+            if (b.likes === a.likes) {
+                //same number of likes, sort by index
+                return a.index - b.index;
+            } else {
+                //sort by the number of likes
+                return b.likes - a.likes;
+            }
+        });
 
         var commentOutput = "";
         for (i = 0; i < cmnts.length; i++) { //wrap comments
             commentOutput += '<li class="postbit postbitim postcontainer">'
-            commentOutput += cmnts[i][1];
+            commentOutput += cmnts[i].html;
             commentOutput += '</li>'
         }
         $("#posts").html(commentOutput); //insert output
@@ -1409,21 +1600,49 @@ function sortCommentsByLikes(cmnts) {
             }
         })
 
+        //display the images that may be hidden by lazyload
+        $("#posts img[original]").each(function () {
+            $(this).attr("src", $(this).attr("original"));
+            $(this).removeAttr("original");
+            $(this).one("load", function () {
+                Update(true);
+            })
+        });
+
         $(".commentIframes").remove();
 
         $("#sortByLikes").attr("title", "התגובות ממויינות בהתאם לכמות סימוני האהבתי.").css("background-image", "url(http://i.imgur.com/GmAfz4N.png)"); //success heart
+
+        Update(true);
     }, 500);
 }
+
+var loadNext = true;
+var autoLoadCurrentPage = currentPage;
+
+//if (pages > 1) { //auto load next page upon multiple pages
+//    var navigationLinks = $(".navlinks")[0];
+
+//    $(window).scroll(function () {
+//        if (loadNext) { //should check if it is legitimate to load the next page
+//            if (window.innerHeight - navigationLinks.getBoundingClientRect().top >= 300) { //check if the page is at its bottom
+//                $("body").append('<iframe id="loadPageBackground" src="'+threadData.url+'&page='+autoLoadCurrentPage+'"></iframe>');
+//                loadNext = false;
+//            }
+//        }
+//    })
+//}
+
 
 
 $("head").append('<script id="editorScript" src="//cdn.tinymce.com/4/tinymce.min.js"></script>');
 
 if (window.location.href.search("member.php") > -1) {
-    chrome.storage.sync.get("notes", function (data) {
+    chrome.storage.local.get("notes", function (data) {
         var notes = data.notes;
         if (notes == undefined) { //set defaults
             notes = [["967488", '<p style="direction: rtl;" data-mce-style="direction: rtl;">איש מגניב <strong>במיוחד</strong>.</p>'], ["30976", '<p style=\"direction: rtl; text-align: center;\" data-mce-style=\"direction: rtl; text-align: center;\">&nbsp;<span class=\"mce-preview-object mce-object-iframe\" contenteditable=\"false\" data-mce-object=\"iframe\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"><iframe src=\"//www.youtube.com/embed/JSgeAFTwg0U\" width=\"560\" height=\"314\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" data-mce-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"></iframe></span><br></p>']];
-            chrome.storage.sync.set({ "notes": [["967488", '<p style="direction: rtl;" data-mce-style="direction: rtl;">איש מגניב <strong>במיוחד</strong>.</p>'], ["30976", '<p style=\"direction: rtl; text-align: center;\" data-mce-style=\"direction: rtl; text-align: center;\">&nbsp;<span class=\"mce-preview-object mce-object-iframe\" contenteditable=\"false\" data-mce-object=\"iframe\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"><iframe src=\"//www.youtube.com/embed/JSgeAFTwg0U\" width=\"560\" height=\"314\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" data-mce-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"></iframe></span><br></p>']] });
+            chrome.storage.local.set({ "notes": [["967488", '<p style="direction: rtl;" data-mce-style="direction: rtl;">איש מגניב <strong>במיוחד</strong>.</p>'], ["30976", '<p style=\"direction: rtl; text-align: center;\" data-mce-style=\"direction: rtl; text-align: center;\">&nbsp;<span class=\"mce-preview-object mce-object-iframe\" contenteditable=\"false\" data-mce-object=\"iframe\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"><iframe src=\"//www.youtube.com/embed/JSgeAFTwg0U\" width=\"560\" height=\"314\" frameborder=\"0\" allowfullscreen=\"allowfullscreen\" data-mce-src=\"//www.youtube.com/embed/JSgeAFTwg0U\"></iframe></span><br></p>']] });
         }
 
         $(".tabslight dd a").click(function () { $("#view-notes").removeClass("selected_view_section").addClass("view_section"); });
@@ -1456,7 +1675,7 @@ if (window.location.href.search("member.php") > -1) {
                 }
             }
             notes.push([userId, noteContent]);
-            chrome.storage.sync.set({ "notes": notes }, function () {
+            chrome.storage.local.set({ "notes": notes }, function () {
                 $("#saveNote").text("השינויים נשמרו.");
                 setTimeout(function () { $("#saveNote").text("שמור שינויים") }, 3000);
                 console.log(notes);
@@ -1669,13 +1888,185 @@ if (JSON.parse(localStorage.getItem("showStats")) && $(".threads_list_fxp").leng
 
 */
 
+function displayUsernameByID(nameArea, id) {
+    id = parseInt(id);
+    if (isNaN(id)) {
+        nameArea.text("? ? ?").removeClass("loadingBackground");
+    } else {
+        chrome.storage.local.get("usernameList", function (data) {
+            var usernameList = data.usernameList;
+            if (usernameList === undefined) {
+                usernameList = [];
+            }
+            //try finding the name in the storage
+            console.log(usernameList);
+            var user = usernameList.find(x=> x.id === id);
+            if (user === undefined) {
+                //no name stored, find it and store findings
+                var userURL = 'https://www.fxp.co.il/member.php?u=' + id;
+                $("#SettingsContent").append('<iframe src id="getNameFrame' + id + '" style="display: none"></iframe>');
+                $("iframe#getNameFrame" + id)
+                    .attr("src", "https://www.fxp.co.il/member.php?u=" + id + "&getUserOnly")
+                    .on("load", function () {
+                        console.log("LOADED USERNAME");
+                        var name = $(this).contents().find(".userOnly").text().trim();
+                        $(this).remove();
 
-var pages = { //html for pages
-    welcome: '<div class="SettingsTitle">ברוכים הבאים!</div> זהו דף ההגדרות. מצד ימין ניתן לראות את החלקים השונים שניתן לשנות בתוסף.<br />במידה ומצאתם באג, או סתם בא לכם לדבר על התוסף, צרו קשר! <br /><div class="settingsWarning"> <span class="warningTtl">אתה בגרסת פיתוח!</span><br/> התוסף אינו בשלבי סיום! <a href="http://goo.gl/forms/38SFbns8EG" target="_blank"><b>לחץ כאן כדי לדווח על באג</b></a>.<br/>בנוסף לכך, שקול להביע את דעתך לגבי התוסף ולדרג אותו בחנות. תוכל גם לעזור לתוסף ו<a href="https://www.fxp.co.il/profile.php?do=editsignature" target="_blank" style="color: blue;">לקשר אליו בחתימה שלך</a>.</div><br/><span style="font-weight: bold; font-size: 16px">אם זו הפעם הראשונה שלך בתוסף, מומלץ לעבור אל "איך להשתמש" כדי להבין איך להתחיל.</span><br/><br/><div style="position:absolute; left:0; bottom: 0; direction: ltr; padding: 6px 14px;"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">FxPlus+</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">SilverTuxedo</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</div>',
+                        chrome.storage.local.get("usernameList", function (data2) {
+                            usernameList = data2.usernameList;
+                            if (usernameList === undefined) {
+                                usernameList = [];
+                            }
+                            if (name === "") {
+                                name = "? ? ?"
+                            } else {
+                                user = usernameList.find(x=> x.id === id);
+                                //user is not already listed
+                                if (user === undefined) {
+                                    usernameList.push({ id: id, name: name });
+                                } else {
+                                    user.name = name;
+                                }
+                                chrome.storage.local.set({ usernameList: usernameList });
+                            }
+                            nameArea.text(name).removeClass("loadingBackground");
+                        })
+
+                    });
+            } else {
+                nameArea.text(user.name).removeClass("loadingBackground");
+            }
+        });
+    }
+}
+
+//$(".userName").focusout(function () { //update user id when focus out (convert)
+//    $(this).parents("tr").find("div.userIdFrame").text("").addClass("loadingBackground");
+//    var nameOfUser = $(this).val();
+//    $(this).parents(".sConvertLine").find("iframe.userIdFrame").attr("src", "https://www.fxp.co.il/member.php?username=" + nameOfUser + "&getIdOnly");
+//    $(".addToTable").css({
+//        "transform": "rotate(45deg)",
+//        "filter": "hue-rotate(-90deg)",
+//        "webkitFilter": "hue-rotate(-90deg)",
+//        "mozFilter": "hue-rotate(-90deg)",
+//        "oFilter": "hue-rotate(-90deg)",
+//        "cursor": "url(http://fcdn.co.il/smilies2/nono.gif), not-allowed"
+//    }).unbind("click");
+//});
+
+//function bindFrameLoad() {
+//    $("iframe.userIdFrame").unbind('load').load(function () {
+//        var userName = $(this).contents().find(".userOnly").text();
+//        $(this).parents("tr").find("div.userIdFrame").text(userName).removeClass("loadingBackground");
+//        $(this).attr("src", "");
+//        if (userName != "? ? ?" && userName != "") {
+//            $(".addToTable").css({
+//                "transform": "rotate(0deg)",
+//                "filter": "hue-rotate(0deg)",
+//                "webkitFilter": "hue-rotate(0deg)",
+//                "mozFilter": "hue-rotate(0deg)",
+//                "oFilter": "hue-rotate(0deg)",
+//                "cursor": "pointer"
+//            }).click(function () {
+//                if ($(".sThreadLine").length > 0) { //make sure to make the right action
+//                    $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId" value="' + userName + '"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
+//                    lastRadioName++;
+//                    displayUsernameByID($(".sThreadLine:last .userFrame"), parseInt(userName));
+//                    $(".sThreadLine:last .removeEntry").click(function () {
+//                        $(this).parents(".sThreadLine").remove();
+//                    });
+//                    $(".sThreadLine:last .userId").focusout(function () {
+//                        $(this).parents("tr").find("div.userFrame").text("").addClass("loadingBackground");
+//                        var idOfUser = $(this).val();
+//                        displayUsernameByID($(this).parents(".sThreadLine").find(".userFrame"), parseInt(idOfUser));
+//                    });
+//                    $(".sThreadLine:last .userId").parents(".sThreadLine").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + userName + "&getUserOnly");
+//                } else if ($(".containtersPlace").length > 0) {
+//                    $(".containtersPlace").append('<div class="sUserGridContainer"> <input type="text" class="userId" placeholder="מספר משתמש" value="' + userName + '"/><br /> <input type="checkbox" class="SettingsCheckbox hideComments"> הסתר תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox unstyleComments"> נטרל עיצוב תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox activeSubNick"> הפעל תת-ניק מיוחד<br /><br /> <table class="nUserGridNick"> <tr> <td colspan="2"><div class="userFrame loadingBackground"></div></td> </tr> <tr> <td colspan="2"><input type="text" class="userSubNick" placeholder="תת-ניק.." /></td> </tr> <tr> <th><input type="color" class="colorId" value="#000000" /></th> <th>px <input type="number" class="textSize" min="0" max="100" value="11"> </th> </tr> <tr> <td colspan="2"><div class="removeEntry" title="הסר"></div></td> </tr> </table> </div>');
+//                    displayUsernameByID($(".sUserGridContainer:last .userFrame"), parseInt(userName));
+//                    $(".sUserGridContainer:last .removeEntry").click(function () {
+//                        $(this).parents(".sUserGridContainer").remove();
+//                    });
+//                    $(".sUserGridContainer:last .userId").focusout(function () { //update username when focus out
+//                        $(this).parents(".sUserGridContainer").find("div.userFrame").text("").addClass("loadingBackground");
+//                        var idOfUser = $(this).val();
+//                        displayUsernameByID($(this).parents(".sUserGridContainer").find("div.userFrame"), parseInt(idOfUser));
+//                    });
+//                    $(".sUserGridContainer:last .colorId").change(function () { //update color of subnick when focus out
+//                        $(this).parents(".sUserGridContainer").find(".userSubNick").css("color", $(this).val());
+//                    });
+//                    $(".sUserGridContainer:last .textSize").change(function () { //update size of subnick when focus out
+//                        $(this).parents(".sUserGridContainer").find(".userSubNick").css("font-size", $(this).val() + "px");
+//                    });
+//                }
+//                bindFrameLoad();
+//            });
+//        }
+//        bindFrameLoad();
+//    });
+//}
+
+function displayIDByName(idArea, name) {
+
+    $("#SettingsContent").append('<iframe src class="getIdFrame" name="' + name + '" style="display: none"></iframe>');
+    $('iframe.getIdFrame[name="' + name + '"]')
+        .attr("src", "https://www.fxp.co.il/member.php?username=" + name + "&getIdOnly")
+        .on("load", function () {
+            var userName = $(this).contents().find(".userOnly").text();
+            $(this).remove();
+            idArea.text(userName).removeClass("loadingBackground");
+            if (userName != "? ? ?" && userName != "") {
+                $(".addToTable").css({
+                    "transform": "rotate(0deg)",
+                    "filter": "hue-rotate(0deg)",
+                    "webkitFilter": "hue-rotate(0deg)",
+                    "mozFilter": "hue-rotate(0deg)",
+                    "oFilter": "hue-rotate(0deg)",
+                    "cursor": "pointer"
+                }).click(function () {
+                    if ($(".sThreadLine").length > 0) { //make sure to make the right action
+                        $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId" value="' + userName + '"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
+                        lastRadioName++;
+                        displayUsernameByID($(".sThreadLine:last .userFrame"), parseInt(userName));
+                        $(".sThreadLine:last .removeEntry").click(function () {
+                            $(this).parents(".sThreadLine").remove();
+                        });
+                        $(".sThreadLine:last .userId").focusout(function () {
+                            $(this).parents("tr").find("div.userFrame").text("").addClass("loadingBackground");
+                            var idOfUser = $(this).val();
+                            displayUsernameByID($(this).parents(".sThreadLine").find(".userFrame"), parseInt(idOfUser));
+                        });
+                        $(".sThreadLine:last .userId").parents(".sThreadLine").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + userName + "&getUserOnly");
+                    } else if ($(".containtersPlace").length > 0) {
+                        $(".containtersPlace").append('<div class="sUserGridContainer"> <input type="text" class="userId" placeholder="מספר משתמש" value="' + userName + '"/><br /> <input type="checkbox" class="SettingsCheckbox hideComments"> הסתר תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox unstyleComments"> נטרל עיצוב תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox activeSubNick"> הפעל תת-ניק מיוחד<br /><br /> <table class="nUserGridNick"> <tr> <td colspan="2"><div class="userFrame loadingBackground"></div></td> </tr> <tr> <td colspan="2"><input type="text" class="userSubNick" placeholder="תת-ניק.." /></td> </tr> <tr> <th><input type="color" class="colorId" value="#000000" /></th> <th>px <input type="number" class="textSize" min="0" max="100" value="11"> </th> </tr> <tr> <td colspan="2"><div class="removeEntry" title="הסר"></div></td> </tr> </table> </div>');
+                        displayUsernameByID($(".sUserGridContainer:last .userFrame"), parseInt(userName));
+                        $(".sUserGridContainer:last .removeEntry").click(function () {
+                            $(this).parents(".sUserGridContainer").remove();
+                        });
+                        $(".sUserGridContainer:last .userId").focusout(function () { //update username when focus out
+                            $(this).parents(".sUserGridContainer").find("div.userFrame").text("").addClass("loadingBackground");
+                            var idOfUser = $(this).val();
+                            displayUsernameByID($(this).parents(".sUserGridContainer").find("div.userFrame"), parseInt(idOfUser));
+                        });
+                        $(".sUserGridContainer:last .colorId").change(function () { //update color of subnick when focus out
+                            $(this).parents(".sUserGridContainer").find(".userSubNick").css("color", $(this).val());
+                        });
+                        $(".sUserGridContainer:last .textSize").change(function () { //update size of subnick when focus out
+                            $(this).parents(".sUserGridContainer").find(".userSubNick").css("font-size", $(this).val() + "px");
+                        });
+                    }
+                });
+            }
+        });
+}
+
+
+var settingsPages = { //html for settings pages
+    welcome: '<div class="SettingsTitle">ברוכים הבאים!</div> זהו דף ההגדרות. מצד ימין ניתן לראות את החלקים השונים שניתן לשנות בתוסף.<br />במידה ומצאתם באג, או סתם בא לכם לדבר על התוסף, צרו קשר! <br /><div class="settingsWarning"> <span class="warningTtl">אתה בגרסת פיתוח!</span><br/> התוסף אינו בשלבי סיום! <a href="http://goo.gl/forms/38SFbns8EG" target="_blank"><b>לחץ כאן כדי לדווח על באג</b></a>.<br/>בנוסף לכך, שקול להביע את דעתך לגבי התוסף ולדרג אותו בחנות. תוכל גם לעזור לתוסף ו<a href="https://www.fxp.co.il/profile.php?do=editsignature" target="_blank" style="color: blue;">לקשר אליו בחתימה שלך</a>.</div><br/><span style="font-weight: bold; font-size: 16px">אם זו הפעם הראשונה שלך בתוסף, מומלץ לעבור אל "איך להשתמש" כדי להבין איך להתחיל.</span><br/><br/>',
     general: '<div class="SettingsTitle">כללי</div> <br /> <input type="checkbox" class="SettingsCheckbox" id="BackgroundNotifications"> שלח התראות גם כאשר האתר סגור<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id="testNotif">שלח הודעת בדיקה</a><br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="signatureResize"> הקטן אוטומטית חתימות גדולות<br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="newMessages"> הצג בסוגריים את מספר ההודעות שלא נקראו<br /> <br /> הסתר אשכולות נעוצים בני יותר מ-<select name="daysPinned"> <option value="3day">3 ימים</option> <option value="7day">שבוע</option> <option value="14day">שבועיים</option> <option value="28day">חודש</option> <option value="never">אף פעם</option> </select><br />&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="SettingsCheckbox" id="hideRules"> כולל אשכולות חוקים<br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="showSpoilers"> הצג ספוילרים<br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="hideOutbrain"> הסתר את Taboola (אשכולות מוצעים)<br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="autonight"> הפעל מצב לילה אוטומטית מ-<select name="startNight"></select> עד <select name="endNight"></select> <br /> <br /> <input type="checkbox" class="SettingsCheckbox" id="showNightIndicator"> הצג קיצור דרך למצב לילה<br/><br/>סגור הצצה לאשכולות <select name="peekCloseMethod"> <option value="auto">אוטומטית</option> <option value="doublePress">בלחיצה חוזרת על המעטפה</option></select><br /> <br /><input type="checkbox" class="SettingsCheckbox" id="useOldSmiles"> השתמש בסמיילים ישנים<br/><br/> <input type="checkbox" class="SettingsCheckbox" id="showStats"> הצג סטטיסטיקת פורומים<br/><br/> <button class="SettingsButton" id="changeBgSet">שנה את הרקע של FxP</button><br/><br/> <div class="settingsEndBtn cyan">שמור</div> <div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div> <br /> <br /> <br />',
     threads: '<div class="SettingsTitle">אשכולות</div><br /><span style="font-size:18px">פעולה לפי משתמש</span><br />המתן לטעינת הטבלה.<br /><table class="sThreadContainer" style="width: 100%;"><tr class="sThreadLine" style="font-weight: bold;"><th>מספר משתמש</th><th>הסתרה</th><th>הדגשה</th><th>שם משתמש</th><th>הסר</th></tr></table><br /><div class="settingsEndBtn green" style="width: 110px; margin-left: 40px; float:right;">הוסף שורה</div><div class="settingsEndBtn cyan" style="float:right;">שמור</div><br/><br/><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div><br /><br/><span style="font-size:18px">פעולה לפי מילים</span><br />בחר מה יקרה אם אשכול מסויים יכלול מילים אלה בכותרת. הפרד מילים ברווח.<br /><table class="sConvertContainer" style="width: 45%;"> <tr class="sConvertLine" style="font-weight: bold;"> <th style="width: 50%">הסתר</th> <th style="width: 50%">הדגש</th> </tr> <tr class="sConvertLine"> <th><textarea class="dataText"></textarea></th> <th><textarea class="dataText"></textarea></th> </tr> </table><br /><div class="settingsEndBtn cyan">שמור</div><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div><br/><span style="font-size:18px">זמן קריאה</span><br />בחר לאילו אשכולות יוצג זמן הקריאה המשוער. <span id="calculateReadTime"> מהירות הקריאה שלך כרגע היא <span id="placeReadSpeed"></span> מילים לדקה. לחץ כאן כדי לחשב מחדש.</span><br /><div class="tagItem" id="דיון"> דיון|</div><div class="tagItem" id="עזרה"> עזרה|</div><div class="tagItem" id="שאלה"> שאלה|</div><div class="tagItem" id="כתבה"> כתבה|</div><div class="tagItem" id="מדריך"> מדריך|</div><div class="tagItem" id="בעיה"> בעיה|</div><div class="tagItem" id="מידע"> מידע|</div><div class="tagItem" id="הצעה"> הצעה|</div><div class="tagItem" id="פרסום"> פרסום|</div><div class="tagItem" id="פתרון"> פתרון|</div><div class="tagItem" id="עקיבה"> עקיבה|</div><div class="tagItem" id="הכרזה"> הכרזה|</div><div class="tagItem" id="ספוילר"> ספוילר|</div><div class="tagItem" id="הורדה"> הורדה|</div><div class="tagItem" id="בקשה"> בקשה|</div><div class="tagItem" id="השוואה"> השוואה|</div><div class="tagItem" id="סיקור"> סיקור|</div><div class="tagItem" id="updateForums"> כתבות בפורומי עדכונים</div><br/><br/><div class="settingsEndBtn cyan">שמור</div><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div><br/><hr /><span style="font-size:16px;" class="convertTitleHighlight">המרה</span><br /><span class="convertHighlighter"> המר שם משתמש למספר משתמש (שבו תוכל להשתמש בטבלה העליונה)</span><br /><table class="sConvertContainer"><tr class="sConvertLine" style="font-weight: bold;"><th>שם משתמש</th><th>מספר משתמש</th><th>הוסף לטבלה</th></tr><tr class="sConvertLine"><th><input type="text" class="userName"></th><th><iframe src="https://www.fxp.co.il/member.php?username=PlaceHolderThisUserCantExist&getIdOnly" class="userIdFrame" /><div class="userIdFrame loadingBackground"></div></th><th><div class="addToTable" title="הוסף לטבלה"></div></th></tr></table>',
     comments: '<div class="SettingsTitle">תגובות ותת-ניקים</div> <br /><span style="font-size:18px">פעולה לפי משתמש</span> <br />המתן לטעינת הדף.<br /> <div class="containtersPlace"> </div> <br /> <div class="settingsEndBtn green" style="width: 110px; margin-left: 40px; float:right;">הוסף אריח</div> <div class="settingsEndBtn cyan" style="float:right;">שמור</div><br /><br /><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div> <br /> <br/> <span style="font-size:18px">עצב תגובות </span> <br />הגדר את העיצוב ההתחלתי של התגובות שלך.<br /><br/> <input type="checkbox" class="SettingsCheckbox enableDefaultStyle" /> אפשר <br/><div style="display: inline-block;"><div class="styleBar"> <div class="bold">B</div> <div class="italic">I</div> <div class="underline">U</div> <select class="font"><option value="unknown">almoni-dl</option> <option value="unknown">Arial</option> <option value="unknown">Arial Black</option> <option value="unknown">Arial Narrow</option> <option value="unknown">Book Antiqua</option> <option value="unknown">Century Gothic</option> <option value="unknown">Comic Sans MS</option> <option value="unknown">Courier New</option> <option value="unknown">Fixedsys</option> <option value="unknown">Franklin Gothic Medium</option> <option value="unknown">Garamond</option> <option value="unknown">Georgia</option> <option value="unknown">Gisha</option> <option value="unknown">Impact</option> <option value="unknown">Lucida Console</option> <option value="unknown">Lucida Sans Unicode</option> <option value="unknown">Micorosft Sans Serif</option> <option value="unknown">Palatino Linotype</option> <option value="unknown">rancho</option> <option value="unknown">Segoe UI</option> <option value="unknown">System</option> <option value="unknown">Tahoma</option> <option value="unknown">Times New Roman</option> <option value="unknown">Terbuchet MS</option> <option value="unknown">Verdana</option> </select><input type="color" class="textColor" value="#333333"> </div><br/> <div class="styleText"> טקסט זה כתוב בעברית.<br/> This text is written in English. </div></div><br /><br/><div class="settingsEndBtn cyan">שמור</div><div class="saveSuccess">השינויים נשמרו! ייתכן שיהיה צורך לרענן.</div> <br /><hr /> <span style="font-size:16px;" class="convertTitleHighlight">המרה</span><br /><span class="convertHighlighter"> המר שם משתמש למספר משתמש (שבו תוכל להשתמש באריחים העליונים)</span><br /><table class="sConvertContainer"><tr class="sConvertLine" style="font-weight: bold;"><th>שם משתמש</th><th>מספר משתמש</th><th>הוסף לטבלה</th></tr><tr class="sConvertLine"><th><input type="text" class="userName"></th><th><iframe src="https://www.fxp.co.il/member.php?username=PlaceHolderThisUsernameCantExist@@&getIdOnly" class="userIdFrame" /><div class="userIdFrame loadingBackground"></div></th><th><div class="addToTable" title="הוסף לטבלה"></div></th></tr></table>',
-    use: '<iframe src="' + chrome.runtime.getURL("howto.html") + '" class="howToFrame"></iframe>',
+    use: '<iframe src="' + chrome.runtime.getURL("html/howto.html") + '" class="howToFrame"></iframe>',
     touch: '<div class="SettingsTitle">תמיכה</div> <br/><span style="font-size:18px">ממני אליך</span> <br/>במידה ויש לך בעיה, הצעה או סתם בא לך ליצור איתי קשר, תוכל לעשות זאת בשני האופנים הבאים:<br /><br/> • באמצעות <a href="https://www.fxp.co.il/private.php?do=newpm&u=967488" style="color: #0000ff">הודעה פרטית ב-FXP</a><br/> • באמצעות Discord - רשום <a href="https://www.fxp.co.il/member.php?u=967488" style="color: #0000ff">בפרופיל שלי</a><br/><br/>אשמח לענות על שאלות ולעזור.<br/><br/><br/><span style="font-size:18px">ממך אל התוסף</span> <br/>התוסף הוא פחות מ-0.1% מהמשתמשים הפעילים ב-FxP. במידה ונהנית מהתוסף, <b>שתף את הכיף!™</b> - תוכל לעשות זאת בכמה אופנים: <br /><br/> • באמצעות תמיכה בתוסף ושיתוף שלו בחתימה שלך. <br/> • באמצעות שיתוף התוסף עם החברים שלך.<br/> • באמצעות השווצה בדברים שהתוסף יכול לעשות.<br/> • בכל אמצעי אחר שנראה לך שיועיל לפרסום התוסף.<br/><br/> אנצל את ההזדמנות הזו גם כדי לומר תודה על זה שהורדת את התוסף! אני מקווה שהוא מועיל לך ומשפר את חוויית הגלישה שלך. <br/><br/>'
 };
 
@@ -1699,10 +2090,10 @@ settingsSide += '</div><div id="SettingsContent">';
 settingsSide += '</div><div id="twitterContainer"><a class="twitter-timeline" href="https://twitter.com/FxPlusplus" data-widget-id="658321258107510785">ציוצים מאת FxPlusplus</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?\'http\':\'https\';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></div>';
 $("#settings").html(settingsSide);
 
-$(".welcomeTab").click(function () { $("#SettingsContent").html(pages.welcome); $("#SettingsContent").css("padding", "21px 32px"); }); //load pages on click of sidebar
+$(".welcomeTab").click(function () { $("#SettingsContent").html(settingsPages.welcome); $("#SettingsContent").css("padding", "21px 32px"); }); //load settingsPages on click of sidebar
 $(".generalTab").click(function () {
     exportFromSyncStorage();
-    $("#SettingsContent").html(pages.general); //load basic skeleton
+    $("#SettingsContent").html(settingsPages.general); //load basic skeleton
     if (localStorage.getItem("signatureResize") == "true") { //change skeleton to fit current values
         $("#signatureResize").attr("checked", true);
     } else {
@@ -1922,61 +2313,70 @@ $(".generalTab").click(function () {
 
 });
 
+
 function bindFrameLoad() {
-    $("iframe.userFrame").unbind('load').load(function () {
-        var userId = $(this).contents().find(".userOnly").text();
-        $(this).parents("tr").find("div.userFrame").text(userId).removeClass("loadingBackground");
-        $(this).after('<iframe class="userFrame" />');
-        $(this).remove();
-        bindFrameLoad();
-    });
-    $("iframe.userIdFrame").unbind('load').load(function () {
-        var userName = $(this).contents().find(".userOnly").text();
-        $(this).parents("tr").find("div.userIdFrame").text(userName).removeClass("loadingBackground");
-        $(this).after('<iframe class="userIdFrame" />');
-        $(this).remove();
-        if (userName != "? ? ?" && userName != "") {
-            $(".addToTable").css({
-                "transform": "rotate(0deg)",
-                "filter": "hue-rotate(0deg)",
-                "webkitFilter": "hue-rotate(0deg)",
-                "mozFilter": "hue-rotate(0deg)",
-                "oFilter": "hue-rotate(0deg)",
-                "cursor": "pointer"
-            }).click(function () {
-                if ($(".sThreadLine").length > 0) { //make sure to make the right action
-                    $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId" value="' + userName + '"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><iframe src="https://www.fxp.co.il/member.php?u=0&getUserOnly" class="userFrame" /><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
-                    lastRadioName++;
-                    $(".sThreadLine:last .removeEntry").click(function () {
-                        $(this).parents(".sThreadLine").remove();
-                    });
-                    $(".sThreadLine:last .userId").focusout(function () {
-                        $(this).parents("tr").find("div.userFrame").text("").addClass("loadingBackground");
-                        var idOfUser = $(this).val();
-                        $(this).parents(".sThreadLine").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + idOfUser + "&getUserOnly");
-                    });
-                    $(".sThreadLine:last .userId").parents(".sThreadLine").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + userName + "&getUserOnly");
-                } else if ($(".containtersPlace").length > 0) {
-                    $(".containtersPlace").append('<div class="sUserGridContainer"> <input type="text" class="userId" placeholder="מספר משתמש" value="' + userName + '"/><br /> <input type="checkbox" class="SettingsCheckbox hideComments"> הסתר תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox unstyleComments"> נטרל עיצוב תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox activeSubNick"> הפעל תת-ניק מיוחד<br /><br /> <table class="nUserGridNick"> <tr> <td colspan="2"><iframe src="https://www.fxp.co.il/member.php?u=' + userName + '&getUserOnly" class="userFrame"></iframe><div class="userFrame loadingBackground"></div></td> </tr> <tr> <td colspan="2"><input type="text" class="userSubNick" placeholder="תת-ניק.." /></td> </tr> <tr> <th><input type="color" class="colorId" value="#000000" /></th> <th>px <input type="number" class="textSize" min="0" max="100" value="11"> </th> </tr> <tr> <td colspan="2"><div class="removeEntry" title="הסר"></div></td> </tr> </table> </div>');
-                    $(".sUserGridContainer:last .removeEntry").click(function () {
-                        $(this).parents(".sUserGridContainer").remove();
-                    });
-                    $(".sUserGridContainer:last .userId").focusout(function () { //update username when focus out
-                        $(this).parents(".sUserGridContainer").find("div.userFrame").text("").addClass("loadingBackground");
-                        var idOfUser = $(this).val();
-                        $(this).parents(".sUserGridContainer").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + idOfUser + "&getUserOnly");
-                    });
-                    $(".sUserGridContainer:last .colorId").change(function () { //update color of subnick when focus out
-                        $(this).parents(".sUserGridContainer").find(".userSubNick").css("color", $(this).val());
-                    });
-                    $(".sUserGridContainer:last .textSize").change(function () { //update size of subnick when focus out
-                        $(this).parents(".sUserGridContainer").find(".userSubNick").css("font-size", $(this).val() + "px");
-                    });
-                }
-                bindFrameLoad();
-            });
-        }
-        bindFrameLoad();
+    //$("iframe.userIdFrame").unbind('load').load(function () {
+    //    var userName = $(this).contents().find(".userOnly").text();
+    //    $(this).parents("tr").find("div.userIdFrame").text(userName).removeClass("loadingBackground");
+    //    $(this).attr("src","");
+    //    if (userName != "? ? ?" && userName != "") {
+    //        $(".addToTable").css({
+    //            "transform": "rotate(0deg)",
+    //            "filter": "hue-rotate(0deg)",
+    //            "webkitFilter": "hue-rotate(0deg)",
+    //            "mozFilter": "hue-rotate(0deg)",
+    //            "oFilter": "hue-rotate(0deg)",
+    //            "cursor": "pointer"
+    //        }).click(function () {
+    //            if ($(".sThreadLine").length > 0) { //make sure to make the right action
+    //                $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId" value="' + userName + '"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
+    //                lastRadioName++;
+    //                displayUsernameByID($(".sThreadLine:last .userFrame"), parseInt(userName));
+    //                $(".sThreadLine:last .removeEntry").click(function () {
+    //                    $(this).parents(".sThreadLine").remove();
+    //                });
+    //                $(".sThreadLine:last .userId").focusout(function () {
+    //                    $(this).parents("tr").find("div.userFrame").text("").addClass("loadingBackground");
+    //                    var idOfUser = $(this).val();
+    //                    displayUsernameByID($(this).parents(".sThreadLine").find(".userFrame"), parseInt(idOfUser));
+    //                });
+    //                $(".sThreadLine:last .userId").parents(".sThreadLine").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + userName + "&getUserOnly");
+    //            } else if ($(".containtersPlace").length > 0) {
+    //                $(".containtersPlace").append('<div class="sUserGridContainer"> <input type="text" class="userId" placeholder="מספר משתמש" value="' + userName + '"/><br /> <input type="checkbox" class="SettingsCheckbox hideComments"> הסתר תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox unstyleComments"> נטרל עיצוב תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox activeSubNick"> הפעל תת-ניק מיוחד<br /><br /> <table class="nUserGridNick"> <tr> <td colspan="2"><div class="userFrame loadingBackground"></div></td> </tr> <tr> <td colspan="2"><input type="text" class="userSubNick" placeholder="תת-ניק.." /></td> </tr> <tr> <th><input type="color" class="colorId" value="#000000" /></th> <th>px <input type="number" class="textSize" min="0" max="100" value="11"> </th> </tr> <tr> <td colspan="2"><div class="removeEntry" title="הסר"></div></td> </tr> </table> </div>');
+    //                displayUsernameByID($(".sUserGridContainer:last .userFrame"), parseInt(userName));
+    //                $(".sUserGridContainer:last .removeEntry").click(function () {
+    //                    $(this).parents(".sUserGridContainer").remove();
+    //                });
+    //                $(".sUserGridContainer:last .userId").focusout(function () { //update username when focus out
+    //                    $(this).parents(".sUserGridContainer").find("div.userFrame").text("").addClass("loadingBackground");
+    //                    var idOfUser = $(this).val();
+    //                    displayUsernameByID($(this).parents(".sUserGridContainer").find("div.userFrame"), parseInt(idOfUser));
+    //                });
+    //                $(".sUserGridContainer:last .colorId").change(function () { //update color of subnick when focus out
+    //                    $(this).parents(".sUserGridContainer").find(".userSubNick").css("color", $(this).val());
+    //                });
+    //                $(".sUserGridContainer:last .textSize").change(function () { //update size of subnick when focus out
+    //                    $(this).parents(".sUserGridContainer").find(".userSubNick").css("font-size", $(this).val() + "px");
+    //                });
+    //            }
+    //            bindFrameLoad();
+    //        });
+    //    }
+    //    bindFrameLoad();
+    //});
+    $(".userName").unbind().focusout(function () { //update user id when focus out (convert)
+        $(this).parents("tr").find("div.userIdFrame").text("").addClass("loadingBackground");
+        var nameOfUser = $(this).val();
+        displayIDByName($(this).parents("tr").find("div.userIdFrame"), nameOfUser);
+        $(this).parents(".sConvertLine").find("iframe.userIdFrame").attr("src", "https://www.fxp.co.il/member.php?username=" + nameOfUser + "&getIdOnly");
+        $(".addToTable").css({
+            "transform": "rotate(45deg)",
+            "filter": "hue-rotate(-90deg)",
+            "webkitFilter": "hue-rotate(-90deg)",
+            "mozFilter": "hue-rotate(-90deg)",
+            "oFilter": "hue-rotate(-90deg)",
+            "cursor": "url(http://fcdn.co.il/smilies2/nono.gif), not-allowed"
+        }).unbind("click");
     });
 }
 
@@ -1988,24 +2388,24 @@ $(".threadsTab").click(function () {
     lowPriorityWord = JSON.parse(localStorage.getItem("lowPriorityWord"));
     readTimePrefix = JSON.parse(localStorage.getItem("readTimePrefix"));
     var readTimeNews = JSON.parse(localStorage.getItem("readTimeNews"));
-    $("#SettingsContent").html(pages.threads);
+    $("#SettingsContent").html(settingsPages.threads);
     if (daysSinceInstall == 0) { $(".convertTitleHighlight").css("background-color", "#FFFF00") }; //highlight convert for the blind
 
     for (i = 0; i < importantPost.length; i++) { //load important (show)
-        $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><iframe src="https://www.fxp.co.il/member.php?u=0&getUserOnly" class="userFrame" /><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
+        $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
         lastRadioName++;
         $(".sThreadLine:last .userId").val(importantPost[i]);
         $(".sThreadLine:last .SettingsCheckbox[value=show]").prop("checked", true);
         var idOfUser = importantPost[i];
-        $(".sThreadLine:last").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + idOfUser + "&getUserOnly");
+        displayUsernameByID($(".sThreadLine:last").find(".userFrame"), parseInt(idOfUser));
     }
     for (i = 0; i < lowPriorityPost.length; i++) { //load low priority (hide)
-        $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><iframe src="https://www.fxp.co.il/member.php?u=0&getUserOnly" class="userFrame" /><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
+        $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
         lastRadioName++;
         $(".sThreadLine:last .userId").val(lowPriorityPost[i]);
         $(".sThreadLine:last .SettingsCheckbox[value=hide]").prop("checked", true);
         var idOfUser = lowPriorityPost[i];
-        $(".sThreadLine:last").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + idOfUser + "&getUserOnly");
+        displayUsernameByID($(".sThreadLine:last").find(".userFrame"), parseInt(idOfUser));
     }
 
     var lowPriorityBox = "";
@@ -2027,7 +2427,7 @@ $(".threadsTab").click(function () {
     $(".userId").focusout(function () { //update username when focus out
         $(this).parents("tr").find("div.userFrame").text("").addClass("loadingBackground");
         var idOfUser = $(this).val();
-        $(this).parents(".sThreadLine").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + idOfUser + "&getUserOnly");
+        displayUsernameByID($(this).parents(".sThreadLine").find(".userFrame"), parseInt(idOfUser));
     });
 
 
@@ -2098,7 +2498,7 @@ $(".threadsTab").click(function () {
     })
 
     $(".settingsEndBtn.green").click(function () { //add new line
-        $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><iframe src="https://www.fxp.co.il/member.php?u=0&getUserOnly" class="userFrame" /><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
+        $(".sThreadLine:last").after('<tr class="sThreadLine"> <th><input type="text" class="userId"></th> <th> <input type="radio" name="radio' + lastRadioName + '" value="hide" class="SettingsCheckbox" />הסתר</th> <th> <input type="radio" name="radio' + lastRadioName + '" value="show" class="SettingsCheckbox" checked="checked" />הדגש</th> <th><div class="userFrame loadingBackground"></div></th> <th><div class="removeEntry" title="הסר"></div></th> </tr>');
         lastRadioName++;
         $(".sThreadLine:last .removeEntry").click(function () {
             $(this).parents(".sThreadLine").remove();
@@ -2106,7 +2506,7 @@ $(".threadsTab").click(function () {
         $(".sThreadLine:last .userId").focusout(function () {
             $(this).parents("tr").find("div.userFrame").text("").addClass("loadingBackground");
             var idOfUser = $(this).val();
-            $(this).parents(".sThreadLine").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + idOfUser + "&getUserOnly");
+            displayUsernameByID($(this).parents(".sThreadLine").find(".userFrame"), parseInt(idOfUser));
         });
         bindFrameLoad();
     });
@@ -2175,6 +2575,7 @@ $(".threadsTab").click(function () {
     $(".userName").focusout(function () { //update user id when focus out (convert)
         $(this).parents("tr").find("div.userIdFrame").text("").addClass("loadingBackground");
         var nameOfUser = $(this).val();
+        displayIDByName($(this).parents("tr").find("div.userIdFrame"), nameOfUser);
         $(this).parents(".sConvertLine").find("iframe.userIdFrame").attr("src", "https://www.fxp.co.il/member.php?username=" + nameOfUser + "&getIdOnly");
         $(".addToTable").css({
             "transform": "rotate(45deg)",
@@ -2197,7 +2598,7 @@ $(".threadsTab").click(function () {
 $(".commentsTab").click(function () {
     exportFromSyncStorage();
     defaultStyle = JSON.parse(localStorage.getItem("defaultStyle"));
-    $("#SettingsContent").html(pages.comments);
+    $("#SettingsContent").html(settingsPages.comments);
     if (daysSinceInstall == 0) { $(".convertTitleHighlight").css("background-color", "#FFFF00") }; //highlight convert for the blind
     var commentsAndSubnicks = [[]];
     commentsAndSubnicks = JSON.parse(localStorage.getItem("commentsAndSubnicks"));
@@ -2208,7 +2609,7 @@ $(".commentsTab").click(function () {
     });
 
     for (i = 0; i < commentsAndSubnicks.length; i++) {
-        $(".containtersPlace").append('<div class="sUserGridContainer"> <input type="text" class="userId" placeholder="מספר משתמש" /><br /> <input type="checkbox" class="SettingsCheckbox hideComments"> הסתר תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox unstyleComments"> נטרל עיצוב תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox activeSubNick"> הפעל תת-ניק מיוחד<br /><br /> <table class="nUserGridNick"> <tr> <td colspan="2"><iframe src="https://www.fxp.co.il/member.php?u=0&getUserOnly" class="userFrame"></iframe><div class="userFrame loadingBackground"></div></td> </tr> <tr> <td colspan="2"><input type="text" class="userSubNick" placeholder="תת-ניק.." /></td> </tr> <tr> <th><input type="color" class="colorId" value="#000000" /></th> <th>px <input type="number" class="textSize" min="0" max="100" value="11"> </th> </tr> <tr> <td colspan="2"><div class="removeEntry" title="הסר"></div></td> </tr> </table> </div>');
+        $(".containtersPlace").append('<div class="sUserGridContainer"> <input type="text" class="userId" placeholder="מספר משתמש" /><br /> <input type="checkbox" class="SettingsCheckbox hideComments"> הסתר תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox unstyleComments"> נטרל עיצוב תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox activeSubNick"> הפעל תת-ניק מיוחד<br /><br /> <table class="nUserGridNick"> <tr> <td colspan="2"><div class="userFrame loadingBackground"></div></td> </tr> <tr> <td colspan="2"><input type="text" class="userSubNick" placeholder="תת-ניק.." /></td> </tr> <tr> <th><input type="color" class="colorId" value="#000000" /></th> <th>px <input type="number" class="textSize" min="0" max="100" value="11"> </th> </tr> <tr> <td colspan="2"><div class="removeEntry" title="הסר"></div></td> </tr> </table> </div>');
         $(".sUserGridContainer:last .removeEntry").click(function () {
             $(this).parents(".sUserGridContainer").remove();
         });
@@ -2220,9 +2621,15 @@ $(".commentsTab").click(function () {
         $(".sUserGridContainer:last .colorId").val("#" + commentsAndSubnicks[i][5]);
         $(".sUserGridContainer:last .textSize").val(commentsAndSubnicks[i][6].split("px")[0]);
 
-        $(".sUserGridContainer:last").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + commentsAndSubnicks[i][0] + "&getUserOnly");
+        //$(".sUserGridContainer:last").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + commentsAndSubnicks[i][0] + "&getUserOnly");
         $(".sUserGridContainer:last").find(".userSubNick").css("color", "#" + commentsAndSubnicks[i][5]);
         $(".sUserGridContainer:last").find(".userSubNick").css("font-size", commentsAndSubnicks[i][6]);
+
+        var id = parseInt(commentsAndSubnicks[i][0]);
+        //get stored usernames
+
+        displayUsernameByID($(".sUserGridContainer:last").find(".userFrame"), parseInt(commentsAndSubnicks[i][0]));
+
     }
 
     if (defaultStyle[0]) $(".enableDefaultStyle").prop("checked", true);
@@ -2237,7 +2644,7 @@ $(".commentsTab").click(function () {
     $(".userId").focusout(function () { //update username when focus out
         $(this).parents(".sUserGridContainer").find("div.userFrame").text("").addClass("loadingBackground");
         var idOfUser = $(this).val();
-        $(this).parents(".sUserGridContainer").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + idOfUser + "&getUserOnly");
+        displayUsernameByID($(this).parents(".sUserGridContainer").find("div.userFrame"), parseInt(idOfUser));
     });
     $(".colorId").change(function () { //update color of subnick when focus out
         $(this).parents(".sUserGridContainer").find(".userSubNick").css("color", $(this).val());
@@ -2247,14 +2654,14 @@ $(".commentsTab").click(function () {
     });
 
     $(".settingsEndBtn.green").click(function () { //add new tile
-        $(".containtersPlace").append('<div class="sUserGridContainer"> <input type="text" class="userId" placeholder="מספר משתמש" /><br /> <input type="checkbox" class="SettingsCheckbox hideComments"> הסתר תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox unstyleComments"> נטרל עיצוב תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox activeSubNick"> הפעל תת-ניק מיוחד<br /><br /> <table class="nUserGridNick"> <tr> <td colspan="2"><iframe src="https://www.fxp.co.il/member.php?u=0&getUserOnly" class="userFrame"></iframe><div class="userFrame loadingBackground"></div></td> </tr> <tr> <td colspan="2"><input type="text" class="userSubNick" placeholder="תת-ניק.." /></td> </tr> <tr> <th><input type="color" class="colorId" value="#000000" /></th> <th>px <input type="number" class="textSize" min="0" max="100" value="11"> </th> </tr> <tr> <td colspan="2"><div class="removeEntry" title="הסר"></div></td> </tr> </table> </div>');
+        $(".containtersPlace").append('<div class="sUserGridContainer"> <input type="text" class="userId" placeholder="מספר משתמש" /><br /> <input type="checkbox" class="SettingsCheckbox hideComments"> הסתר תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox unstyleComments"> נטרל עיצוב תגובות ממשתמש זה<br /> <input type="checkbox" class="SettingsCheckbox activeSubNick"> הפעל תת-ניק מיוחד<br /><br /> <table class="nUserGridNick"> <tr> <td colspan="2"><div class="userFrame loadingBackground"></div></td> </tr> <tr> <td colspan="2"><input type="text" class="userSubNick" placeholder="תת-ניק.." /></td> </tr> <tr> <th><input type="color" class="colorId" value="#000000" /></th> <th>px <input type="number" class="textSize" min="0" max="100" value="11"> </th> </tr> <tr> <td colspan="2"><div class="removeEntry" title="הסר"></div></td> </tr> </table> </div>');
         $(".sUserGridContainer:last .removeEntry").click(function () {
             $(this).parents(".sUserGridContainer").remove();
         });
         $(".sUserGridContainer:last .userId").focusout(function () { //update username when focus out
             $(this).parents(".sUserGridContainer").find("div.userFrame").text("").addClass("loadingBackground");
             var idOfUser = $(this).val();
-            $(this).parents(".sUserGridContainer").find("iframe.userFrame").attr("src", "https://www.fxp.co.il/member.php?u=" + idOfUser + "&getUserOnly");
+            displayUsernameByID($(this).parents(".sUserGridContainer").find(".userFrame"), parseInt(idOfUser));
         });
         $(".sUserGridContainer:last .colorId").change(function () { //update color of subnick when focus out
             $(this).parents(".sUserGridContainer").find(".userSubNick").css("color", $(this).val());
@@ -2357,15 +2764,14 @@ $(".commentsTab").click(function () {
     $("#SettingsContent").css("padding", "21px 32px");
 });
 
-$(".useTab").click(function () { $("#SettingsContent").html(pages.use); $("#SettingsContent").css("padding", "0"); });
-$(".touchTab").click(function () { $("#SettingsContent").html(pages.touch); $("#SettingsContent").css("padding", "21px 32px"); });
-//$(".aprlflsS").html("אחד באפריל!").css("font-weight", "bold").click(function () {
-//    $("#SettingsContent").html('<div class="aprlsafe"><div class="SettingsTitle aprlsafe">אחד באפריל!</div> <br /><br/>כן, זו שוב התקופה הזו בשנה. לתאריך מיוחד זה בלבד, התוסף משנה לגופן איכותי ומרהיב - והוא למעשה גופן הכתב של דוד בן גוריון בכבודו ובעצמו! לא מדהים?<br/><br/><a id="cancelDavid" class="aprlsafe" style="cursor: pointer; color: #0000ff">כדי לנטרל את עיצוב זה לחץ כאן.</a></div>').find("*").css("font-family", "Arial");
-//    $("#cancelDavid").click(function () {
-//        setCookie("disableDavid", "true", 5);
-//        location.reload();
-//    })
-//});
+$(".useTab").click(function () {
+    $("#SettingsContent").html(settingsPages.use);
+    $("#SettingsContent").css("padding", "0");
+});
+$(".touchTab").click(function () {
+    $("#SettingsContent").html(settingsPages.touch);
+    $("#SettingsContent").css("padding", "21px 32px");
+});
 $(".closeTab").click(function () { //close settings
     $("#settings").fadeOut(100);
     document.title = oldTitle;
@@ -2383,7 +2789,7 @@ $(window).resize(function () {
 });
 
 var oldTitle = "FxP";
-$("#SettingsContent").html(pages.welcome); //load settings
+$("#SettingsContent").html(settingsPages.welcome); //load settings
 $(".settingsBtn").click(function () {
     oldTitle = document.title;
     document.title = "הגדרות FxPlus+";
@@ -2458,6 +2864,7 @@ $(".settingsBtn").click(function () {
 
 
 
+var daysSinceInstall = -1;
 
 chrome.storage.local.get("loadedbefore", function (data) { //first visit check
     var loaded = data.loadedbefore;
@@ -2472,16 +2879,9 @@ chrome.storage.local.get("loadedbefore", function (data) { //first visit check
             chrome.storage.local.set({ "loadedbefore": true, "previousVersion": version, "installTime": n, "suggestedToRate": false });
         });
     } else {
-        //var aprlfls = d.getMonth() == 3 && d.getDate() == 1 && getCookie("disableDavid") != "true";
-        //if (aprlfls) {
-        //    $("head").append("<style>@font-face { font-family: 'Ben Gurion';src: url(" + chrome.runtime.getURL("BENGURION.woff") + ") format('woff');}</style>");
-        //    $("*:not(.aprlsafe)").css("font-family", "'Ben Gurion', cursive, Arial");
-        //    $("body").append('<a href="https://www.youtube.com/watch?v=yhJJws3kgzY" target="_blank"><img src="http://i.imgur.com/yhQCIOE.png" id="davidBenGurionImg" /></a>');
-        //    $("#davidBenGurionImg").css("left", "-200px").delay(3000).animate({ left: 0 }, 1000);
-        //}
         chrome.storage.local.get("previousVersion", function (data) { //show update notification on version change
             var prev = data.previousVersion;
-            if (prev != version && !(chrome.runtime.lastError)) {
+            if (prev != version && !(chrome.runtime.lastError) && primeVersion) {
                 if (prev == "0.0.11") { //remove cookie explosion from this version
                     removeCookiePrefix("readTime");
                     removeCookiePrefix("comments");
@@ -2489,7 +2889,7 @@ chrome.storage.local.get("loadedbefore", function (data) { //first visit check
                 $("#blackage").unbind().fadeIn(1000, function () {
                     $("#SpecialInfo").append('<div class="ribbon" style="display: none">' + versionTitle + '<i></i> <i></i> <i></i> <i></i> </div>')
                         .append(versionDescription + '<br/><div class="specialClose"></div>')
-                        .append('<audio autoplay> <source src="' + chrome.runtime.getURL("success.mp3") + '" type="audio/mpeg"> </audio>')
+                        .append('<audio autoplay> <source src="' + chrome.runtime.getURL("sound/success.mp3") + '" type="audio/mpeg"> </audio>')
                         .show().find(".ribbon").show();
 
                     $(".specialClose").click(function () {
@@ -2498,48 +2898,44 @@ chrome.storage.local.get("loadedbefore", function (data) { //first visit check
                         chrome.storage.local.set({ "previousVersion": version });
                     });
                 });
-            } else if (chrome.runtime.lastError) chrome.storage.local.set({ "previousVersion": version }); //fallback if no version
-        });
-    }
-});
-
-var daysSinceInstall = -1;
-chrome.storage.local.get("installTime", function (data) { //first visit check
-    if (chrome.runtime.lastError || data.installTime == undefined) {
-        var n = d.getTime();
-        chrome.storage.local.set({ "installTime": n, "suggestedToRate": false });
-    } else {
-        var insTime = data.installTime;
-        var n = d.getTime();
-        daysSinceInstall = Math.round((n - insTime) / 86400000);
-        console.log("daysSinceInstall : " + daysSinceInstall);
-        console.log("n : " + n);
-        console.log("insTime : " + insTime);
-        chrome.storage.local.get("suggestedToRate", function (data2) {
-            var sugToRate = data2.suggestedToRate;
-            if (daysSinceInstall >= 3 && !sugToRate) {
-                $("#blackage").unbind().fadeIn(1000, function () {
-                    $("body").append('<div class="bigMessage" id="experiencedUserScreen"> <div class="ribbon" style="display: none">אז.. מה דעתך?<i></i> <i></i> <i></i> <i></i> </div><span style="font-size: 14px; font-weight: bold;">כבר עברו ' + daysSinceInstall + ' ימים מאז שהורדת את התוסף <div class="ltrInline">FxPlus+</div>. אני מקווה שאתה מרוצה ממנו ושהוא עמד בציפיות שלך.</span><br/>אשמח אם תדרג את התוסף בחנות. הדירוג שלך יעזור למשתמשים אחרים לגלות ולהוריד את התוסף, וגם זה אומר לי שמה שאני עושה שווה את זה.<br/><a href="https://chrome.google.com/webstore/detail/fxplus%2B-beta/gpfgllaokimfkkbnhiimahpbemmdmobg/reviews" target="_blank"><img src="http://i.imgur.com/EYs93sf.png" title="לחץ כדי להיכנס לדף הביקורות של התוסף" alt="לינק לדף של התוסף"/></a><br/><br/><b>תודה!</b><br/><br/> <div class="closeBtn" style="margin: 0 auto;" title="סגור"></div></div>'); //add first visit div
-                    $("#experiencedUserScreen").fadeIn(250, function () {
-                        $(this).find(".ribbon").show();
-                    });
+            } else {
+                if (chrome.runtime.lastError) chrome.storage.local.set({ "previousVersion": version }); //fallback if no version
+                chrome.storage.local.get("installTime", function (data) { //first visit check
+                    if (chrome.runtime.lastError || data.installTime == undefined) {
+                        var n = d.getTime();
+                        chrome.storage.local.set({ "installTime": n, "suggestedToRate": false });
+                    } else {
+                        var insTime = data.installTime;
+                        var n = d.getTime();
+                        daysSinceInstall = Math.round((n - insTime) / 86400000);
+                        console.log("daysSinceInstall : " + daysSinceInstall);
+                        console.log("n : " + n);
+                        console.log("insTime : " + insTime);
+                        chrome.storage.local.get("suggestedToRate", function (data2) {
+                            var sugToRate = data2.suggestedToRate;
+                            if (daysSinceInstall >= 3 && !sugToRate) {
+                                $("#blackage").unbind().fadeIn(1000, function () {
+                                    $("body").append('<div class="bigMessage" id="experiencedUserScreen"> <div class="ribbon" style="display: none">אז.. מה דעתך?<i></i> <i></i> <i></i> <i></i> </div><span style="font-size: 14px; font-weight: bold;">כבר עברו ' + daysSinceInstall + ' ימים מאז שהורדת את התוסף <div class="ltrInline">FxPlus+</div>. אני מקווה שאתה מרוצה ממנו ושהוא עמד בציפיות שלך.</span><br/>אשמח אם תדרג את התוסף בחנות. הדירוג שלך יעזור למשתמשים אחרים לגלות ולהוריד את התוסף, וגם זה אומר לי שמה שאני עושה שווה את זה.<br/><a href="https://chrome.google.com/webstore/detail/fxplus%2B-beta/gpfgllaokimfkkbnhiimahpbemmdmobg/reviews" target="_blank"><img src="http://i.imgur.com/EYs93sf.png" title="לחץ כדי להיכנס לדף הביקורות של התוסף" alt="לינק לדף של התוסף"/></a><br/><br/><b>תודה!</b><br/><br/> <div class="closeBtn" style="margin: 0 auto;" title="סגור"></div></div>'); //add first visit div
+                                    $("#experiencedUserScreen").fadeIn(250, function () {
+                                        $(this).find(".ribbon").show();
+                                    });
 
 
-                    $(".closeBtn").click(function () {
-                        $("#experiencedUserScreen").fadeOut(200, function () { $("#blackage").fadeOut(100); });
-                        chrome.storage.local.set({ "suggestedToRate": true });
-                    });
+                                    $(".closeBtn").click(function () {
+                                        $("#experiencedUserScreen").fadeOut(200, function () { $("#blackage").fadeOut(100); });
+                                        chrome.storage.local.set({ "suggestedToRate": true });
+                                    });
+                                });
+                            }
+                        });
+                    }
                 });
             }
         });
     }
 });
 
-var fxpLogo = $('.divhed div[style="position:absolute; z-index: 99;left: 870px;"], .divhed div[style="position: absolute; z-index: 0; left: 870px;"]');
-if (fxpLogo.css("z-index")) { //itay's design makes FXP's logo too high - fix
-    fxpLogo.css("z-index", "10001");
-}
-
+//tell the background process the current notification count
 chrome.storage.sync.get("BackgroundNotifications", function (data) {
     var bgn = data.BackgroundNotifications;
     if (bgn) {

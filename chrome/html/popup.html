@@ -1,5 +1,21 @@
 ﻿<!DOCTYPE html>
 <html dir="rtl" lang="he">
+<!--
+    Copyright 2016 SilverTuxedo
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
 <head>
     <title>ההתראות שלך</title>
     <meta charset="utf-8" />
@@ -30,10 +46,13 @@
 
         body {
             margin: 0;
+            padding: 0;
             width: 350px;
             text-align: center;
             font-family: "almoni-dl", "Segoe UI", Tahoma, sans-serif;
+            font-size: 75%;
             cursor: default;
+            overflow-x: hidden;
         }
 
         #title {
@@ -230,7 +249,7 @@
 </head>
 <body>
     <div id="title">התראות</div>
-    <a href="https://www.fxp.co.il" target="_blank">
+    <a href="https://www.fxp.co.il" target="_blank" style="text-decoration:none;">
         <div id="flexList">
             <div>
                 <span id="likeCount">0</span> לייקים
@@ -254,7 +273,7 @@
         <input type="checkbox" id="sendBackground"> שלח התראות גם כאשר האתר סגור
     </div>
 
-    <script src="jquery-2.1.4.min.js"></script>
-    <script src="popup.js"></script>
+    <script src="../js/jquery-2.1.4.min.js"></script>
+    <script src="../js/popup.js"></script>
 </body>
 </html>
