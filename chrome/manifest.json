@@ -5,7 +5,7 @@
   "short_name": "FxPlus+",
   "author": "SilverTuxedo",
   "description": "שפר את FxP והפוך אותו לשלך, באמצעות הגדרות ססגוניות ואפשרויות רבות אחרות.",
-  "version": "0.0.20",
+  "version": "0.0.21",
 
   "applications": {
     "gecko": {

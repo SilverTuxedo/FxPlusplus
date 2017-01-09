@@ -1831,6 +1831,10 @@ div.userIdFrame {
     animation-delay: -1.0s;
 }
 
+.threadbit {
+    overflow: hidden;
+}
+
 @-webkit-keyframes sk-bounce {
     0%, 100% {
         -webkit-transform: scale(0.0);

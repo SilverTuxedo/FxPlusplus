@@ -36,10 +36,10 @@
 
 */
 
-version = "0.0.20";
+version = "0.0.21";
 versionTitle = "עדכון 0.0.20";
 versionDescription = '<blockquote class="twitter-tweet" data-lang="he"><p lang="iw" dir="rtl">גרסה 0.0.20 היא הגרסה המשמעותית האחרונה לפני היציאה מהבטא! והיא כבר כאן.<a href="https://t.co/ot3mucWxIc">https://t.co/ot3mucWxIc</a></p>&mdash; FxPlus+ (@FxPlusplus) <a href="https://twitter.com/FxPlusplus/status/765965426249633792">17 באוגוסט 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>';
-primeVersion = true; //version is worth a notification on screen
+primeVersion = false; //version is worth a notification on screen
 
 var d1 = new Date();
 var startExecution = d1.getTime();
