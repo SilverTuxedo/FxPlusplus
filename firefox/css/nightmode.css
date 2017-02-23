@@ -1,0 +1,504 @@
+﻿/*
+    Copyright 2017 SilverTuxedo
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+/*
+GENERAL
+*/
+
+#nightmodeShortcut {
+    background-color: #000;
+}
+
+body {
+    background-color: #000;
+}
+
+.breadcrumb {
+    color: #e2e2e2;
+}
+
+    .breadcrumb a {
+        color: white;
+    }
+
+.pagination span a {
+    background: #2b2b2b none;
+    border: 1px solid #353535;
+    color: #2c85d2;
+}
+
+.threadbit .pagination a {
+    color: #5791b7;
+}
+
+.pagination span.selected a {
+    background: #dedede;
+}
+
+.dargot {
+    opacity: 0.3;
+    transition: 0.2s opacity;
+}
+
+    .dargot:hover {
+        opacity: 1;
+    }
+
+.blockbody, .formcontrols .blockrow, .wysiwyg_block .formcontrols .blockrow {
+    color: #d2d2d2;
+    background: #252525;
+}
+
+legend {
+    color: #fff;
+}
+
+h1 {
+    color: #003C70;
+}
+
+#pagetitle {
+    color: #f3f3f3;
+}
+
+    #pagetitle a {
+        color: #fff;
+    }
+
+
+.flo {
+    background-color: #0e0e0e;
+}
+
+.headofviral, .left_block_1 .description_clean {
+    color: #fff;
+}
+
+    .headofviral, .left_block_1 .description_clean a {
+        color: #fff;
+    }
+
+.itemviral .title_f a {
+    color: #fff;
+}
+
+.viralimg img {
+    border-color: #000000;
+}
+
+.flo .forumbit_post h2 {
+    color: black;
+    filter: invert(100%);
+}
+
+
+.actionbuttons .group .button {
+    background: linear-gradient(#5d5d5d, #3e3e3e);
+    color: #fff;
+    border: 1px solid #8e8e8e;
+}
+
+.blockrow a {
+    color: white;
+}
+
+.cke_dialog_background_cover {
+    background-color: black !important;
+}
+
+.cke_button a {
+    color: black;
+}
+
+/*
+FRONT PAGE
+*/
+
+#statinfo,
+.greengrnew {
+    background: #c0cc3a !important;
+}
+
+.cats {
+    background: #111;
+    border: 1px solid #313131;
+}
+
+.ftitle {
+    border: 1px solid #6f6f6f;
+}
+
+.childforum {
+    filter: invert(100%);
+}
+
+
+/*
+THREADS LIST
+*/
+
+.threadbit {
+    color: #d6d6d6;
+    border-left: 1px solid #3e3e3e;
+    border-right: 1px solid #3e3e3e;
+}
+
+    .threadbit .sticky,
+    .threadbit .nonsticky,
+    .threadbit .rating0 {
+        border-bottom: 1px solid #3e3e3e;
+    }
+
+.threadlisthead, #thread_controls {
+    border: 1px solid #3e3e3e;
+    background: #212121;
+    color: #6d6d6d;
+}
+
+    .threadlisthead a, #thread_controls a {
+        color: #838383;
+    }
+
+.pagetitle {
+    border-left: 1px solid #3e3e3e;
+    border-right: 1px solid #3e3e3e;
+}
+
+.time {
+    color: #d6d6d6;
+}
+
+.threadbit a {
+    color: white;
+}
+
+.threadbit .sticky {
+    background: #0a0a0a;
+}
+
+.threadbit .nonsticky,
+.threadbit .discussionrow {
+    background: #101010;
+}
+
+.threadstatus {
+    filter: invert(100%);
+}
+
+.threadbit .threadstats {
+    filter: invert(100%);
+}
+
+
+#forumStatsContainer {
+    background: #082746;
+    border-color: #3e3e3e;
+    color: #e8e8e8;
+}
+
+.hideThread .rating0, .hideThread .nonsticky, .hideThread .sticky {
+    color: #777777;
+}
+
+.hideThread a, .hideThread em {
+    color: #777777 !important;
+}
+
+.yellowMarkedThread .rating0, .yellowMarkedThread .nonsticky, .yellowMarkedThread .sticky {
+    background: linear-gradient(to left, rgb(0, 90, 255) 0%, rgb(16, 16, 16) 65%) !important;
+}
+
+.blueTitleThread .threadtitle, .blueTitleThread .threadtitle a {
+    color: yellow;
+}
+
+.minithread {
+    color: #3e3e3e;
+    background: #191919;
+    border-bottom: 1px solid #3e3e3e;
+    border-right: 1px solid #003ac7 !important;
+}
+
+    .minithread a {
+        color: black;
+    }
+
+    .minithread .sk-cube-grid .sk-cube {
+        background: #3c3c3c;
+    }
+
+/*
+COMMENTS
+*/
+
+.titleshowt {
+    border-color: #3e3e3e;
+}
+
+.postbit .userinfo, .postbit .userinfo_noavatar {
+    border-color: #191919;
+    border-bottom: 1px solid #2b2b2b;
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(#1d1d1d, #131313);
+}
+
+.userinfo_noavatar .contact, .postbody, .commentsContainer {
+    filter: invert(100%);
+}
+
+    .userinfo_noavatar img, .userinfo_noavatar video, .postbody img, .postbody video, .postbody iframe, .postbody twitterwidget, .commentsContainer img, .commentsContainer video, .commentsContainer iframe, .commentsContainer twitterwidget {
+        filter: invert(100%);
+    }
+
+.userinfo_noavatar div[style*='left:10px;'] {
+    color: #888 !important;
+}
+
+.postfoot .textcontrols div[style*='margin-right: 5px;'] {
+    filter: invert(100%);
+}
+
+.postbit .postfoot .textcontrols, .postbitlegacy .postfoot .textcontrols, .eventbit .eventfoot .eventcontrols {
+    background: #0c0c0c;
+    border: 1px solid #131313;
+    border-top: 0;
+}
+
+.postbit .postbody {
+    background: #e2e2e2;
+}
+
+    .postbit .postbody .time {
+        color: #3e3e3e;
+    }
+
+.bbcode_container div.bbcode_quote {
+    background: #dadddf none;
+}
+
+.bbcode_container .bbcode_quote_container {
+    filter: brightness(90%);
+}
+
+.commentsContainer {
+    filter: invert(100%);
+}
+
+.miniComment {
+    background: #efefef;
+}
+
+    .miniComment:nth-child(2n+1) {
+        background: #e6e6e6;
+    }
+
+.signature {
+    border-top: 1px solid #cacaca;
+}
+
+.posthead-date {
+    z-index: 3;
+}
+
+.navlinks {
+    background: #272727 none;
+    color: #bfbfbf;
+    border-top: 1px solid #404040;
+}
+
+    .navlinks a {
+        color: white;
+    }
+
+.postbit.blockrow {
+    color: #3e3e3e;
+    background: #eaeaea;
+    filter: invert(100%);
+}
+
+span.cke_skin_kama {
+    border: 1px solid #565656;
+}
+
+.likebox {
+    z-index: 3;
+}
+
+/*
+PMs and settings
+*/
+.pmlist .blockrow {
+    background: #131313;
+    border-top: solid 1px #26333c;
+}
+
+.pmbit {
+    border-left: 1px solid #26333c;
+    border-right: 1px solid #26333c;
+}
+
+.blocksubhead {
+    background: #464646;
+    color: #efefef;
+    border-top: 1px solid #7a868e;
+}
+
+    .blocksubhead a {
+        color: #efefef;
+    }
+
+.blockbody.settings_form_border {
+    border-left: 1px solid #26333c;
+    border-right: 1px solid #26333c;
+    border-bottom: 1px solid #26333c;
+}
+
+#above_postlist .folderstats {
+    color: #efefef;
+}
+
+#usercp_nav .blockbody, #usercp_nav li {
+    background: #3a3a3a;
+}
+
+#usercp_nav .blockrow .active a {
+    color: #000;
+}
+
+ul.userlist_showavatars li {
+    background: #3e3e3e;
+}
+
+.receiptlist .blockrow {
+    background: #252525;
+}
+
+.polloptionsblock {
+    background: #292929 url(https://images.fxp.co.il/images_new/misc/poll_question_mark.png) no-repeat 30px 10px;
+}
+
+.pollresultsblock {
+    background: #292929;
+}
+
+#pollinfo {
+    border: 1px solid #484848;
+}
+
+    #pollinfo .polltitle {
+        color: #ffffff;
+    }
+
+    #pollinfo .blockhead .totalvotes {
+        color: #bfbfbf;
+    }
+
+#pollresults {
+    border: 1px solid #5d5d5d;
+}
+
+#sidebar_container.member_summary {
+    background-color: #2b303a;
+    color: #cacaca;
+    border-color: #484848;
+    box-shadow: -2px 2px 2px #151515;
+}
+
+#sidebar_container #userinfo {
+    filter: invert(100%);
+    color: #424242;
+}
+
+    #sidebar_container #userinfo img {
+        filter: invert(100%);
+    }
+
+#sidebar_container #usermenu img {
+    filter: invert(100%);
+}
+
+#sidebar_container #usermenu a {
+    color: #5aa6d8;
+}
+
+#sidebar_container .userprof_content .blockrow {
+    background-color: #4a5365;
+    border-color: #4a5365;
+    color: #e6e6e6;
+}
+
+#sidebar_container .blockbody {
+    border: 1px solid #737780;
+}
+
+    dl.stats dt, #sidebar_container dl.stats, #sidebar_container .blockbody.userprof_content, #sidebar_container .userprof_content .time, .userprof_content .time {
+        color: #efefef;
+    }
+
+#sidebar_container .blocksubhead {
+    color: #cacaca;
+}
+
+
+.userprof_headers {
+    background-color: #131517;
+}
+
+.userprof_headers_border {
+    border-color: #1e2225;
+}
+
+.userprof_vmright .member_blockrow label {
+    filter: invert(100%);
+}
+
+.userprof_content {
+    background-color: #0e0e0e;
+}
+
+.userprof_content_border {
+    border-color: #0e0e0e;
+}
+
+.userprof blockquote {
+    filter: invert(100%);
+}
+
+    .userprof blockquote img, .userprof blockquote video, .userprof blockquote iframe, .userprof blockquote twitterwidget {
+        filter: invert(100%);
+    }
+
+.userprof_button {
+    background: #3e3e3e;
+    color: #fff;
+    border: 1px solid #8e8e8e;
+}
+
+.userprof_editor {
+    color: #e4e4e4;
+    background-color: #1b1b1b;
+}
+
+.profile_editor_border, .profile_content .actionbuttons {
+    border-color: #373b3e;
+}
+
+.addCreditBtn {
+    color: rgb(226, 247, 255);
+    background: rgb(0, 0, 0);
+    border-color: #525252;
+}

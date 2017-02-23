@@ -1,0 +1,803 @@
+﻿/*
+    Copyright 2017 SilverTuxedo
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+
+.whiteSpoiler {
+    color: #000;
+    background-color: #000;
+    transition: 0.15s color;
+}
+
+    .whiteSpoiler:hover {
+        color: #fff;
+    }
+
+.hiddenSticky {
+    transition: max-height 0.4s;
+    max-height: 4px;
+}
+
+    .hiddenSticky:hover {
+        max-height: 50px;
+    }
+
+.threadbit {
+    overflow: hidden;
+}
+
+.yellowMarkedThread .rating0, .yellowMarkedThread .nonsticky, .yellowMarkedThread .sticky {
+    background: linear-gradient(to left, rgba(255, 255, 143, 1) 0%, rgb(250, 250, 250) 65%) !important;
+}
+
+.blueTitleThread .threadtitle {
+    color: blue;
+    font-weight: bold;
+}
+
+    .blueTitleThread .threadtitle a {
+        color: blue;
+    }
+
+.hideThread .rating0, .hideThread .nonsticky, .hideThread .sticky {
+    color: #d5d5d5;
+    font-style: italic;
+    height: 31px;
+}
+
+.hideThread a, .hideThread em {
+    color: #d5d5d5;
+}
+
+.hideThread img, .hideThread .threadstatus {
+    opacity: 0.5;
+}
+
+.hideThread .threadtitle {
+    margin-top: 2px !important;
+    font-size: 10px !important;
+}
+
+.hideThread .threadtitle_unread {
+    font-weight: normal !important;
+}
+
+.hideThread .threadstats {
+    padding-top: 2px !important;
+}
+
+.hideThread .threadlastpost {
+    padding-top: 1px !important;
+}
+
+.hideThread .threadstatus {
+    margin-top: -4px;
+}
+
+.hideThread .pagination a {
+    font-size: 6px !important;
+    opacity: 0.5;
+}
+
+.hideThread > .newComments {
+    opacity: 0.2;
+    font-style: normal;
+}
+
+.hideThread .newCommentsIndicator {
+    color: #d5d5d5;
+    font-weight: normal;
+}
+
+    .hideThread .newCommentsIndicator:hover {
+        color: red;
+    }
+
+#forumStatsContainer {
+    width: 100%;
+    clear: both;
+    background: #feffe5;
+    border: 1px solid #C4C4C4;
+    border-top: none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    box-sizing: border-box;
+}
+
+#forumStats {
+    padding: 1em;
+    text-align: center;
+}
+
+.openedThread {
+    border-bottom: 1px dashed #c4c4c4;
+    border-right: 1px solid #00f;
+}
+
+.minithread {
+    height: 250px;
+    overflow: auto;
+    /*background-image: url(http://i.imgur.com/yV7gTKc.gif);*/
+    background-position: center;
+    background-repeat: no-repeat;
+    border-right: 1px solid #00f !important;
+    border-bottom: 1px solid #C4C4C4;
+    resize: vertical;
+    background-color: #fff;
+}
+
+    .minithread.flexible {
+        height: auto;
+        min-height: 60px;
+    }
+
+    .minithread .content a {
+        text-decoration: underline;
+    }
+
+    .minithread .sk-cube-grid {
+        position: relative;
+        top: 50%;
+        right: 50%;
+        transform: translate(50%, -50%);
+    }
+
+        .minithread .sk-cube-grid .sk-cube {
+            background: #dedede;
+        }
+
+.pmbit.minithread {
+    border-bottom: none;
+    border-top: solid 1px #cedfeb;
+}
+
+.miniComment {
+    padding: 10px;
+    padding-bottom: 15px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+    .miniComment:nth-child(odd) {
+        background: #f7f7f7;
+    }
+
+    .miniComment img {
+        max-width: 90%;
+    }
+
+
+.miniUser {
+    margin-bottom: 6px;
+}
+
+.endingComment {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+}
+
+.threadstatus {
+    cursor: pointer;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.readTimeThreadbit {
+    margin-top: 12px;
+    font-size: 0.8em;
+    text-align: center;
+    font-weight: bold;
+    color: #2471ff;
+    font-family: almoni-dl;
+    text-shadow: white 1px 0, white -1px 0, white 0 1px, white 0 -1px;
+    /*text-shadow: #7dabff 1px 0px, #7dabff -1px 0px, #7dabff 0px 1px, #7dabff 0px -1px;
+    color: #000;
+    font-weight: normal;*/
+}
+
+.userColorIndicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 3px;
+    display: inline-block;
+    margin: 0 4px 0 10px;
+}
+
+/*Fix for FXP bad titles for featured threads*/
+.images_sik {
+    position: relative;
+}
+
+    .images_sik .textsik {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        top: auto;
+        height: auto;
+    }
+
+    .images_sik:hover .textsik {
+        opacity: 1 !important;
+    }
+
+.readTimeThumbnail {
+    overflow: hidden;
+}
+
+    .readTimeThumbnail .thumbnailReadtime {
+        max-height: 0;
+        opacity: 0;
+        transition: max-height 0.3s, opacity 0.3s;
+    }
+
+    .readTimeThumbnail:hover .thumbnailReadtime {
+        max-height: calc(0.8em + 4px);
+        opacity: 1;
+    }
+
+
+.newCommentsIndicator {
+    font-weight: bold;
+    font-size: 0.7em;
+    color: red;
+    display: inline-block;
+    margin-right: 0.5em;
+}
+
+.thumbnailReadtime {
+    font-size: 0.7em;
+    color: #efefef;
+    display: flex;
+    overflow: hidden;
+}
+
+    .thumbnailReadtime:before {
+        content: 'access_time';
+        display: inline-block;
+        font-family: 'Material Icons';
+        padding-left: 0.3em;
+    }
+
+.fxpSpopupSeperator {
+    margin: 10px;
+    height: 2px;
+    background-color: #C3D825;
+}
+
+.niceButton {
+    display: inline-block;
+    font-weight: 600;
+    padding: 0.5em 1.4em;
+    font-size: 1.2em;
+    margin: 0.5em 0;
+    border-radius: 0.1em;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+    .niceButton.thinBtn {
+        padding: 0.5em 1em;
+    }
+
+    .niceButton.blueBtn {
+        background-color: #00baff;
+        color: #fff;
+    }
+
+        .niceButton.blueBtn:hover {
+            background-color: #34c8ff;
+        }
+
+    .niceButton.darkBlueBtn {
+        background-color: #157cc0;
+        color: #fff;
+    }
+
+        .niceButton.darkBlueBtn:hover {
+            background-color: #188edc;
+        }
+
+.hiddenPostbit {
+    filter: grayscale(100%);
+    opacity: 0.4;
+    transition: filter 0.2s, opacity 0.2s;
+}
+
+    .hiddenPostbit:hover, .hiddenPostbit.active {
+        filter: grayscale(0);
+        opacity: 1;
+    }
+
+    .hiddenPostbit .userinfo_noavatar {
+        cursor: pointer;
+    }
+
+.quickSubnickInput {
+    display: block;
+    font-weight: bold;
+    border-radius: 0.1em;
+    padding: 0.2em;
+    border: 0.1em solid #dedede;
+}
+
+    .quickSubnickInput::-webkit-input-placeholder {
+        font-style: italic;
+        color: #BDBDBD;
+    }
+
+    .quickSubnickInput::-moz-placeholder {
+        font-style: italic;
+        color: #BDBDBD;
+    }
+
+.temp-show {
+    position: absolute !important;
+    visibility: hidden !important;
+    display: block !important;
+}
+
+#nightmodeShortcut {
+    position: absolute;
+    right: 1em;
+    top: 0;
+    width: 2em;
+    height: 2.5em;
+    padding-bottom: 0.5em;
+    border-bottom-left-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+    background-color: white;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+    z-index: 101;
+    background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#saveTemplateBtn {
+    background: #dedede;
+    color: #424242;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border: 1px solid #dedede;
+    border-left: 0;
+    font-size: 1.5em;
+    line-height: 1em;
+    padding: 0 0.2em;
+    cursor: pointer;
+}
+
+.templateNameContainer {
+    text-align: center;
+    display: inline-flex;
+}
+
+.templateInterface {
+    text-align: center;
+}
+
+#templateNameInput {
+    border: 2px solid #dedede;
+    width: 20em;
+    font-size: 1em;
+    padding-right: 0.2em;
+}
+
+#templateList {
+    padding: 1em;
+}
+
+    #templateList .option {
+        background: #6c7a89;
+        padding: 0.4em;
+        color: #fff;
+        border-radius: 0.2em;
+        display: inline-block;
+        margin: 0.5em;
+        cursor: pointer;
+    }
+
+.hideContent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: 999999999999999;
+}
+
+#creditAddon {
+    padding: 0.5em;
+    text-align: center;
+}
+
+.addCreditBtn {
+    display: inline-block;
+    margin: 0.2em 1em;
+    background: #fff;
+    padding: 0.3em 1em;
+    border-radius: 0.2em;
+    font-weight: bold;
+    color: #004b67;
+    border: 1px solid #c5c5c5;
+    cursor: pointer;
+}
+
+.bottomFloat {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: 0 auto;
+    text-align: center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#bottomCard {
+    background: white;
+    box-shadow: 0 0 17px 4px rgba(0,0,0,0.19), 0 0 7px 0px rgba(0,0,0,0.23);
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
+    display: inline-block;
+    max-width: 60%;
+    overflow-x: hidden;
+    pointer-events: auto;
+    position: relative;
+}
+
+    #bottomCard.smallCard {
+        font-size: 0.8em;
+    }
+
+        #bottomCard.smallCard .quotedHeavy {
+            margin: 0;
+            display: inline-block;
+        }
+
+        #bottomCard.smallCard .closeBtn {
+            padding: 0;
+            padding-right: 1em;
+        }
+
+        #bottomCard.smallCard .progressBg {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        #bottomCard.smallCard .cardContent {
+            background: transparent;
+        }
+
+.cardTop {
+    background: #d03d3d;
+    position: relative;
+}
+
+#bottomCard .progressBg {
+    position: absolute;
+    width: 0%;
+    height: 100%;
+    background: rgba(255,255,255,0.25);
+}
+
+    #bottomCard .progressBg.shortAutoClose {
+        transition: 8s width linear;
+    }
+
+.cardTop .progressBg.showoff {
+    animation: 1.1s loadSideToSide cubic-bezier(0, 0, 0.15, 0.87);
+}
+
+.cardTop .cardTitle {
+    position: relative;
+    font-size: 2.5em;
+    padding: 0.4em 1.8em;
+    color: #fff;
+    font-weight: bold;
+    font-family: almoni-dl, Tahoma, Arial;
+}
+
+.cardContent {
+    padding: 1em 2em;
+    background: #fff;
+    font-size: 1em;
+    color: #000;
+    font-family: Tahoma, Arial;
+    max-width: 650px;
+    position: relative;
+}
+
+#howToSettingsImg {
+    display: block;
+    margin: 1em auto;
+}
+
+.closeBtn {
+    color: #8a8a8a;
+    font-family: almoni-dl;
+    font-size: 1.1em;
+    padding: 0 2em;
+    display: inline-block;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s color;
+}
+
+    .closeBtn:hover {
+        color: #0040d6;
+    }
+
+.xCloseBtn {
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/PjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDI4IDI4IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyOCAyODsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxnPjxwb2x5Z29uIHN0eWxlPSJmaWxsOiMwMzAxMDQ7IiBwb2ludHM9IjI4LDIyLjM5OCAxOS41OTQsMTQgMjgsNS42MDIgMjIuMzk4LDAgMTQsOC40MDIgNS41OTgsMCAwLDUuNjAyIDguMzk4LDE0IDAsMjIuMzk4IDUuNTk4LDI4IDE0LDE5LjU5OCAyMi4zOTgsMjgiLz48L2c+PC9zdmc+);
+    width: 1.5em;
+    height: 1.5em;
+    margin: 0 auto;
+}
+
+.quotedHeavy {
+    font-weight: bold;
+    margin: 0.5em 0;
+    font-style: italic;
+}
+
+.quotedBtw {
+    margin-bottom: 1em;
+    font-size: 0.8em;
+}
+
+#updateLoader {
+    background: #3d5cd0 !important;
+    animation: loadSideToSide 1.15s 0.2s, loadSideToSideSymmetrical 0.6s 1.40s;
+}
+
+.stickToLeft {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+}
+
+.manageThreadPP {
+    width: 2em;
+    font-family: 'Material Icons', Arial;
+    font-size: 1.5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.3);
+    color: #222;
+    cursor: pointer;
+    height: 100%;
+}
+
+.manageThreadDropdown {
+    height: 100%;
+}
+
+    .manageThreadDropdown .dropdownLContent {
+        width: 17em;
+        border: 1px solid #CECECE;
+        border-top: none;
+        left: -1px;
+        z-index: 3;
+    }
+
+.dropdownL {
+    position: relative;
+    display: inline-block;
+}
+
+    .dropdownL.showOnHover:hover .dropdownLContent {
+        display: block;
+    }
+
+.dropdownLContent {
+    display: none;
+    position: absolute;
+    background: #fff;
+    min-width: 10em;
+    box-shadow: 0px 3px 10px 1px rgba(0,0,0,0.23);
+    z-index: 1;
+    animation: comeFromBelow 0.1s;
+}
+
+    .dropdownLContent a {
+        padding: 1em;
+        background: #fff;
+        transition: 0.2s background;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+.dromdownLContent a:hover {
+    background: #eaf6ff;
+}
+
+#bottomfxplusplusstats {
+    margin-top: 0.5em;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+/*
+CSS loader from SpinKit: http://tobiasahlin.com/spinkit/
+*/
+
+.sk-cube-grid {
+    width: 40px;
+    height: 40px;
+}
+
+    .sk-cube-grid .sk-cube {
+        width: 33%;
+        height: 33%;
+        background-color: #333;
+        color: transparent;
+        float: left;
+        animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+    }
+
+    .sk-cube-grid .sk-cube1 {
+        animation-delay: 0.2s;
+    }
+
+    .sk-cube-grid .sk-cube2 {
+        animation-delay: 0.3s;
+    }
+
+    .sk-cube-grid .sk-cube3 {
+        animation-delay: 0.4s;
+    }
+
+    .sk-cube-grid .sk-cube4 {
+        animation-delay: 0.1s;
+    }
+
+    .sk-cube-grid .sk-cube5 {
+        animation-delay: 0.2s;
+    }
+
+    .sk-cube-grid .sk-cube6 {
+        animation-delay: 0.3s;
+    }
+
+    .sk-cube-grid .sk-cube7 {
+        animation-delay: 0s;
+    }
+
+    .sk-cube-grid .sk-cube8 {
+        animation-delay: 0.1s;
+    }
+
+    .sk-cube-grid .sk-cube9 {
+        animation-delay: 0.2s;
+    }
+
+
+@keyframes sk-cubeGridScaleDelay {
+    0%, 70%, 100% {
+        transform: scale3d(1, 1, 1);
+    }
+
+    35% {
+        transform: scale3d(0, 0, 1);
+    }
+}
+
+/*usually 1.15s*/
+@keyframes loadSideToSide {
+    0% {
+        right: 0;
+        left: auto;
+        width: 0%;
+    }
+
+    74% {
+        right: 0;
+        left: auto;
+        width: 100%;
+    }
+
+    74.0001% {
+        left: 0;
+        right: auto;
+        width: 100%;
+    }
+
+    100% {
+        left: 0;
+        right: auto;
+        width: 0%;
+    }
+}
+
+@keyframes loadSideToSideSymmetrical {
+    0% {
+        right: 0;
+        left: auto;
+        width: 0%;
+    }
+
+    50% {
+        right: 0;
+        left: auto;
+        width: 100%;
+    }
+
+    50.0001% {
+        left: 0;
+        right: auto;
+        width: 100%;
+    }
+
+    100% {
+        left: 0;
+        right: auto;
+        width: 0%;
+    }
+}
+
+@keyframes comeFromBelow {
+    0% {
+        transform: translateY(20%);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+.nightmodeActive #nightmodeShortcut {
+    background-color: #000;
+}
+
+.nightmodeActive #forumStatsContainer {
+    background: #082746;
+    border-color: #3e3e3e;
+    color: #e8e8e8;
+}
+
+.nightmodeActive #sidebar_container .blocksubhead img {
+    float: none;
+}
+
+.nightmodeActive .minithread {
+    color: #3e3e3e;
+    background: #191919;
+    border-bottom: 1px solid #3e3e3e;
+    border-right: 1px solid #003ac7 !important;
+}
+
+    .nightmodeActive .minithread a {
+        color: black;
+    }
+
+    .nightmodeActive .minithread .sk-cube-grid .sk-cube {
+        background: #3c3c3c;
+    }
+
+
+.nightmodeActive .yellowMarkedThread .rating0, .nightmodeActive .yellowMarkedThread .nonsticky, .nightmodeActive .yellowMarkedThread .sticky {
+    background: linear-gradient(to left, rgb(0, 90, 255) 0%, rgb(16, 16, 16) 65%) !important;
+}
+
+.nightmodeActive .blueTitleThread .threadtitle, .nightmodeActive .blueTitleThread .threadtitle a {
+    color: yellow;
+}

@@ -1,1 +1,0 @@
-﻿$("body").append('<div id="thisPageLoaded" style="display: none;"></div>');
