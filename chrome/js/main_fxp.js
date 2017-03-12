@@ -17,10 +17,9 @@
  
 "use strict";
 
-var versionDescription =
-    "ברוכים הבאים לגרסה הרשמית הראשונה של +FxPlus! יכולים להיות טיפה באגים ובעיות קטנות - כי כמעט כל הקוד של התוסף נכתב מחדש. קראו עוד לגבי זה בפרסום הבלוג!";
-//"תיקונים קטנים"
-var versionBig = true;
+var versionDescription = "עיצוב תגובות אוטומטית עובד במקומות נוספים";
+var versionBig = false;
+var versionHref = "https://fxplusplus.blogspot.co.il/";
 
 var factorySettings =
     {
@@ -93,10 +92,9 @@ chrome.storage.sync = (function ()
 
 /*
  * 
- * REMEMBER:
- * Change the rating suggestion to match the browser (chrome or firefox)
- * Including link!
- * (which may become a problem)
+ * 
+ * Change the rating suggestion to include link
+ * 
  * 
  */
 
@@ -327,13 +325,13 @@ chrome.storage.sync.get("settings", function (data)
 
         var beginDate = new Date();
 
-        $("body").append($("<div>", { style: "position: fixed; bottom: 0; left: 0; background: green; padding: 12px" })
-            .append($("<button>").text("DEBUG").click(
-            function ()
-            {
-                updateKnownIds("967488", "כפרעליך איתי");
-            }
-            )))
+        //$("body").append($("<div>", { style: "position: fixed; bottom: 0; left: 0; background: green; padding: 12px" })
+        //    .append($("<button>").text("DEBUG").click(
+        //    function ()
+        //    {
+        //        updateKnownIds("967488", "aaaaaaaa");
+        //    }
+        //    )))
 
         //add settings button in FxP toolbar
         $("#settings_pop .popupbody").append($("<div>", { class: "fxpSpopupSeperator" })) //add seperator
@@ -937,12 +935,14 @@ chrome.storage.sync.get("settings", function (data)
 
 
         var styleWrapper; //element to wrap around the text that has the styles
+
+        //custom style to comments
         if (settings.customDefaultStyle.active)
         {
             var styleElements = [];
             var styleProp = settings.customDefaultStyle;
 
-            var noFontsPage =
+            var noFontsPage = //true if the page's editor does not allow fonts
                 window.location.href.indexOf("member.php") > -1 ||
                 window.location.href.indexOf("converse.php") > -1 ||
                 window.location.href.indexOf("visitormessage.php") > -1;
@@ -1039,14 +1039,14 @@ chrome.storage.sync.get("settings", function (data)
                             //bind observer for new children (text)
                             if (qtnts.length > 0) //the contents are available, iframe loaded
                             {
-                                if (editorFrame.contents().find("body.forum").length > 0)
+                                if (editorFrame.contents().find("body.forum, body.content").length > 0)
                                 {
                                     if (settings.customDefaultStyle.active)
                                     {
-                                        observers.insideEditor.observe(editorFrame.contents().find("body.forum")[0], { childList: true });
+                                        observers.insideEditor.observe(editorFrame.contents().find("body.forum, body.content")[0], { childList: true });
                                     }
                                     if (settings.classicIcons)
-                                        observers.iconsInEditor.observe(editorFrame.contents().find("body.forum")[0], { childList: true, subtree: true });
+                                        observers.iconsInEditor.observe(editorFrame.contents().find("body.forum, body.content")[0], { childList: true, subtree: true });
                                 }
                                 else
                                     bindEditorFrameLoad(editorFrame, settings);
@@ -1642,16 +1642,6 @@ function addStyle(style, specialId)
         css.id = specialId;
 
     document.getElementsByTagName("head")[0].appendChild(css); //append element to head
-}
-
-//adds a <script> tag with a url
-function addScript(src)
-{
-    var script = document.createElement('script'); //create element
-    script.setAttribute('type', 'text/javascript');
-    script.setAttribute('src', 'http://mysite/my.js');
-
-    document.getElementsByTagName("head")[0].appendChild(script); //append element to head
 }
 
 //change the count of comments
@@ -2633,7 +2623,7 @@ function handleRatingSuggestion()
                                 $("<div>", { class: "cardTop" }).append($("<div>", { class: "progressBg", id: "updateLoader" })).append($("<div>", { class: "cardTitle" }).text("עדכון " + versionNew))
                             ).append(
                                 updateContent.append(
-                                    $("<a>", { class: "closeBtn", target: "_blank", href: "https://fxplusplus.blogspot.co.il/" }).text("גלה מה נשתנה").click(function ()
+                                    $("<a>", { class: "closeBtn", target: "_blank", href: versionHref }).text("גלה מה נשתנה").click(function ()
                                     {
                                         chrome.runtime.sendMessage({ event: { cat: "Popup", type: "See changes" } });
                                     })
@@ -2666,8 +2656,12 @@ function handleRatingSuggestion()
                 }
                 else
                 {
+                    var updateText = "+FxPlus עודכן לגרסה " + versionNew;
+                    if (versionDescription.length > 0)
+                        updateText += ": " + versionDescription;
+
                     var updateContent = $("<div>", { class: "cardContent" }).append(
-                                $("<a>", { class: "quotedHeavy", target: "_blank", href: "https://fxplusplus.blogspot.co.il/" }).text("+FxPlus עודכן לגרסה " + versionNew + ": " + versionDescription)
+                                $("<a>", { class: "quotedHeavy", target: "_blank", href: versionHref }).text(updateText)
                             )
                     $("body").append($("<div>", { class: "bottomFloat" }).append(
                         $("<div>", { id: "bottomCard", class: "smallCard", style: "display: none" }).append($("<div>", { class: "progressBg shortAutoClose", "data-completeAction": "updateVersion" })).append(
