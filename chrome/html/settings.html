@@ -21,7 +21,7 @@
 
     <link rel="shortcut icon" href="../images/icon.png" />
     <link href="../fonts/Assistant.css" rel="stylesheet" />
-    <link href="../fonts/MaterialIcons.css" rel="stylesheet" />
+    <link href="../fonts/materialdesignicons.css" rel="stylesheet" />
     <link href="../css/settings.css" rel="stylesheet" />
     <link href="../css/jquery-clockpicker.css" rel="stylesheet" />
     <link href="../css/balloon.css" rel="stylesheet" />
@@ -85,40 +85,36 @@
             </div>
             <ul id="optionList">
                 <li data-tab="general" class="selected">
-                    <i class="material-icons optionIcon">build</i>
+                    <span class="mdi mdi-wrench optionIcon"></span>
                     <span class="optionDesc">כללי</span>
                 </li>
                 <li data-tab="threads">
-                    <i class="material-icons optionIcon">send</i>
+                    <span class="mdi mdi-send optionIcon"></span>
                     <span class="optionDesc">אשכולות</span>
                 </li>
                 <li data-tab="comments">
-                    <i class="material-icons optionIcon">message</i>
+                    <span class="mdi mdi-message-text optionIcon"></span>
                     <span class="optionDesc">תגובות ותת-ניקים</span>
                 </li>
-                <!--<li data-tab="tutorial">
-                    <i class="material-icons optionIcon">lightbulb_outline</i>
-                    <span class="optionDesc">מדריך</span>
-                </li>-->
                 <li data-tab="about">
-                    <i class="material-icons optionIcon">info</i>
+                    <span class="mdi mdi-information optionIcon"></span>
                     <span class="optionDesc">אודות</span>
                 </li>
                 <li data-tab="report">
-                    <i class="material-icons optionIcon">eject</i>
+                    <span class="mdi mdi-bug optionIcon"></span>
                     <span class="optionDesc">דיווח באגים ומשוב</span>
                 </li>
                 <li data-tab="restoreOld" class="redTab" style="display: none;">
-                    <i class="material-icons optionIcon">save</i>
+                    <span class="mdi mdi-backup-restore optionIcon"></span>
                     <span class="optionDesc">שחזר הגדרות ישנות</span>
                 </li>
             </ul>
             <div id="savedIndicator">
-                <i class="material-icons savedIndicatorLogo">done</i><br />
+                <span class="mdi mdi-check savedIndicatorLogo"></span><br />
                 השינויים נשמרו.
             </div>
             <div id="resetIndicator">
-                <i class="material-icons savedIndicatorLogo">restore</i><br />
+                <span class="mdi mdi-undo-variant savedIndicatorLogo"></span><br />
                 השינויים בוטלו.
             </div>
         </div>
@@ -165,7 +161,7 @@
                     <div class="setOption">
                         <div class="optionName">
                             סגור
-                            <span data-balloon="ניתן ללחוץ על המעטפה שמופיעה בצד כל אשכול כדי להציץ לתוכן שלו." data-balloon-pos="left">הצצה לאשכולות</span>:
+                            <span class="balloonBorder" data-balloon="ניתן ללחוץ על המעטפה שמופיעה בצד כל אשכול כדי להציץ לתוכן שלו." data-balloon-pos="left">הצצה לאשכולות</span>:
                             <div style="height: 0.2em"></div>
                             <div style="display: flex; margin-bottom: 0.15em;">
                                 <div class="switch radio" style="width: 2em;"><input type="radio" checked name="peekCollapse" id="manualCollapse" /><label for="manualCollapse"></label></div>

@@ -88,6 +88,20 @@ var factorySettings =
         customBg: {
             day: "",
             night: ""
+        },
+        quickAccessThreads: [
+            {
+                prefix: "פרסום|",
+                title: "+FxPlus - תוסף לכרום",
+                authorId: 967488,
+                threadId: 16859147
+            }
+        ],
+        trackedThreads: {
+            list: [
+            ],
+            refreshRate: 15,
+            lastRefreshTime: 0
         }
     };
 
@@ -1028,7 +1042,7 @@ function addUserCard(id, subnick, subnickStyle, hideSignature, disableStyle, hid
             $(this).parents(".userCard").find(".subnick").css("font-size", $(this).val() * 1.2 + "px");
         });
 
-        card.find("i.delete").click(function ()
+        card.find("span.delete").click(function ()
         { //delete button
             var card = $(this).parents(".userCard");
             card.removeClass("noAnimation").css({ animation: "sizedownfade 0.4s forwards" })
@@ -1084,7 +1098,7 @@ function addStyleThreadsRow(type, selector, validation, action)
         }
     });
 
-    row.find("i.delete").click(function ()
+    row.find("span.delete").click(function ()
     { //delete button
         var row = $(this).parents("tr");
         row.css({ transition: "font-size 0.3s", fontSize: 0 })
@@ -1252,7 +1266,7 @@ function buildUserCard()
                 )
             ).append(
                 $("<td>", { class: "styleSubnick" }).append(
-                    $("<i>", { class: "material-icons" }).text("format_color_text")
+                    $("<span>", { class: "mdi mdi-format-size" })
                 )
             )
         ).append(
@@ -1280,7 +1294,7 @@ function buildUserCard()
                 )
             ).append(
                 $("<td>", { rowspan: "3", class: "delete" }).append(
-                    $("<i>", { class: "material-icons delete" }).text("delete")
+                    $("<span>", { class: "mdi mdi-delete delete" })
                 )
             )
         ).append(
@@ -1391,13 +1405,13 @@ function buildStyleThreadsRow(type)
                     $("<input>", { type: "checkbox", name: "boldPost", checked: "checked" })
                 ).append(
                     $("<div>", { class: "showHideToggle boldOn" }).append(
-                        $("<i>", { class: "material-icons boldHideIcon" }).text("visibility")
+                        $("<span>", { class: "mdi mdi-eye boldHideIcon" })
                     ).append(
                         $("<div>", { class: "boldHideText" }).text("הדגש")
                     )
                 ).append(
                     $("<div>", { class: "showHideToggle hideOn" }).append(
-                        $("<i>", { class: "material-icons boldHideIcon hideIcon" }).text("visibility_off")
+                        $("<span>", { class: "mdi mdi-eye-off boldHideIcon hideIcon" })
                     ).append(
                         $("<div>", { class: "boldHideText" }).text("הסתר")
                     )
@@ -1405,7 +1419,7 @@ function buildStyleThreadsRow(type)
             )
         ).append(
             $("<td>").append(
-                $("<i>", { class: "material-icons delete" }).text("delete")
+                $("<span>", { class: "mdi mdi-delete delete" })
             )
         )
     return row;

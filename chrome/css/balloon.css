@@ -5,7 +5,6 @@ button[data-balloon] {
 
 [data-balloon] {
     position: relative;
-    border-bottom: 1px dotted black;
 }
 
 
@@ -206,6 +205,6 @@ button[data-balloon] {
     cursor: auto;
 }
 
-.balloonNoBorder {
-    border-bottom: 0;
+.balloonBorder {
+    border-bottom: 1px dotted black;
 }

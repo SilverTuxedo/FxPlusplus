@@ -123,10 +123,21 @@ h1 {
     color: black;
 }
 
+.miniQuickThread {
+    border-color: #2b2b2b;
+}
+
+    .miniQuickThread a {
+        color: #e4e4e4;
+    }
+
+.borderelssSelect {
+    color: #fff;
+}
+
 /*
 FRONT PAGE
 */
-
 #statinfo,
 .greengrnew {
     background: #c0cc3a !important;
@@ -207,6 +218,20 @@ THREADS LIST
     background: #082746;
     border-color: #3e3e3e;
     color: #e8e8e8;
+}
+
+.statTable {
+    border-color: #232323;
+}
+
+.popupBottom {
+    background: #0e0e0e;
+    color: #efefef;
+}
+
+.smallPlusButton {
+    border: 1px dashed #505050;
+    background: #051525;
 }
 
 .hideThread .rating0, .hideThread .nonsticky, .hideThread .sticky {
@@ -337,6 +362,11 @@ span.cke_skin_kama {
 .likebox {
     z-index: 3;
 }
+
+.manageThreadDropdown .dropdownLContent {
+    border-color: #3e3e3e;
+}
+
 
 /*
 PMs and settings

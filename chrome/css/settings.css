@@ -538,7 +538,7 @@ input {
         vertical-align: bottom;
     }
 
-    .userCard i.delete {
+    .userCard span.delete {
         font-size: 1.3em;
         color: #ff0000;
         opacity: 0.3;
@@ -546,7 +546,7 @@ input {
         cursor: pointer;
     }
 
-        .userCard i.delete:hover {
+        .userCard span.delete:hover {
             opacity: 1;
         }
 
@@ -660,7 +660,7 @@ input[name=boldPost]:checked ~ .showHideToggle.hideOn {
     display: none;
 }
 
-.StyleThreads i.delete {
+.StyleThreads span.delete {
     font-size: 1.3em;
     color: #ff0000;
     opacity: 0.3;
@@ -668,7 +668,7 @@ input[name=boldPost]:checked ~ .showHideToggle.hideOn {
     cursor: pointer;
 }
 
-    .StyleThreads i.delete:hover {
+    .StyleThreads span.delete:hover {
         opacity: 1;
     }
 

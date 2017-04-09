@@ -75,6 +75,20 @@ var factorySettings =
         customBg: {
             day: "",
             night: ""
+        },
+        quickAccessThreads: [
+            {
+                prefix: "פרסום|",
+                title: "+FxPlus - תוסף לכרום",
+                authorId: 967488,
+                threadId: 16859147
+            }
+        ],
+        trackedThreads: {
+            list: [
+            ],
+            refreshRate: 15,
+            lastRefreshTime: 0
         }
     };
 
@@ -171,83 +185,78 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
     }
     else
     {
-        $.get(fxpDomain + "feed_live.php?userid=" + id + "&format=json", function (data) //get the like, notification, and pm count
+        getNotificationsNormal(function (normal)
         {
-            var notificationCount = JSON.parse(data);
-
-            //update counters
-            $("#likeCount").text(notificationCount.like);
-            $("#notificationCount").text(notificationCount.noti);
-            $("#pmCount").text(notificationCount.pm);
-
-            $(".counter").show();
-
-            if (updateBadge)
+            getNotificationsTrackedThreads(function (tracked)
             {
-                var notificationSum = parseInt(notificationCount.like) +
-                                      parseInt(notificationCount.noti) +
-                                      parseInt(notificationCount.pm);
-                if (notificationSum > 0)
-                    changeBadge(notificationSum);
+                $("#likeCount").text(normal.likes);
+                $("#notificationCount").text(normal.notifications + tracked.length);
+                $("#pmCount").text(normal.pms);
+
+                $(".counter").show();
+
+                if (updateBadge)
+                {
+                    var notificationSum = normal.total() + tracked.length;
+                    if (notificationSum > 0)
+                        changeBadge(notificationSum);
+                    else
+                        changeBadge("");
+                }
                 else
+                {
                     changeBadge("");
-            }
-            else
-            {
-                changeBadge("");
-            }
+                }
 
-
-            getDomainCookies(fxpDomain, "bb_userid", function (idNum)
-            {
-                var requestsComplete = 0;
-                var requestsSent = 0;
-                if (parseInt(notificationCount.like) > 0)
+                getDomainCookies(fxpDomain, "bb_userid", function (idNum)
                 {
-                    //show like messages
-                    requestsSent++;
-                    httpGetAsync(fxpDomain + "likesno.php?userid=" + idNum, function (response)
+                    var requestsComplete = 0;
+                    var requestsSent = 0;
+                    if (normal.likes > 0)
                     {
-                        requestsComplete++;
-
-                        var doc = $(domParser.parseFromString(response, "text/html"));
-
-                        doc.find('a[style*="background-color: #fafe8a"]').parent().each(function ()
+                        //show like messages
+                        requestsSent++;
+                        httpGetAsync(fxpDomain + "likesno.php?userid=" + idNum, function (response)
                         {
-                            formatNoti($(this));
-                            $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
-                            $("#notifications").append($(this))
-                            .append($("<div>", { class: "seperator" }));
-                        })
+                            requestsComplete++;
 
-                        addUnreadPm(requestsSent, requestsComplete, notificationCount.pm);
-                    })
-                }
-                if (parseInt(notificationCount.noti) > 0)
-                {
-                    requestsSent++;
-                    //show like messages
-                    httpGetAsync(fxpDomain + "notifc.php?userid=" + idNum, function (response)
+                            var doc = $(domParser.parseFromString(response, "text/html"));
+
+                            doc.find('a[style*="background-color: #fafe8a"]').parent().each(function ()
+                            {
+                                formatNoti($(this));
+                                $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
+                                $("#notifications").append($(this))
+                                    .append($("<div>", { class: "seperator" }));
+                            })
+
+                            addExtraNotifications(requestsSent, requestsComplete, normal.pms, tracked);
+                        })
+                    }
+                    if (normal.notifications > 0)
                     {
-                        requestsComplete++;
-
-                        var doc = $(domParser.parseFromString(response, "text/html"));
-
-                        doc.find('a[style*="background-color: #fafe8a"]').parent().each(function ()
+                        requestsSent++;
+                        //show like messages
+                        httpGetAsync(fxpDomain + "notifc.php?userid=" + idNum, function (response)
                         {
-                            formatNoti($(this));
-                            $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
-                            $("#notifications").append($(this))
-                            .append($("<div>", { class: "seperator" }));
-                        })
+                            requestsComplete++;
 
-                        addUnreadPm(requestsSent, requestsComplete, notificationCount.pm);
-                    })
-                }
-                if (parseInt(notificationCount.pm) > 0)
-                {
-                    addUnreadPm(requestsSent, requestsComplete, notificationCount.pm);
-                }
+                            var doc = $(domParser.parseFromString(response, "text/html"));
+
+                            doc.find('a[style*="background-color: #fafe8a"]').parent().each(function ()
+                            {
+                                formatNoti($(this));
+                                $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
+                                $("#notifications").append($(this))
+                                    .append($("<div>", { class: "seperator" }));
+                            })
+
+                            addExtraNotifications(requestsSent, requestsComplete, normal.pms, tracked);
+                        })
+                    }
+                    addExtraNotifications(requestsSent, requestsComplete, normal.pms, tracked);
+                });
+
             });
         });
     }
@@ -306,12 +315,12 @@ function formatNoti(element)
 }
 
 //adds the new pm notification if all requests have been completed
-function addUnreadPm(sent, complete, pmCount)
+function addExtraNotifications(sent, complete, pmCount, tracked)
 {
     console.log(sent + " " + complete + " " + pmCount);
-    if (parseInt(pmCount) > 0)
+    if (complete >= sent)
     {
-        if (complete >= sent)
+        if (pmCount > 0)
         {
             var pmNotification = $("<div>", { id: "del_noti" }).append(
                         $("<a>", {
@@ -326,6 +335,51 @@ function addUnreadPm(sent, complete, pmCount)
                     .append($("<div>", { class: "seperator" }));
             }, 500);
         }
+
+        if (tracked.length > 0)
+        {
+
+            setTimeout(function ()
+            {
+                var notification, additional;
+                for (var i = 0; i < tracked.length; i++)
+                {
+                    console.log(tracked[i]);
+
+                    if (tracked[i].newComments < 2)
+                    {
+                        additional = " הגיב באשכול ";
+                    }
+                    else if (tracked[i].newComments == 2)
+                    {
+                        additional = " ומשתמש נוסף הגיבו באשכול ";
+                    }
+                    else
+                    {
+                        additional = " ו-" + (tracked[i].newComments - 1) + " משתמשים נוספים הגיבו באשכול ";
+                    }
+
+                    notification =
+                        $("<div>", { id: "del_noti" }).append(
+                            $("<span>", { style: "position: relative;float: right;clear: left;top: 12px;padding-right: 3px;" }).append(
+                                $("<img>", { src: "https://images.fxp.co.il/guy/c3.png" })
+                            )
+                        ).append($("<a>", {
+                            href: tracked[i].url,
+                            target: "_blank",
+                            style: "font-size:11px; padding-right: 25px;"
+                        }).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) })
+                            .append($("<span>").text("המשתמש "))
+                            .append($("<span>", { style: "font-weight: bold" }).text(tracked[i].lastCommentor))
+                            .append($("<span>").text(additional))
+                            .append($("<span>", { style: "font-weight: bold" }).text(tracked[i].threadTitle))
+                            );
+                            
+                    $("#notifications").append(notification)
+                        .append($("<div>", { class: "seperator" }))
+                }
+            }, 700);
+        }
     }
 }
 
@@ -334,4 +388,97 @@ function changeBadge(str)
 {
     str = "" + str; //make sure it's a string
     chrome.browserAction.setBadgeText({ text: str });
+}
+
+//returns notification objects for tracked threads
+function getNotificationsTrackedThreads(callback)
+{
+    var noti = [];
+    var commentNum, url;
+    chrome.storage.local.get("threadComments", function (data)
+    {
+        var threadComments = data.threadComments || [];
+        chrome.storage.sync.get("settings", function (data2)
+        {
+            var settings = data2.settings || factorySettings;
+
+            for (var i = 0; i < settings.trackedThreads.list.length; i++)
+            {
+                for (var j = 0; j < threadComments.length; j++)
+                {
+                    if (threadComments[j].id == settings.trackedThreads.list[i].threadId)
+                    {
+                        commentNum = settings.trackedThreads.list[i].totalComments - threadComments[j].comments;
+                        url = fxpDomain + "showthread.php?t=" + settings.trackedThreads.list[i].threadId;
+                        if (settings.trackedThreads.list[i].totalComments > 15) //add pages
+                        {
+                            url += "&page=" + Math.ceil(settings.trackedThreads.list[i].totalComments / 15);
+                        }
+                        if (commentNum > 0)
+                        {
+                            noti.push({
+                                threadTitle: settings.trackedThreads.list[i].title,
+                                threadId: settings.trackedThreads.list[i].threadId,
+                                totalComments: settings.trackedThreads.list[i].totalComments,
+                                newComments: commentNum,
+                                lastCommentor: settings.trackedThreads.list[i].lastCommentor,
+                                url: url
+                            })
+                        }
+                        break;
+                    }
+                }
+            }
+
+            //return the notifications
+            console.log(noti.length + " tracked threads notifications");
+            callback(noti);
+        });
+    });
+}
+
+//returns notifications from each kind, and total from FXP itself
+function getNotificationsNormal(callback)
+{
+    var noti = {
+        pms: 0,
+        likes: 0,
+        notifications: 0,
+        total: function ()
+        {
+            return this.pms + this.likes + this.notifications;
+        }
+    };
+    getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
+    {
+        if (id != null)
+            httpGetAsync(fxpDomain + "feed_live.php?userid=" + id + "&format=json", function (data)
+            {
+                var notificationCount = JSON.parse(data);
+
+                noti.pms = parseInt(notificationCount.pm);
+                noti.likes = parseInt(notificationCount.like);
+                noti.notifications = parseInt(notificationCount.noti);
+
+                console.log(noti.total() + " normal notifications");
+                callback(noti);
+            })
+        else
+            callback(noti);
+    });
+}
+
+//returns the addition of all notification types
+function getNotificationsTotalNum(callback)
+{
+    var total = 0;
+    getNotificationsNormal(function (n1)
+    {
+        total += n1.total();
+        getNotificationsTrackedThreads(function (n2)
+        {
+            total += n2.length
+            callback(total);
+        })
+    })
 }
