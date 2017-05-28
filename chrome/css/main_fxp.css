@@ -477,16 +477,53 @@
 }
 
 .addCreditBtn {
-    display: inline-block;
     margin: 0.2em 1em;
     background: #fff;
-    padding: 0.3em 1em;
     border-radius: 0.2em;
     font-weight: bold;
     color: #004b67;
     border: 1px solid #c5c5c5;
     cursor: pointer;
+    padding: 0;
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
+
+    .addCreditBtn img {
+        border: 0;
+        height: 100%;
+    }
+
+    .addCreditBtn .addCreditDesc {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 1;
+    }
+
+        .addCreditBtn .addCreditDesc:hover {
+            opacity: 0;
+        }
+
+    .addCreditBtn#addTextCredit .addCreditDesc:hover {
+        opacity: 1;
+    }
+
+    .addCreditBtn#addXLimg  {
+        width: 110px;
+    }
 
 .bottomFloat {
     position: fixed;
@@ -735,6 +772,10 @@
         background: #1d9655;
     }
 
+    .popupContainer.orangeTopPopup .popupTop {
+        background: #ea861c;
+    }
+
     .popupContainer.alertTopPopup .popupTop {
         background: #ef1700;
     }
@@ -881,6 +922,76 @@ CSS loader from SpinKit: http://tobiasahlin.com/spinkit/
     }
 
 
+#onScreenKeyboard {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+    #onScreenKeyboard li {
+        float: left;
+        margin: 0 5px 5px 0;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        color: #fff;
+        background: #fff;
+        border: 1px solid #f9f9f9;
+        border-radius: 5px;
+    }
+
+        #onScreenKeyboard li:hover {
+            border-color: #e5e5e5;
+            cursor: pointer;
+            color: #000;
+        }
+
+    #onScreenKeyboard .capslock,
+    #onScreenKeyboard .tab,
+    #onScreenKeyboard .left-shift {
+        clear: left;
+    }
+
+    #onScreenKeyboard .tab,
+    #onScreenKeyboard .delete {
+        width: 70px;
+    }
+
+    #onScreenKeyboard .capslock {
+        width: 80px;
+    }
+
+    #onScreenKeyboard .return {
+        width: 77px;
+    }
+
+    #onScreenKeyboard .left-shift {
+        width: 95px;
+    }
+
+    #onScreenKeyboard .right-shift {
+        width: 109px;
+    }
+
+    #onScreenKeyboard .lastitem {
+        margin-right: 0;
+    }
+
+    #onScreenKeyboard .space {
+        clear: left;
+        width: 681px;
+    }
+
+#cgglass {
+    position: absolute;
+    z-index: 1;
+    left: 52%;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
 @keyframes sk-cubeGridScaleDelay {
     0%, 70%, 100% {
         transform: scale3d(1, 1, 1);
@@ -996,6 +1107,20 @@ CSS loader from SpinKit: http://tobiasahlin.com/spinkit/
         background: #051525;
     }
 
+.nightmodeActive .statTable {
+    border-color: #232323;
+}
+
+.nightmodeActive .popupBottom {
+    background: #0e0e0e;
+    color: #efefef;
+}
+
+.nightmodeActive .manageThreadDropdown .dropdownLContent {
+    border-color: #3e3e3e;
+}
+
+
 .nightmodeActive #sidebar_container .blocksubhead img {
     float: none;
 }
@@ -1022,4 +1147,21 @@ CSS loader from SpinKit: http://tobiasahlin.com/spinkit/
 
 .nightmodeActive .blueTitleThread .threadtitle, .nightmodeActive .blueTitleThread .threadtitle a {
     color: yellow;
+}
+
+.nightmodeActive .addCreditBtn {
+    border-color: #525252;
+}
+
+.nightmodeActive .miniQuickThread {
+    border-color: #2b2b2b;
+}
+
+.nightmodeActive .miniQuickThread a {
+    color: #e4e4e4;
+}
+
+.nightmodeActive .borderelssSelect {
+    color: #fff;
+    background: #0e0e0e;
 }

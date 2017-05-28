@@ -202,6 +202,27 @@ chrome.runtime.onMessage.addListener(
       }
     });
 
+
+//listeners for alarms (scheduled events)
+chrome.alarms.onAlarm.addListener(function (alarm)
+{
+    //update comment conunts in tracked threads
+    if (alarm.name == "updateTrackedThreads")
+    {
+        trackedThreadsAlarm();
+    }
+});
+
+//the alarm that fires when the comments of tracked threads should be updated
+function trackedThreadsAlarm()
+{
+    chrome.storage.sync.get("settings", function (data2)
+    {
+        var settings = data2.settings;
+        updateTotalCommentsTrackedThreads(settings.trackedThreads.list, settings.trackedThreads.refreshRate);
+    });
+}
+
 //an asynchronous loop. func runs every iteration and callback runs when the loop is over
 function asyncLoop(iterations, func, callback)
 {
@@ -740,15 +761,13 @@ function updateTotalCommentsTrackedThreads(threadList, refreshRate)
 
                 //update again after the specified minutes
                 if (refreshRate > 0)
-                    refreshTimeout = setTimeout(function ()
+                {
+                    chrome.storage.sync.get("settings", function (data2)
                     {
-                        chrome.storage.sync.get("settings", function (data2)
-                        {
-                            var settings = data2.settings;
-                            updateTotalCommentsTrackedThreads(settings.trackedThreads.list, settings.trackedThreads.refreshRate);
-                        });
-                       
-                    }, 1000 * 60 * refreshRate);
+                        var settings = data2.settings;
+                        scheduleTrackedThreadsUpdate(settings.trackedThreads.lastRefreshTime, settings.trackedThreads.refreshRate);
+                    });
+                }
             });
         });
 }
@@ -757,16 +776,23 @@ function updateTotalCommentsTrackedThreads(threadList, refreshRate)
 function scheduleTrackedThreadsUpdate(lastRefresh, refreshRate)
 {
     var timeToRefresh = lastRefresh - new Date() + (1000 * 60 * refreshRate);
-    refreshTimeout = setTimeout(function ()
+    var refreshTime = lastRefresh + (1000 * 60 * refreshRate);
+    var nextUpIn = (lastRefresh - new Date() + (1000 * 60 * refreshRate)) / 1000 / 60;
+    //clear previous alarm if exists, and set a new for the next time of update
+    chrome.alarms.clear("updateTrackedThreads", function (wasCleared)
     {
-        chrome.storage.sync.get("settings", function (data2)
+        console.log("thread tracker scheduled for " + Math.round(nextUpIn * 100) / 100 + "mins from now");
+        if (nextUpIn < 1)
         {
-            var settings = data2.settings;
-            updateTotalCommentsTrackedThreads(settings.trackedThreads.list, settings.trackedThreads.refreshRate);
-        });
-
-    }, timeToRefresh);
-    console.log("thread tracker scheduled for ~" + Math.round(timeToRefresh / 1000 / 60) + " minutes from now");
+            trackedThreadsAlarm();
+        }
+        else
+        {
+            chrome.alarms.create("updateTrackedThreads", {
+                delayInMinutes: nextUpIn
+            })
+        }
+    }); 
 }
 
 //returns notification objects for tracked threads

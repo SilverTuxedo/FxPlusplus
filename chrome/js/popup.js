@@ -92,11 +92,13 @@ var factorySettings =
         }
     };
 
+//if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
 {
     return chrome.storage.sync ||
-           chrome.storage.local;
+        chrome.storage.local;
 })();
+
 chrome.browserAction.setBadgeBackgroundColor({ color: "#007cff" });
 
 var fxpDomain = "https://www.fxp.co.il/";

@@ -133,6 +133,7 @@ h1 {
 
 .borderelssSelect {
     color: #fff;
+    background: #0e0e0e;
 }
 
 /*
@@ -528,7 +529,5 @@ ul.userlist_showavatars li {
 }
 
 .addCreditBtn {
-    color: rgb(226, 247, 255);
-    background: rgb(0, 0, 0);
     border-color: #525252;
 }

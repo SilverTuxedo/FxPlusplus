@@ -1,0 +1,296 @@
+[33mcommit 5c0aade5a54507ed234528fa30eb6a657e39ec5c[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Sun Apr 9 23:39:56 2017 +0300
+
+    version 1.1.0
+
+:000000 100644 0000000... f654283... A	chrome/fonts/materialdesignicons-webfont.woff2
+:000000 100644 0000000... 9f66830... A	chrome/fonts/materialdesignicons.css
+:000000 100644 0000000... 5365383... A	chrome/images/confirm.svg
+:000000 100644 0000000... 0f0da66... A	chrome/images/graph.svg
+:000000 100644 0000000... d265d21... A	chrome/images/mouse.svg
+
+[33mcommit 4772c23b206ab4a26ed9b754f67ea927976a63a3[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Thu Feb 23 23:33:07 2017 +0200
+
+    version 1.0.0
+
+:000000 100644 0000000... 6d42e95... A	chrome/css/balloon.css
+:000000 100644 0000000... 376cb2e... A	chrome/css/jquery-clockpicker.css
+:000000 100644 0000000... 337987b... A	chrome/css/main_fxp.css
+:000000 100644 0000000... f0c1876... A	chrome/css/nightmode.css
+:000000 100644 0000000... 0128e06... A	chrome/css/popup.css
+:000000 100644 0000000... 8931fc9... A	chrome/css/settings.css
+:000000 100644 0000000... 1959cbb... A	chrome/fonts/Assistant-Regular-Hebrew.woff2
+:000000 100644 0000000... fd7187f... A	chrome/fonts/Assistant-Regular-Latin.woff2
+:000000 100644 0000000... 3706b22... A	chrome/fonts/Assistant-SemiBold-Hebrew.woff2
+:000000 100644 0000000... ef04625... A	chrome/fonts/Assistant-SemiBold-Latin.woff2
+:000000 100644 0000000... dcc7345... A	chrome/fonts/Assistant.css
+:000000 100644 0000000... 7c88c25... A	chrome/fonts/MaterialIcons.css
+:000000 100644 0000000... 5c17f4b... A	chrome/fonts/MaterialIcons.woff2
+:000000 100644 0000000... 5f5e80d... A	chrome/html/settings.html
+:000000 100644 0000000... 9268ceb... A	chrome/images/blackyellowstripes.png
+:000000 100644 0000000... 0dc62f1... A	chrome/images/discord-logo.svg
+:000000 100644 0000000... 6c6f9e5... A	chrome/images/green-tick.svg
+:000000 100644 0000000... 78c3ed1... A	chrome/images/left_arrow.svg
+:000000 100644 0000000... d2b3632... A	chrome/images/moon.svg
+:000000 100644 0000000... c3a22c9... A	chrome/images/nightmode-off.svg
+:000000 100644 0000000... 117da93... A	chrome/images/nightmode-on.svg
+:000000 100644 0000000... cecd3a6... A	chrome/images/paint-brush.svg
+:000000 100644 0000000... a455b92... A	chrome/images/sun.svg
+:000000 100644 0000000... 4178195... A	chrome/images/timer.svg
+:000000 100644 0000000... 72bf972... A	chrome/images/twitterLogo.svg
+:000000 100644 0000000... f8e9c2e... A	chrome/js/jquery-clockpicker.js
+:000000 100644 0000000... fc356ee... A	chrome/js/jquery.min.js
+:000000 100644 0000000... b460ccb... A	chrome/js/main_fxp.js
+:000000 100644 0000000... 779249d... A	chrome/js/settings.js
+:000000 100644 0000000... 460148f... A	chrome/js/twitterFetcher.js
+:000000 100644 0000000... 6d42e95... A	firefox/css/balloon.css
+:000000 100644 0000000... 376cb2e... A	firefox/css/jquery-clockpicker.css
+:000000 100644 0000000... 337987b... A	firefox/css/main_fxp.css
+:000000 100644 0000000... f0c1876... A	firefox/css/nightmode.css
+:000000 100644 0000000... 0128e06... A	firefox/css/popup.css
+:000000 100644 0000000... 8931fc9... A	firefox/css/settings.css
+:000000 100644 0000000... 1959cbb... A	firefox/fonts/Assistant-Regular-Hebrew.woff2
+:000000 100644 0000000... fd7187f... A	firefox/fonts/Assistant-Regular-Latin.woff2
+:000000 100644 0000000... 3706b22... A	firefox/fonts/Assistant-SemiBold-Hebrew.woff2
+:000000 100644 0000000... ef04625... A	firefox/fonts/Assistant-SemiBold-Latin.woff2
+:000000 100644 0000000... dcc7345... A	firefox/fonts/Assistant.css
+:000000 100644 0000000... 7c88c25... A	firefox/fonts/MaterialIcons.css
+:000000 100644 0000000... 5c17f4b... A	firefox/fonts/MaterialIcons.woff2
+:000000 100644 0000000... 5f5e80d... A	firefox/html/settings.html
+:000000 100644 0000000... 9268ceb... A	firefox/images/blackyellowstripes.png
+:000000 100644 0000000... 0dc62f1... A	firefox/images/discord-logo.svg
+:000000 100644 0000000... 6c6f9e5... A	firefox/images/green-tick.svg
+:000000 100644 0000000... 78c3ed1... A	firefox/images/left_arrow.svg
+:000000 100644 0000000... d2b3632... A	firefox/images/moon.svg
+:000000 100644 0000000... c3a22c9... A	firefox/images/nightmode-off.svg
+:000000 100644 0000000... 117da93... A	firefox/images/nightmode-on.svg
+:000000 100644 0000000... cecd3a6... A	firefox/images/paint-brush.svg
+:000000 100644 0000000... a455b92... A	firefox/images/sun.svg
+:000000 100644 0000000... 4178195... A	firefox/images/timer.svg
+:000000 100644 0000000... 72bf972... A	firefox/images/twitterLogo.svg
+:000000 100644 0000000... f8e9c2e... A	firefox/js/jquery-clockpicker.js
+:000000 100644 0000000... fc356ee... A	firefox/js/jquery.min.js
+:000000 100644 0000000... b460ccb... A	firefox/js/main_fxp.js
+:000000 100644 0000000... 779249d... A	firefox/js/settings.js
+:000000 100644 0000000... 460148f... A	firefox/js/twitterFetcher.js
+
+[33mcommit 2f2eb9c506bcaaee0dba7d794e8598e7ca29ac24[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Thu Feb 23 16:43:13 2017 +0200
+
+    Set theme jekyll-theme-cayman
+
+:000000 100644 0000000... c419263... A	_config.yml
+
+[33mcommit fb0b4ce5cb1a7d798455eb5445771f4919820f2e[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Fri Aug 19 11:59:21 2016 +0300
+
+    version 0.0.20 for Chrome
+
+:000000 100644 0000000... 5207a46... A	chrome/css/fxpStyle.css
+:000000 100644 0000000... 71bdad8... A	chrome/html/background.html
+:000000 100644 0000000... 2071ea0... A	chrome/html/howto.html
+:000000 100644 0000000... 8cc05b7... A	chrome/html/popup.html
+:000000 100644 0000000... 1fa6152... A	chrome/images/icon.png
+:000000 100644 0000000... 951c3b1... A	chrome/images/icon128.png
+:000000 100644 0000000... 3bf8023... A	chrome/images/icon16.png
+:000000 100644 0000000... c4cea8a... A	chrome/images/icon48.png
+:000000 100644 0000000... fe4903b... A	chrome/images/iconStore.png
+:000000 100644 0000000... 35945f7... A	chrome/images/notificationImg.png
+:000000 100644 0000000... f594336... A	chrome/js/background.js
+:000000 100644 0000000... c3fac7e... A	chrome/js/fxpCode.js
+:000000 100644 0000000... 2a1092c... A	chrome/js/getNames.js
+:000000 100644 0000000... fd61672... A	chrome/js/happyEyes.js
+:000000 100644 0000000... fc356ee... A	chrome/js/jquery-2.1.4.min.js
+:000000 100644 0000000... 044aa63... A	chrome/js/peek.js
+:000000 100644 0000000... bd7ef9e... A	chrome/js/popup.js
+:000000 100644 0000000... 2e3bf85... A	chrome/js/readTime.js
+:000000 100644 0000000... 6f478d8... A	chrome/js/socket.io-1.4.5.js
+:000000 100644 0000000... 5096bea... A	chrome/js/thisPageLoadedMarker.js
+:000000 100644 0000000... 79d8b2c... A	chrome/js/tinymce.min.js
+:000000 100644 0000000... c470484... A	chrome/sound/notice.mp3
+:000000 100644 0000000... 8c87d7d... A	chrome/sound/success.mp3
+
+[33mcommit 12ce9c5e2ef997a048c92de4a74cdaf53f473b5f[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Thu Jul 28 20:03:15 2016 +0300
+
+    working on Firefox 48
+
+:000000 100644 0000000... e0862af... A	firefox/css/fxpStyle.css
+:000000 100644 0000000... 4ee4815... A	firefox/html/background.html
+:000000 100644 0000000... 9554c3a... A	firefox/html/howto.html
+:000000 100644 0000000... 4eabe76... A	firefox/html/popup.html
+:000000 100644 0000000... 1fa6152... A	firefox/images/icon.png
+:000000 100644 0000000... 951c3b1... A	firefox/images/icon128.png
+:000000 100644 0000000... 3bf8023... A	firefox/images/icon16.png
+:000000 100644 0000000... c4cea8a... A	firefox/images/icon48.png
+:000000 100644 0000000... fe4903b... A	firefox/images/iconStore.png
+:000000 100644 0000000... 35945f7... A	firefox/images/notificationImg.png
+:000000 100644 0000000... 9448c0e... A	firefox/js/background.js
+:000000 100644 0000000... 6d8e12d... A	firefox/js/fxpCode.js
+:000000 100644 0000000... 0bb6807... A	firefox/js/getNames.js
+:000000 100644 0000000... e6842e1... A	firefox/js/happyEyes.js
+:000000 100644 0000000... fc356ee... A	firefox/js/jquery-2.1.4.min.js
+:000000 100644 0000000... 33599e4... A	firefox/js/peek.js
+:000000 100644 0000000... 84b0473... A	firefox/js/popup.js
+:000000 100644 0000000... 760f1a0... A	firefox/js/readTime.js
+:000000 100644 0000000... 6f478d8... A	firefox/js/socket.io-1.4.5.js
+:000000 100644 0000000... b2bb98b... A	firefox/js/thisPageLoadedMarker.js
+:000000 100644 0000000... 79d8b2c... A	firefox/js/tinymce.min.js
+:000000 100644 0000000... c470484... A	firefox/sound/notice.mp3
+:000000 100644 0000000... 8c87d7d... A	firefox/sound/success.mp3
+
+[33mcommit c8b3297b6ea45d128301b697cb2ba3fe7b08a6d1[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Fri Jul 8 02:30:26 2016 +0300
+
+    added JPM failed attempt
+
+:000000 100644 0000000... fcf9a7d... A	firefox/jpm.zip
+
+[33mcommit a17da522401c773b60cb25fda80e05eda652b1e7[m
+Author: Nitzan Shwartz <nitzandesigns@gmail.com>
+Date:   Fri Jul 8 00:48:53 2016 +0300
+
+    Little changes to firefox ver.
+
+:000000 100644 0000000... 9607447... A	firefox/background.html
+:000000 100644 0000000... 81c3074... A	firefox/background.js
+:000000 100644 0000000... c3fd646... A	firefox/firefox.XPI
+:000000 100644 0000000... a35faf4... A	firefox/fxpCode.js
+:000000 100644 0000000... 7374827... A	firefox/fxpStyle.css
+:000000 100644 0000000... 0bb6807... A	firefox/getNames.js
+:000000 100644 0000000... 6a16b14... A	firefox/happyEyes.js
+:000000 100644 0000000... 9554c3a... A	firefox/howto.html
+:000000 100644 0000000... 1fa6152... A	firefox/icon.png
+:000000 100644 0000000... 951c3b1... A	firefox/icon128.png
+:000000 100644 0000000... 3bf8023... A	firefox/icon16.png
+:000000 100644 0000000... c4cea8a... A	firefox/icon48.png
+:000000 100644 0000000... fe4903b... A	firefox/iconStore.png
+:000000 100644 0000000... fc356ee... A	firefox/jquery-2.1.4.min.js
+:000000 100644 0000000... 241e0be... A	firefox/manifest.json
+:000000 100644 0000000... c470484... A	firefox/notice.mp3
+:000000 100644 0000000... 35945f7... A	firefox/notificationImg.png
+:000000 100644 0000000... d1c1dca... A	firefox/peek.js
+:000000 100644 0000000... 61bf0d8... A	firefox/popup.html
+:000000 100644 0000000... c1b0afd... A	firefox/popup.js
+:000000 100644 0000000... 112321b... A	firefox/readTime.js
+:000000 100644 0000000... 6f478d8... A	firefox/socket.io-1.4.5.js
+:000000 100644 0000000... 8c87d7d... A	firefox/success.mp3
+:000000 100644 0000000... b2bb98b... A	firefox/thisPageLoadedMarker.js
+:000000 100644 0000000... 79d8b2c... A	firefox/tinymce.min.js
+
+[33mcommit 7b47623251938d9a1f858c4fbc192954fb6e2945[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Thu Jul 7 17:52:02 2016 +0300
+
+    added firefox
+
+:000000 100644 0000000... e69de29... A	firefox/file.file
+
+[33mcommit a533e4ffe69b9a821801d37d88a4496a2b79a74b[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Thu Jul 7 17:48:01 2016 +0300
+
+    added specific browser directories
+
+:000000 100644 0000000... 9607447... A	chrome/background.html
+:000000 100644 0000000... ac70908... A	chrome/background.js
+:000000 100644 0000000... a35faf4... A	chrome/fxpCode.js
+:000000 100644 0000000... 7374827... A	chrome/fxpStyle.css
+:000000 100644 0000000... 0bb6807... A	chrome/getNames.js
+:000000 100644 0000000... 6a16b14... A	chrome/happyEyes.js
+:000000 100644 0000000... 9554c3a... A	chrome/howto.html
+:000000 100644 0000000... 1fa6152... A	chrome/icon.png
+:000000 100644 0000000... 951c3b1... A	chrome/icon128.png
+:000000 100644 0000000... 3bf8023... A	chrome/icon16.png
+:000000 100644 0000000... c4cea8a... A	chrome/icon48.png
+:000000 100644 0000000... fe4903b... A	chrome/iconStore.png
+:000000 100644 0000000... fc356ee... A	chrome/jquery-2.1.4.min.js
+:000000 100644 0000000... 5f2aec1... A	chrome/manifest.json
+:000000 100644 0000000... c470484... A	chrome/notice.mp3
+:000000 100644 0000000... 35945f7... A	chrome/notificationImg.png
+:000000 100644 0000000... d1c1dca... A	chrome/peek.js
+:000000 100644 0000000... 61bf0d8... A	chrome/popup.html
+:000000 100644 0000000... 1abd53a... A	chrome/popup.js
+:000000 100644 0000000... 112321b... A	chrome/readTime.js
+:000000 100644 0000000... 6f478d8... A	chrome/socket.io-1.4.5.js
+:000000 100644 0000000... 8c87d7d... A	chrome/success.mp3
+:000000 100644 0000000... b2bb98b... A	chrome/thisPageLoadedMarker.js
+:000000 100644 0000000... 79d8b2c... A	chrome/tinymce.min.js
+
+[33mcommit f331f8045866ddbb6f17f101dc4ee5f8d1c7a69c[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Thu Jul 7 16:33:04 2016 +0300
+
+    organization
+
+:000000 100644 0000000... 9607447... A	extension/background.html
+:000000 100644 0000000... ac70908... A	extension/background.js
+:000000 100644 0000000... a35faf4... A	extension/fxpCode.js
+:000000 100644 0000000... 7374827... A	extension/fxpStyle.css
+:000000 100644 0000000... 0bb6807... A	extension/getNames.js
+:000000 100644 0000000... 6a16b14... A	extension/happyEyes.js
+:000000 100644 0000000... 9554c3a... A	extension/howto.html
+:000000 100644 0000000... 1fa6152... A	extension/icon.png
+:000000 100644 0000000... 951c3b1... A	extension/icon128.png
+:000000 100644 0000000... 3bf8023... A	extension/icon16.png
+:000000 100644 0000000... c4cea8a... A	extension/icon48.png
+:000000 100644 0000000... fe4903b... A	extension/iconStore.png
+:000000 100644 0000000... fc356ee... A	extension/jquery-2.1.4.min.js
+:000000 100644 0000000... 5f2aec1... A	extension/manifest.json
+:000000 100644 0000000... c470484... A	extension/notice.mp3
+:000000 100644 0000000... 35945f7... A	extension/notificationImg.png
+:000000 100644 0000000... d1c1dca... A	extension/peek.js
+:000000 100644 0000000... 61bf0d8... A	extension/popup.html
+:000000 100644 0000000... 1abd53a... A	extension/popup.js
+:000000 100644 0000000... 112321b... A	extension/readTime.js
+:000000 100644 0000000... 6f478d8... A	extension/socket.io-1.4.5.js
+:000000 100644 0000000... 8c87d7d... A	extension/success.mp3
+:000000 100644 0000000... b2bb98b... A	extension/thisPageLoadedMarker.js
+:000000 100644 0000000... 79d8b2c... A	extension/tinymce.min.js
+
+[33mcommit 65e4c87fde76c0275816346bc3d93eaa38a3d59b[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Thu Jul 7 16:24:59 2016 +0300
+
+    first addition of files
+
+:000000 100644 0000000... 9607447... A	background.html
+:000000 100644 0000000... ac70908... A	background.js
+:000000 100644 0000000... a35faf4... A	fxpCode.js
+:000000 100644 0000000... 7374827... A	fxpStyle.css
+:000000 100644 0000000... 0bb6807... A	getNames.js
+:000000 100644 0000000... 6a16b14... A	happyEyes.js
+:000000 100644 0000000... 9554c3a... A	howto.html
+:000000 100644 0000000... 1fa6152... A	icon.png
+:000000 100644 0000000... 951c3b1... A	icon128.png
+:000000 100644 0000000... 3bf8023... A	icon16.png
+:000000 100644 0000000... c4cea8a... A	icon48.png
+:000000 100644 0000000... fe4903b... A	iconStore.png
+:000000 100644 0000000... fc356ee... A	jquery-2.1.4.min.js
+:000000 100644 0000000... 5f2aec1... A	manifest.json
+:000000 100644 0000000... c470484... A	notice.mp3
+:000000 100644 0000000... 35945f7... A	notificationImg.png
+:000000 100644 0000000... d1c1dca... A	peek.js
+:000000 100644 0000000... 61bf0d8... A	popup.html
+:000000 100644 0000000... 1abd53a... A	popup.js
+:000000 100644 0000000... 112321b... A	readTime.js
+:000000 100644 0000000... 6f478d8... A	socket.io-1.4.5.js
+:000000 100644 0000000... 8c87d7d... A	success.mp3
+:000000 100644 0000000... b2bb98b... A	thisPageLoadedMarker.js
+:000000 100644 0000000... 79d8b2c... A	tinymce.min.js
+
+[33mcommit b8dfed923af59d8ace08fbaed1c525e7de37755b[m
+Author: SilverTuxedo <talmarian8@gmail.com>
+Date:   Thu Jul 7 14:39:13 2016 +0300
+
+    Initial commit
+
+:000000 100644 0000000... 9cecc1d... A	LICENSE
+:000000 100644 0000000... afb417a... A	README.md

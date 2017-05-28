@@ -20,13 +20,11 @@
     <meta charset="utf-8" />
 
     <link rel="shortcut icon" href="../images/icon.png" />
-    <link href="../fonts/Assistant.css" rel="stylesheet" />
+    <link href="../fonts/extra_fonts.css" rel="stylesheet" />
     <link href="../fonts/materialdesignicons.css" rel="stylesheet" />
     <link href="../css/settings.css" rel="stylesheet" />
     <link href="../css/jquery-clockpicker.css" rel="stylesheet" />
     <link href="../css/balloon.css" rel="stylesheet" />
-
-    <link href="https://fonts.googleapis.com/css?family=Rancho" rel="stylesheet">
 </head>
 <body>
     <div id="blackScreen" style="display: none;">
@@ -121,7 +119,11 @@
 
         <div id="contentContainer">
             <div id="settingsUpperBar">
-                <span class="twitterIcon"></span><a href="" target="_blank" id="lastTweetText">...</a>
+                <span class="mdi mdi-lightbulb-on topBarIcon" id="tipIcon"></span>
+                <span>
+                    <b>טיפ: </b>
+                    <span id="tip"></span>
+                </span>
             </div>
             <div id="settingsContent">
                 <!--
@@ -266,6 +268,16 @@
                             בתחתית כל פורום יוצגו סטטיסטיקות. למשל: פותח האשכולות הדומיננטי ביותר, התיוג הנפוץ ביותר, ויחס התגובות לצפיות.
                         </div>
                     </div>
+
+                    <!--<div class="setOption">
+                        <div class="optionToggle"><div class="switch"><input type="checkbox" id="hideTyping" /><label for="hideTyping"></label></div></div>
+                        <div class="optionName">
+                            אל תודיע שאני מקליד
+                        </div>
+                        <div class="optionExplain">
+                            מבטל את ההודעה שאתה מקליד באשכולות והודעות פרטיות. עדיין תוכל לראות אנשים אחרים מקלידים אם הם לא כיבו את האופציה כמוך.
+                        </div>
+                    </div>-->
 
                     <div class="setOption">
 
@@ -444,28 +456,33 @@
                         </div>
                     </div>
                     <br /><br />
-                    במידה ויש לך בעיה, הצעה או סתם בא לך ליצור איתי קשר, תוכל לעשות זאת בשני האופנים הבאים:
-                    <ul>
-                        <li>
-                            באמצעות
-                            <a href="https://www.fxp.co.il/private.php?do=newpm&u=967488" target="_blank">הודעה פרטית ב-FxP</a>
-                        </li>
-                        <li>
-                            באמצעות Discord - רשום
-                            <a href="https://www.fxp.co.il/member.php?u=967488" target="_blank">בפרופיל שלי</a>,
-                            או דרך <a class="discordLink" href="https://discord.gg/AW7CeG7" target="_blank" style="font-weight: bold;">השרת של התוסף</a>
-                        </li>
-                    </ul>
-                    אשמח לענות על שאלות ולעזור.
-                    <br /><br />
                     במידה ואתה נהנה מהתוסף, <b>שתף את הכיף!™ </b>והוסף אותו לחתימה שלך.<br />
-                    תוכל למצוא כפתורים נוחים לעשות את זה בדף עריכת החתימה.<br /><br />
+                    תוכל למצוא כפתורים נוחים לעשות את זה <a href="https://www.fxp.co.il/profile.php?do=editsignature" target="_blank">בדף עריכת החתימה</a>.
+                    <br /><br />
                     <!--<a href="http://yo-yoo.co.il/eggs/click.php?eid=108382" target="_blank">
                         <img src="http://yo-yoo.co.il/eggs/egg_108382.png" />
                     </a>-->
-                    <a class="discordLink" href="https://discord.gg/AW7CeG7" target="_blank">
-                        <img src="../images/discord-logo.svg" height="80" />
+                    <a class="communicateSection" id="privateSect" href="https://www.fxp.co.il/private.php?do=newpm&u=967488" target="_blank">
+                        <span class="serviceIcon mdi mdi-mailbox"></span><span class="serviceName">שלח הודעה פרטית</span>
                     </a>
+                    <br />
+                    <a class="communicateSection" id="twitterSect" href="https://twitter.com/fxplusplus" target="_blank">
+                        <span class="serviceIcon mdi mdi-twitter"></span><span class="serviceName">+FxPlus ב-Twitter</span>
+                    </a>
+                    <br />
+                    <a class="communicateSection" id="bloggerSect" href="https://fxplusplus.blogspot.co.il" target="_blank">
+                        <span class="serviceIcon mdi mdi-blogger"></span><span class="serviceName">בלוג העדכונים של +FxPlus</span>
+                    </a>
+                    <br />
+                    <a class="communicateSection" id="discordSect" href="https://discord.gg/AW7CeG7" target="_blank">
+                        <span class="serviceIcon mdi mdi-discord"></span><span class="serviceName">שרת ה-Discord של +FxPlus</span>
+                    </a>
+                    <br />
+                    <a class="communicateSection" id="qnaSect" href="https://fxplusplus.blogspot.co.il/p/qna.html" target="_blank">
+                        <span class="serviceIcon mdi mdi-comment-question-outline"></span><span class="serviceName">שאלות ותשובות</span>
+                    </a>
+                    <br /><br />
+                    יש בעיה, הצעה או סתם בא לך ליצור איתי קשר? שלח הודעה פרטית או דבר איתי ב-Discord! אשמח לענות על שאלות ולעזור.
                     <br /><br />
                     הכתוב בתוסף זה הוא בלשון זכר אך פונה לשני המינים כאחד.
                 </div>
@@ -494,6 +511,7 @@
                     <button id="clearLocalStorage">אפס אחסון מקומי</button>
                     <button id="clearSyncStorage">אפס אחסון סנכרוני</button>
                     <button id="printSettingsToConsole">הדפס הגדרות לקונסולה</button>
+                    <button id="editSettingsJson">ערוך הגדרות כ-JSON</button>
                 </div>
                 <div id="restoreOld" class="settingsTab">
                     <h2>שחזר את ההגדרות הישנות שלך</h2>
@@ -512,7 +530,6 @@
 
     <script src="../js/jquery.min.js"></script>
     <script src="../js/jquery-clockpicker.js"></script>
-    <script src="../js/twitterFetcher.js"></script>
     <script src="../js/settings.js"></script>
 </body>
 </html>

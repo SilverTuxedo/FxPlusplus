@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "מעקב אחר אשכולות, גם אלה שלא שייכים לך! גרסה 1.1.0 מביאה איתה את החידוש הזה, מחזירה את הגישה המהירה מהבטא, ומציגה שדרוג נוסף.";
-var versionBig = true;
-var versionHref = "https://fxplusplus.blogspot.com/2017/04/110.html";
+var versionDescription = "שיפורים, תיקונים, והשלמה אוטומטית בדף הגדרות התוסף";
+var versionBig = false;
+var versionHref = "https://fxplusplus.blogspot.com/2017/05/111.html";
 
 var factorySettings =
     {
@@ -1330,10 +1330,11 @@ chrome.storage.sync.get("settings", function (data)
                 if (mutation.addedNodes.length > 0)
                     if (settings.customDefaultStyle.active || settings.classicIcons)
                     {
-                        if (mutation.addedNodes[0].tagName == "IFRAME") //editor iframe added
+                        var addedJ = $(mutation.addedNodes[0]);
+                        if (addedJ.parents(".cke_contents").length > 0 && mutation.addedNodes[0].tagName == "IFRAME") //editor iframe added
                         {
                             debug.info("binding to new editor div");
-                            var editorFrame = $(mutation.addedNodes[0]);
+                            var editorFrame = addedJ;
                             var qtnts = editorFrame.contents();
 
                             //bind observer for new children (text)
@@ -1346,7 +1347,9 @@ chrome.storage.sync.get("settings", function (data)
                                         observers.insideEditor.observe(editorFrame.contents().find("body.forum, body.content")[0], { childList: true });
                                     }
                                     if (settings.classicIcons)
+                                    {
                                         observers.iconsInEditor.observe(editorFrame.contents().find("body.forum, body.content")[0], { childList: true, subtree: true });
+                                    }
                                 }
                                 else
                                     bindEditorFrameLoad(editorFrame, settings);
@@ -1460,41 +1463,52 @@ chrome.storage.sync.get("settings", function (data)
         //add easy credit to signature
         if (window.location.href.search("editsignature") > -1 || window.location.href.search("updatesignature") > -1)
         {
+            var publishedThreadUrl = "https://www.fxp.co.il/showthread.php?t=16859147";
             debug.info("adding signature credit buttons");
             var element = $("<div>", { id: "creditAddon" }).append(
                     $("<div>").text(" שתף את הכיף!™ והוסף קרדיט לתוסף +FxPlus בחתימה שלך:")
                 ).append(
-                    $("<div>", { class: "addCreditBtn", id: "addXLimg" }).text("500x276").click(function ()
-                    {
+                    $("<div>", { class: "addCreditBtn", id: "addXLimg" }).append(
+                        $("<img>", { src: "http://signavatar.com/47618_s.jpg" })
+                    ).append(
+                        $("<span>", { class: "addCreditDesc" }).text("500x276 (מתחלף)")
+                    ).click(function() {
                         $(".cke_contents iframe").contents().find("body").append(
-                                $("<a>", { href: "https://www.fxp.co.il/showthread.php?t=16859147", target: "_blank" }).append(
-                                    $("<img>", { border: 0, src: "http://signavatar.com/47618_s.jpg" })
+                                $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
+                                    $("<img>", { border: 0, src: $(this).find("img").attr("src") })
                                 )
                             )
                     })
                 ).append(
-                    $("<div>", { class: "addCreditBtn", id: "addLimg" }).text("128x128").click(function ()
-                    {
+                    $("<div>", { class: "addCreditBtn", id: "addLimg" }).append(
+                        $("<img>", { src: "http://i.imgur.com/bsVtJ5o.png" })
+                    ).append(
+                        $("<span>", { class: "addCreditDesc" }).text("128x128")
+                    ).click(function() {
                         $(".cke_contents iframe").contents().find("body").append(
-                                $("<a>", { href: "https://www.fxp.co.il/showthread.php?t=16859147", target: "_blank" }).append(
-                                    $("<img>", { border: 0, src: "http://i.imgur.com/bsVtJ5o.png" })
+                                $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
+                                    $("<img>", { border: 0, src: $(this).find("img").attr("src") })
                                 )
                             )
                     })
                 ).append(
-                    $("<div>", { class: "addCreditBtn", id: "addMimg" }).text("48x48").click(function ()
-                    {
+                    $("<div>", { class: "addCreditBtn", id: "addMimg" }).append(
+                        $("<img>", { src: "http://i.imgur.com/O7FsbY8.png" })
+                    ).append(
+                        $("<span>", { class: "addCreditDesc" }).text("48x48")
+                    ).click(function() {
                         $(".cke_contents iframe").contents().find("body").append(
-                                $("<a>", { href: "https://www.fxp.co.il/showthread.php?t=16859147", target: "_blank" }).append(
-                                    $("<img>", { border: 0, src: "http://i.imgur.com/O7FsbY8.png" })
+                                $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
+                                    $("<img>", { border: 0, src: $(this).find("img").attr("src") })
                                 )
                             )
                     })
                 ).append(
-                    $("<div>", { class: "addCreditBtn", id: "addTextCredit" }).text("טקסט").click(function ()
-                    {
+                    $("<div>", { class: "addCreditBtn", id: "addTextCredit" }).append(
+                        $("<span>", { class: "addCreditDesc" }).text("טקסט")
+                    ).click(function() {
                         $(".cke_contents iframe").contents().find("body").append(
-                                $("<a>", { href: "https://www.fxp.co.il/showthread.php?t=16859147", target: "_blank" }).text("+FxPlus")
+                                $("<a>", { href: publishedThreadUrl, target: "_blank" }).text("+FxPlus")
                             )
                     })
                 )
@@ -1617,21 +1631,35 @@ chrome.storage.sync.get("settings", function (data)
             ).append(
                 $("<div>").text("+FxPlus שיפר את דף זה תוך " + elapsed + "ms")
             ));
-    })
 
-    $(window).load(function ()
-    {
-        if ($(".signaturecontainer img[src='clear.gif']").length == 0) //there are no images in signatures that can change their src
+        $(".imagefooter").append($("<div>", { id: "cgglass" }));
+        var topCgglass = 0.45 * (400 / 1000) * $(".imagefooter").width();
+        if (topCgglass + $("#cgglass").height() < 400)
+            $("#cgglass").css("top", topCgglass);
+
+        $(window).on('resize', function ()
         {
-            if (observers.hasOwnProperty("signatures"))
-            {
-                debug.notice("signature mutation observers disconnected");
-                observers.signatures.disconnect(); //disconnect signature observer
-            }
-        }
+            var topCgglass = 0.18 * $(".imagefooter").width();
+            if (topCgglass + $("#cgglass").height() < 400)
+                $("#cgglass").css("top", topCgglass);
+        });
 
-        if ($("#bottomCard").css("display") == "none") //card not shown, page loaded
-            cardSlideSteps($("#bottomCard"));
+        $(window).on('load', function ()
+        {
+            if ($(".signaturecontainer img[src='clear.gif']").length == 0) //there are no images in signatures that can change their src
+            {
+                if (observers.hasOwnProperty("signatures"))
+                {
+                    debug.notice("signature mutation observers disconnected");
+                    observers.signatures.disconnect(); //disconnect signature observer
+                }
+            }
+
+            if ($("#bottomCard").css("display") == "none") //card not shown, page loaded
+                cardSlideSteps($("#bottomCard"));
+        })
+
+        $("#cgglass").click(function () { eyesPopup(); });
     })
 })
 
@@ -1953,6 +1981,13 @@ function loadMinithread(threadLink, element, pm)
                 content.find(".twitter-tweet a").each(function ()
                 {
                     $(this).text($(this).attr("href"));
+                })
+
+                //fix for voice comments
+                content.find(".voice_recorder").each(function ()
+                {
+                    $(this).find("audio").attr("controls", true);
+                    $(this).find(".fxpplayer").remove();
                 })
 
                 var comment = buildMiniComment(author, content, likes, link);
@@ -3033,6 +3068,7 @@ function disableNightmode()
 //binds the load events for ckeeditor iframes
 function bindEditorFrameLoad(editorFrame, settings)
 {
+    console.log(editorFrame);
     editorFrame.load(function ()
     {
         if (settings.customDefaultStyle.active)
@@ -3259,6 +3295,76 @@ function changeTrackedThreadsRefresh(refresh)
 }
 
 
+//popup that opens once the eye is clicked
+function eyesPopup()
+{
+    openPopupWindow("infrontofeyes",
+        chrome.extension.getURL("images/omelette.svg"),
+        "זה היה מול העיניים שלי כל הזמן הזה...",
+        "watch?v=De4c9SkMNDA", "orangeTopPopup");
+}
+
+
+//returns an element of an on-screen keyboard
+function buildOnScreenKeyboard()
+{
+    return $("<ul>", { id: "onScreenKeyboard" })
+        .append($("<li>", { class: "letter" }).text("`"))
+        .append($("<li>", { class: "letter" }).text("1"))
+        .append($("<li>", { class: "letter" }).text("2"))
+        .append($("<li>", { class: "letter" }).text("3"))
+        .append($("<li>", { class: "letter" }).text("4"))
+        .append($("<li>", { class: "letter" }).text("5"))
+        .append($("<li>", { class: "letter" }).text("6"))
+        .append($("<li>", { class: "letter" }).text("7"))
+        .append($("<li>", { class: "letter" }).text("8"))
+        .append($("<li>", { class: "letter" }).text("9"))
+        .append($("<li>", { class: "letter" }).text("0"))
+        .append($("<li>", { class: "letter" }).text("-"))
+        .append($("<li>", { class: "letter" }).text("="))
+        .append($("<li>", { class: "delete lastitem" }).text("←"))
+        .append($("<li>", { class: "tab" }).text("Tab"))
+        .append($("<li>", { class: "letter" }).text("/"))
+        .append($("<li>", { class: "letter" }).text("'"))
+        .append($("<li>", { class: "letter" }).text("ק"))
+        .append($("<li>", { class: "letter" }).text("ר"))
+        .append($("<li>", { class: "letter" }).text("א"))
+        .append($("<li>", { class: "letter" }).text("ט"))
+        .append($("<li>", { class: "letter" }).text("ו"))
+        .append($("<li>", { class: "letter" }).text("ן"))
+        .append($("<li>", { class: "letter" }).text("ם"))
+        .append($("<li>", { class: "letter" }).text("פ"))
+        .append($("<li>", { class: "letter" }).text("]"))
+        .append($("<li>", { class: "letter" }).text("["))
+        .append($("<li>", { class: "letter lastitem" }).text("\\"))
+        .append($("<li>", { class: "capslock" }).text("Caps Lock"))
+        .append($("<li>", { class: "letter" }).text("ש"))
+        .append($("<li>", { class: "letter" }).text("ד"))
+        .append($("<li>", { class: "letter" }).text("ג"))
+        .append($("<li>", { class: "letter" }).text("כ"))
+        .append($("<li>", { class: "letter" }).text("ע"))
+        .append($("<li>", { class: "letter" }).text("י"))
+        .append($("<li>", { class: "letter" }).text("ח"))
+        .append($("<li>", { class: "letter" }).text("ל"))
+        .append($("<li>", { class: "letter" }).text("ך"))
+        .append($("<li>", { class: "letter" }).text("ף"))
+        .append($("<li>", { class: "letter" }).text(","))
+        .append($("<li>", { class: "return lastitem" }).text("Enter"))
+        .append($("<li>", { class: "left-shift" }).text("Shift"))
+        .append($("<li>", { class: "letter" }).text("ז"))
+        .append($("<li>", { class: "letter" }).text("ס"))
+        .append($("<li>", { class: "letter" }).text("ב"))
+        .append($("<li>", { class: "letter" }).text("ה"))
+        .append($("<li>", { class: "letter" }).text("נ"))
+        .append($("<li>", { class: "letter" }).text("מ"))
+        .append($("<li>", { class: "letter" }).text("צ"))
+        .append($("<li>", { class: "letter" }).text("ת"))
+        .append($("<li>", { class: "letter" }).text("ץ"))
+        .append($("<li>", { class: "letter" }).text("."))
+        .append($("<li>", { class: "right-shift lastitem" }).text("Shift"))
+        .append($("<li>", { class: "space lastitem" }).text(" "))
+}
+
 //replaces time strings (HH:MM) with time in seconds from midnight
 function timeInSeconds(timeStr)
 {
@@ -3386,7 +3492,7 @@ function handleRatingSuggestion()
                 ).append($("<br>")).append(
                     $("<span>", { style: "font-weight: bold" }).text("כדי לפתוח את הגדרות התוסף, לחץ על כפתור גלגל השיניים בבר העליון.")
                 ).append(
-                    $("<img>", { id: "howToSettingsImg", src: "https://i.imgur.com/QweqQ1h.png", height: 44 })
+                    $("<img>", { id: "howToSettingsImg", src: chrome.extension.getURL("images/howtoSettings.png"), height: 44 })
                 );
 
                 $("body").append($("<div>", { class: "bottomFloat" }).append(
@@ -3487,24 +3593,23 @@ function handleRatingSuggestion()
                 var singleDay = 1000 * 60 * 60 * 24; //a single day in milliseconds
                 var daysSince = Math.round((d.getTime() - installTime) / singleDay);
 
-                //at least 3 days since install, show rating popup
+                //at least 5 days since install, show rating popup
                 console.log(daysSince - timeBuffer);
-                if (daysSince - timeBuffer >= 3)
+                if (daysSince - timeBuffer >= 5)
                 {
                     localStorage.removeItem("ratingBuffer"); //remove buffer (if it even exists)
 
                     var ratingLink;
                     if (chrome.runtime.getManifest().browser == "firefox")
                     {
-                        //CHANGE THIS
                         ratingLink = $("<a>", { style: "display: block", target: "_blank", href: "https://addons.mozilla.org/en-US/firefox/search/?q=fxplus%2B" }).append(
-                            $("<img>", { src: "https://i.imgur.com/QacTVWL.png", height: 128 })
+                            $("<img>", { src: chrome.extension.getURL("images/firefoxStore.png"), height: 128 })
                         );
                     }
                     else
                     {
                         ratingLink = $("<a>", { style: "display: block", target: "_blank", href: 'https://chrome.google.com/webstore/detail/fxplus%2B-beta/gpfgllaokimfkkbnhiimahpbemmdmobg/reviews' }).append(
-                            $("<img>", { src: "https://i.imgur.com/EYs93sf.png", height: 128 })
+                            $("<img>", { src: chrome.extension.getURL("images/chromeStore.png"), height: 128 })
                         );
                     }
 
