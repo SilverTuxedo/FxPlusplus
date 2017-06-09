@@ -735,6 +735,36 @@ input {
         padding: 0;
     }
 
+.highlight {
+    animation: 2s blinkYellow;
+}
+
+.userCard.highlight {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12), inset 0 -8px 0px 0px rgba(255, 215, 0, 0.57);
+}
+
+@keyframes blinkYellow {
+    0% {
+        background: #fff;
+    }
+
+    25% {
+        background: #fff78d;
+    }
+
+    50% {
+        background: #fff;
+    }
+
+    75% {
+        background: #fff78d;
+    }
+
+    100% {
+        background: #fff;
+    }
+}
+
 @keyframes sizedownfade {
     from {
         -moz-transform: scale(1);

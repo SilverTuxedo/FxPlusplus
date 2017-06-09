@@ -208,6 +208,10 @@
         max-width: 90%;
     }
 
+    .miniComment iframe {
+        max-width: 100%;
+    }
+
 
 .miniUser {
     margin-bottom: 6px;

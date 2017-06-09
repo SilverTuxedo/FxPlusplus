@@ -411,6 +411,8 @@ function changeTab(element)
 
 }
 
+var highlightUser = -1;
+
 if (location.hash.length > 0)
 {
     //there is a hashtag in the url specifying a tab
@@ -429,7 +431,18 @@ if (location.hash.length > 0)
 }
 else
 {
-    changeTab($("#optionList li:first")); //default tab is the first one
+    //check if there are other expressions in the title 
+    var exp = location.href.match(/userFilter=[0-9]+/g);
+    if (exp != null)
+    {
+        //userFilter query
+        var queryId = parseInt(exp[0].substr("userFilter=".length));
+        changeTab($('[data-tab="comments"]'));
+        highlightUser = queryId;
+        //alert(queryId);
+    }
+    else
+        changeTab($("#optionList li:first")); //default tab is the first one
 }
 
 //one of the sidebar options was clicked, switch to the tab
@@ -612,6 +625,11 @@ function sub_loadCommentFilters(settings)
             settings.commentFilters[i].hideComments
         );
     }
+
+    if (highlightUser > 0 && $(".userCard.highlight").length == 0)
+    {
+        addUserCard(highlightUser, "", { color: "#333333", size: 11 }, false, false, false);
+    } 
 }
 function sub_loadDefaultStyle(settings)
 {
@@ -1230,6 +1248,9 @@ function addUserCard(id, subnick, subnickStyle, hideSignature, disableStyle, hid
             }, 400);
         });
 
+        if (id == highlightUser)
+            card.addClass("highlight");
+
         $("#commentsCards").append(card);
     })
 }
@@ -1628,33 +1649,36 @@ $("#editSettingsJson").click(function ()
     chrome.storage.sync.get("settings", function (data)
     {
         var dataJson = JSON.stringify(data.settings);
-        $("#editSettingsJson").after($("<button>", {id: "saveJsonBtn"}).text("שמור").click(function ()
+        if ($("button#saveJsonBtn").length == 0)
         {
-            try
+            $("#editSettingsJson").after($("<button>", { id: "saveJsonBtn" }).text("שמור").click(function ()
             {
-                var dataParsed = JSON.parse($("#settingsJsonBox").val());
-                $(this).hide();
-
-                chrome.storage.sync.set({ settings: dataParsed }, function ()
+                try
                 {
-                    if (chrome.runtime.lastError)
+                    var dataParsed = JSON.parse($("#settingsJsonBox").val());
+                    $(this).hide();
+
+                    chrome.storage.sync.set({ settings: dataParsed }, function ()
                     {
-                        $("#saveJsonBtn").show();
-                        throw chrome.runtime.lastError;
-                    }
-                    else
-                    {
-                        $("#saveJsonBtn").remove();
-                        $("#settingsJsonBox").remove();
-                    }
-                })
-            }
-            catch (err)
-            {
-                alert("השמירה נכשלה:\n" + err);
-            }
-        }));
-        $("#editSettingsJson").after($("<textarea>", {id: "settingsJsonBox", style: "display: block; direction: ltr;"}).val(dataJson));
+                        if (chrome.runtime.lastError)
+                        {
+                            $("#saveJsonBtn").show();
+                            throw chrome.runtime.lastError;
+                        }
+                        else
+                        {
+                            $("#saveJsonBtn").remove();
+                            $("#settingsJsonBox").remove();
+                        }
+                    })
+                }
+                catch (err)
+                {
+                    alert("השמירה נכשלה:\n" + err);
+                }
+            }));
+            $("#editSettingsJson").after($("<textarea>", { id: "settingsJsonBox", style: "display: block; direction: ltr; width: 50%; height: 200px;" }).val(dataJson));
+        }
     })
 })
 

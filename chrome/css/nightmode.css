@@ -274,23 +274,22 @@ COMMENTS
     border-color: #3e3e3e;
 }
 
-.postbit .userinfo, .postbit .userinfo_noavatar {
+.postbit .userinfo {
     border-color: #191919;
     border-bottom: 1px solid #2b2b2b;
-    position: relative;
     z-index: 2;
     background: linear-gradient(#1d1d1d, #131313);
 }
 
-.userinfo_noavatar .contact, .postbody, .commentsContainer {
+.userinfo .contact, .userinfo .user-picture-holder, .postbody, .commentsContainer {
     filter: invert(100%);
 }
 
-    .userinfo_noavatar img, .userinfo_noavatar video, .postbody img, .postbody video, .postbody iframe, .postbody twitterwidget, .commentsContainer img, .commentsContainer video, .commentsContainer iframe, .commentsContainer twitterwidget {
+    .userinfo img, .userinfo video, .postbody img, .postbody video, .postbody iframe, .postbody twitterwidget, .commentsContainer img, .commentsContainer video, .commentsContainer iframe, .commentsContainer twitterwidget {
         filter: invert(100%);
     }
 
-.userinfo_noavatar div[style*='left:10px;'] {
+.userinfo div[style*='left:10px;'] {
     color: #888 !important;
 }
 

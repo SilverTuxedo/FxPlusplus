@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "שיפורים, תיקונים, והשלמה אוטומטית בדף הגדרות התוסף";
+var versionDescription = "תיקונים למצב לילה, תת-ניקים והגדרות.";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2017/05/111.html";
+var versionHref = "https://fxplusplus.blogspot.com/2017/06/112.html";
 
 var factorySettings =
     {
@@ -2727,12 +2727,7 @@ function checkAllFilters(userFilters, keywordFilters, threadElement)
 //returns true if the string given is a url
 function isURL(str)
 {
-    var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
-    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-    '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+    var pattern = /(https?:\/\/[^\s]+)/g;
     return pattern.test(str);
 }
 
@@ -2844,6 +2839,18 @@ function applyCommentsFilter(filter, userPostbits)
         hideComment(userPostbits);
 }
 
+//applies a filter to a userbar - in FXP's chat system
+function applyCommentFilterInChat(filter, chatTitle)
+{
+    if (filter.subnick.value.length > 0) //a subnick is set
+    {
+        var subnickContainer = chatTitle.find(".user-title");
+        setSubnickContainer(filter.subnick, subnickContainer);
+    }
+
+    //the rest is irrelevant for this kind of container
+}
+
 //sets the content of the subnick container
 function setSubnickContainer(subnick, subnickContainer)
 {
@@ -2934,7 +2941,11 @@ function quickEditSubnick(subnickElement)
         $(this).removeAttr("href").contents().unwrap();
     });
 
-    var prevNick = subnickElement.text();
+    var prevNick = subnickElement.text().trim();
+    if (prevNick.length == 0) //try to find an image if can't find text
+    {
+        prevNick = subnickElement.find("img").attr("src") ? subnickElement.find("img").attr("src") : "";
+    }
     var color = subnickElement.css("color");
     var size = subnickElement.css("font-size");
     var innerReference = subnickElement.find("*"); //find inner place for reference of color in case of special sub nick
@@ -3425,15 +3436,22 @@ function cardSlideSteps(cardElement)
 
         if (cardElement.find(".progressBg.shortAutoClose").length > 0)
         {
-            cardElement.find(".progressBg.shortAutoClose").css("width", "100%");
+            var closeAfterMs = parseInt(cardElement.find(".progressBg.shortAutoClose").attr("data-closeAfter"));
+            cardElement.find(".progressBg.shortAutoClose").css({
+                "transition": (closeAfterMs / 1000) + "s width linear",
+                "width": "100%"
+            });
             setTimeout(function ()
             {
                 var completeAction = cardElement.find(".progressBg.shortAutoClose").attr("data-completeAction");
 
                 if (completeAction == "updateVersion")
+                {
                     changeNotificationValue("lastKnownVersion", chrome.runtime.getManifest().version);
+                    chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update Auto" } });
+                }
                 closeBottomCard();
-            }, 8500)
+            }, closeAfterMs)
         }
     }, delay)
 }
@@ -3566,7 +3584,7 @@ function handleRatingSuggestion()
                                 $("<a>", { class: "quotedHeavy", target: "_blank", href: versionHref }).text(updateText)
                             )
                     $("body").append($("<div>", { class: "bottomFloat" }).append(
-                        $("<div>", { id: "bottomCard", class: "smallCard", style: "display: none" }).append($("<div>", { class: "progressBg shortAutoClose", "data-completeAction": "updateVersion" })).append(
+                        $("<div>", { id: "bottomCard", class: "smallCard", style: "display: none" }).append($("<div>", { class: "progressBg shortAutoClose", "data-completeAction": "updateVersion", "data-closeAfter": 15000 })).append(
                                 updateContent.append(
                                     $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
                                     {
