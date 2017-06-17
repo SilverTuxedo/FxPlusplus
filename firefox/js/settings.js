@@ -88,6 +88,20 @@ var factorySettings =
         customBg: {
             day: "",
             night: ""
+        },
+        quickAccessThreads: [
+            {
+                prefix: "פרסום|",
+                title: "+FxPlus - תוסף לכרום",
+                authorId: 967488,
+                threadId: 16859147
+            }
+        ],
+        trackedThreads: {
+            list: [
+            ],
+            refreshRate: 15,
+            lastRefreshTime: 0
         }
     };
 
@@ -95,6 +109,32 @@ var customBg = {
     day: "",
     night: ""
 }
+
+var tipBox = [
+    'אפשר להפעיל ולכבות את מצב הלילה ידנית גם כאשר מצב הלילה הוגדר באופן אוטומטי על-ידי הפעלת קיצור הדרך למצב לילה ולחיצה עליו',
+    'לחיצה על מעטפת אשכול בכל מקום, כולל בחיפוש וברשימת האשכולות בפורום, תציג את האשכול בתצוגה מינימלית ללא פתיחת דף חדש',
+    'ניתן להגדיר תמונה כתת-ניק: הזן את הקישור בתיבה של תת-הניק והתוסף יציג את התמונה אוטומטית',
+    'חישוב זמן קריאה מחדש גם מאפס את הזמנים שכבר חושבו',
+    'הסתרת תגובה? ניתן לראות אותה בחזרה על-ידי לחיצה על השורה העליונה (שמופיע בה גם שם המשתמש)',
+    'עיצוב התגובות האוטומטי חל בכל מקום שניתן לעצב, כולל הודעות חברים (ללא גופן) והודעות פרטיות',
+    'רוצה לדעת מה תת-הניק המקורי של משתמש מסויים? היכנס לפרופיל שלו - תת-הניק אינו משתנה שם',
+    'נתקלת בטעות או שגיאה בתוסף? ניתן לדווח דרך הטפסים ב"דיווח באגים ומשוב" או בהודעה פרטית',
+    'יש לך רעיון למשהו שתרצה לראות בתוסף? ניתן לספר דרך הטפסים ב"דיווח באגים ומשוב" או בהודעה פרטית',
+    'המספרים שמופיעים ליד שמות המשתמשים הם המספר הסידורי של אותו המשתמש. המספר גם מופיע בכתובת הפרופיל שלו',
+    'לא בטוח לגבי אותיות גדולות או קטנות בשמות משתמשים? אל דאגה - התוסף יתקן אותן בשבילך אוטומטית',
+    'לחיצה על \'T\' בעריכת תת-הניק מאפשרת הגדרה ידנית של הצבע והגודל',
+    'ניתן לשנות את הטקסט שמופיע בתיבה של עיצוב התגובות בלחיצה עליו',
+    'לחיצה על "בטל" מבטלת את השינויים רק בקטע שערכת',
+    'רוצה לדעת מה השתנה בין הגרסה הנוכחית והקודמת? השינויים נמצאים בבלוג של התוסף',
+    'רוצה לדעת מתי משתחררת גרסה חדשה או הודעה חשובה? עקוב אחרי התוסף בטוויטר',
+    'ביטול חישוב זמן הקריאה של כתבות מפורומי עדכונים יבטל גם את חישוב זמן הקריאה של הכתבות בדף הבית',
+    'נהנה מהתוסף? תוכל להוסיף לו קרדיט בקלות דרך הכפתורים בדף עריכת החתימה',
+    'גם אם פורום מסוים לא מוצע לך בחוקי הדגשת והסתרת אשכולות, עדיין תוכל להזין ידנית את הפורום שאתה רוצה (למשל היכל התהילה)',
+    'לחיצה על תת-ניק בתגובות מאפשרת לערוך אותו בזריזות, גם בלי להיכנס להגדרות'
+]
+showTip(true);
+
+var forumCompleteCooldown; //cooldown object for inputs of forum names
 
 $('.clockpicker').clockpicker();
 
@@ -140,6 +180,34 @@ function httpGetAsync(theUrl, callback)
 
 var domParser = new DOMParser();
 var useridRegex = /userid=[0-9]+/g; //matches userid={NUMBER}
+
+//selects and displays a random tip
+function showTip(allowSame)
+{
+    var randomIndex = Math.floor(Math.random() * tipBox.length);
+    var randomTip = tipBox[randomIndex];
+    if (!allowSame)
+    {
+        if (randomTip == $("#tip").text())
+        {
+            showTip(allowSame);
+            return;
+        }
+    }
+    $("#tip").text(randomTip);
+
+}
+
+var nudgeTimeout;
+$("#tipIcon").click(function ()
+{
+    $("#tipIcon").addClass("nudgeAnimation");
+    nudgeTimeout = setTimeout(function ()
+    {
+        $("#tipIcon").removeClass("nudgeAnimation");
+    }, 201);
+    showTip(false);
+});
 
 //get a user ID from user name
 function userIdByName(name, callback)
@@ -247,31 +315,31 @@ function updateIdDisplay(element, commonParentSelector)
     });
 }
 
-var backgrounds = [ //default backgrounds
-        { light: "https://i.imgur.com/1MmUNu3.png", dark: "https://i.imgur.com/bDWYR8Z.png" },
-        { light: "https://i.imgur.com/ADrRgIt.png", dark: "https://i.imgur.com/Pjsc6hN.png" },
-        { light: "https://i.imgur.com/CMrXz8C.png", dark: "https://i.imgur.com/qeFYhiV.png" },
-        { light: "https://i.imgur.com/BBhSnQe.png", dark: "https://i.imgur.com/czWChlP.png" },
-        { light: "https://i.imgur.com/DsaJFcC.png", dark: "https://i.imgur.com/oy9i3HC.png" },
-        { light: "https://i.imgur.com/5aAa07S.png", dark: "https://i.imgur.com/C5PEadU.png" },
-        { light: "https://i.imgur.com/cBpNKbC.png", dark: "https://i.imgur.com/cg00LqB.png" },
-        { light: "https://i.imgur.com/EPItv2I.png", dark: "https://i.imgur.com/ydaX5SR.png" },
-        { light: "https://i.imgur.com/HUJ8DiQ.png", dark: "https://i.imgur.com/1ZPqz07.png" },
-        { light: "https://i.imgur.com/Zdn0dcl.png", dark: "https://i.imgur.com/KuohAF3.png" },
-        { light: "https://i.imgur.com/GMWMX6k.png", dark: "https://i.imgur.com/TMeYKDG.png" },
-        { light: "https://i.imgur.com/85oSEzZ.png", dark: "https://i.imgur.com/6JlEIa3.png" },
-        { light: "https://i.imgur.com/rEW5Qez.png", dark: "https://i.imgur.com/SSCQKzG.png" },
-        { light: "https://i.imgur.com/toShjHB.png", dark: "https://i.imgur.com/lkCHdKb.png" },
-        { light: "https://i.imgur.com/3bzgci3.png", dark: "https://i.imgur.com/u7DobRc.png" },
-        { light: "https://i.imgur.com/WULD0vG.png", dark: "https://i.imgur.com/93gxurP.png" },
-        { light: "https://i.imgur.com/CDQaTZp.png", dark: "https://i.imgur.com/4roFVau.png" },
-        { light: "https://i.imgur.com/iifEP38.png", dark: "https://i.imgur.com/Mjd130p.png" },
-        { light: "https://i.imgur.com/grQrpbz.png", dark: "https://i.imgur.com/HYFGeXE.png" },
-        { light: "https://i.imgur.com/Gwk41En.png", dark: "https://i.imgur.com/2s4sHgS.png" },
-        { light: "https://i.imgur.com/5rOH2Jf.png", dark: "https://i.imgur.com/Sh3ThC4.png" },
-        { light: "https://i.imgur.com/KC9Mhws.png", dark: "https://i.imgur.com/J1vFm19.png" },
-        { light: "https://i.imgur.com/oIGwW4j.png", dark: "https://i.imgur.com/N7yNCrJ.jpg" }
-]
+var backgroundNames = [
+    "sofa",
+    "rainbow",
+    "connection",
+    "scuffed",
+    "wave",
+    "fabric",
+    "shape",
+    "diagonalfabric",
+    "latticed",
+    "tiles",
+    "leather",
+    "paper",
+    "triangle",
+    "shadededge",
+    "smallcube",
+    "knitting",
+    "squashed",
+    "rhombus",
+    "dottedtiles",
+    "dirt",
+    "marble",
+    "compressedsquashed",
+    "animals"
+];
 
 var forumPrefixes = [
 "דיון",
@@ -343,6 +411,8 @@ function changeTab(element)
 
 }
 
+var highlightUser = -1;
+
 if (location.hash.length > 0)
 {
     //there is a hashtag in the url specifying a tab
@@ -361,7 +431,18 @@ if (location.hash.length > 0)
 }
 else
 {
-    changeTab($("#optionList li:first")); //default tab is the first one
+    //check if there are other expressions in the title 
+    var exp = location.href.match(/userFilter=[0-9]+/g);
+    if (exp != null)
+    {
+        //userFilter query
+        var queryId = parseInt(exp[0].substr("userFilter=".length));
+        changeTab($('[data-tab="comments"]'));
+        highlightUser = queryId;
+        //alert(queryId);
+    }
+    else
+        changeTab($("#optionList li:first")); //default tab is the first one
 }
 
 //one of the sidebar options was clicked, switch to the tab
@@ -496,7 +577,7 @@ function sub_loadThreadFilterLines(settings)
                 },
                 {
                     type: user.type,
-                    forums: buildCommaSeperatedString(user.forums),
+                    forums: user.forums,
                     excludeTitles: buildCommaSeperatedString(user.exception)
                 },
                 user.action
@@ -514,7 +595,7 @@ function sub_loadThreadFilterLines(settings)
             },
             {
                 type: keyword.type,
-                forums: buildCommaSeperatedString(keyword.forums),
+                forums: keyword.forums,
                 excludeTitles: buildCommaSeperatedString(keyword.exception)
             },
             keyword.action
@@ -544,6 +625,11 @@ function sub_loadCommentFilters(settings)
             settings.commentFilters[i].hideComments
         );
     }
+
+    if (highlightUser > 0 && $(".userCard.highlight").length == 0)
+    {
+        addUserCard(highlightUser, "", { color: "#333333", size: 11 }, false, false, false);
+    } 
 }
 function sub_loadDefaultStyle(settings)
 {
@@ -569,40 +655,44 @@ function sub_loadDefaultStyle(settings)
     updateDefaultStyleAppearance();
 }
 
+//suggests forums for tags in the filtering section
+function suggestForumTag(inputElement) {
+    var search = inputElement.val().trim();
+    if (search.length > 0) {
+        $.ajax({
+            url: 'https://www.fxp.co.il/ajax.php',
+            dataType: "json",
+            data: {
+                do: 'forumdisplayqserach',
+                name_startsWith: inputElement.val().trim()
+            },
+            success: function(data) {
+                var suggContainer = inputElement.parent().find(".tagSuggestionsContainer");
 
-//config for the fxplusplus twitter account
-var configProfile = {
-    "profile": { "screenName": 'fxplusplus' },
-    "domId": 'exampleList',
-    "maxTweets": 1,
-    "enableLinks": true,
-    "showUser": false,
-    "showTime": false,
-    "showImages": false,
-    "customCallback": showLastTweet,
-    "lang": 'he'
-};
-twitterFetcher.fetch(configProfile);
-
-var regexLink = /(https?:\/\/[^\s]+)/g;
-//show the last fxplusplus tweet at the top of the settings
-function showLastTweet(tweet)
-{
-    var tweetElement = tweet[0];
-
-    var tweetText = tweetElement.tweet; //get the text of the last tweet
-    tweetText += " ❭ ";
-    var tweetPost = tweetElement.permalinkURL;
-    var tweetLink = tweetText.match(regexLink);
-
-    if (tweetLink)
-        if (tweetLink.length > 0)
-        {
-            //remove links from text (decultter)
-            tweetText = tweetText.replace(regexLink, "");
-        }
-    $("#lastTweetText").empty().text(tweetText).attr("href", tweetPost); //show the text
-
+                var singleSuggestion;
+                if (data.length == 0) {
+                    suggContainer.hide();
+                    console.log("warning: no suggestions for entered forum");
+                }
+                else {
+                    suggContainer.empty();
+                    for (var i = 0; i < data.length; i++) {
+                        if (i > 10) {
+                            suggContainer.append(
+                                $("<div>", { class: "tagSuggestion" }).text("...")
+                            );
+                            break;
+                        }
+                        singleSuggestion = data[i].title_clean;
+                        suggContainer.append(
+                            $("<div>", { class: "tagSuggestion", tabindex: 0 }).text(singleSuggestion)
+                        );
+                    }
+                    suggContainer.show();
+                }
+            }
+        });
+    }
 }
 
 //open a popup that darkens the screen, by id
@@ -646,19 +736,19 @@ $("#changeBgBtn").click(function ()
 //add prefixes to prefix list in threads tab
 for (var i = 0; i < forumPrefixes.length; i++)
 {
-    addTag(forumPrefixes[i], true);
+    addPrefixTag(forumPrefixes[i], true);
 }
 var newsForumToggleName = "כתבות מפורומי עדכונים"
-addTag(newsForumToggleName, false);
+addPrefixTag(newsForumToggleName, false);
 
 //add backgrounds to background lists in background popup
-for (var i = 0; i < backgrounds.length; i++)
+for (var i = 0; i < backgroundNames.length; i++)
 {
     $("#bgList").append(
         $("<div>", { class: "customBackground" }).append(
-            $("<div>", { class: "lightBG", style: "background-image: url(" + backgrounds[i].light + ");" })
+            $("<div>", { class: "lightBG", style: "background-image: url(" + chrome.extension.getURL("images/bgs/light/" + backgroundNames[i]+".png") + ");" })
         ).append(
-            $("<div>", { class: "darkBG", style: "background-image: url(" + backgrounds[i].dark + ");" })
+            $("<div>", { class: "darkBG", style: "background-image: url(" + chrome.extension.getURL("images/bgs/dark/" + backgroundNames[i] + ".png") + ");" })
         )
     )
 }
@@ -713,6 +803,7 @@ $(".changeStyle").change(function ()
     updateDefaultStyleAppearance();
 })
 
+
 //change the editor in the comments section when needed
 function updateDefaultStyleAppearance()
 {
@@ -745,7 +836,7 @@ function updateDefaultStyleAppearance()
 }
 updateDefaultStyleAppearance(); //first update
 
-function buildTag(name, addLine)
+function buildPrefixTag(name, addLine)
 { //builds a tag for read time
     var displayName = name;
     if (addLine)
@@ -759,9 +850,60 @@ function buildTag(name, addLine)
     return tag;
 }
 
-function addTag(name, addLine)
+function addPrefixTag(name, addLine)
 { //adds a read time tag
-    $("#tagList").append(buildTag(name, addLine));
+    $("#tagList").append(buildPrefixTag(name, addLine));
+}
+
+//builds an element for a tag
+function buildGeneralTag(name) {
+    return $("<div>", { class: "tagBody" }).append(
+        $("<span>", { class: "tagName" }).text(name)
+    ).append(
+        $("<span>", { class: "tagRemove mdi mdi-close" }).click(function() {
+        $(this).parents(".tagBody").fadeOut(200, function() { $(this).remove() }); //fade out and remove
+        })
+    );
+}
+
+//builds an element for adding tags
+function buildGeneralTagAdder() {
+    return $("<div>", { class: "addTagBody" }).append(
+        $("<input>", { class: "tagInput" }).focusin(function() {
+            $(this).css("width", "10em"); //expand on focus in
+            forumCompleteCooldown = -1;
+        }).focusout(function(e) {
+            if (e.relatedTarget && $(e.relatedTarget).hasClass("tagSuggestion")) {
+                //if clicked on suggestion, change the value to the suggestion clicked on
+                $(this).val($(e.relatedTarget).text());
+                window.clearTimeout(forumCompleteCooldown); //cancel future suggestions
+            }
+
+            if ($(this).val().trim().length > 0) //add tag on focus out
+            { 
+                var tagName = $(this).val();
+                $(this).parents(".addTagBody").before(buildGeneralTag(tagName));
+            }
+            $(this).val("");
+            $(this).css("width", "");
+            $(this).parent().find(".tagSuggestionsContainer").hide();
+        }).keypress(function(e) {
+            if (e.which == 13) //blur on enter
+                $(this).blur();
+            else if (forumCompleteCooldown == -1) //first edit, ignore
+            {
+                var inputElement = $(this);
+                forumCompleteCooldown = setTimeout(function() {
+                    suggestForumTag(inputElement);
+                    forumCompleteCooldown = -1;
+                }, 900); //cooldown of 0.9s
+            }
+        })
+    ).append(
+        $("<span>", { class: "tagAdd mdi mdi-plus" })
+    ).append(
+        $("<div>", { class: "tagSuggestionsContainer" })
+        );;
 }
 
 function showSaveSuccess()
@@ -876,7 +1018,10 @@ $(".saveSettings").click(function ()
                 if (!isNaN(id))
                 {
                     var type = $(this).find(".forumTarget:checked").val();
-                    var forums = buildArrayFromCommaString($(this).find("input[name='forums']").val());
+                    var forums = [];
+                    $(this).find(".tagsContainer.forums .tagName").each(function() {
+                        forums.push($(this).text());
+                    });
                     var exception = buildArrayFromCommaString($(this).find("input[name='excludeTitles']").val());
                     var action = $(this).find("[name='boldPost']").prop("checked") ? "bold" : "hide";
                     settings.threadFilters.users.push({
@@ -896,7 +1041,10 @@ $(".saveSettings").click(function ()
             {
                 var words = buildArrayFromCommaString($(this).find("textarea[name='keyword']").val());
                 var type = $(this).find(".forumTarget:checked").val();
-                var forums = buildArrayFromCommaString($(this).find("input[name='forums']").val());
+                var forums = [];
+                $(this).find(".tagsContainer.forums .tagName").each(function() {
+                    forums.push($(this).text());
+                });
                 var exception = buildArrayFromCommaString($(this).find("input[name='excludeTitles']").val());
                 var action = $(this).find("[name='boldPost']").prop("checked") ? "bold" : "hide";
                 settings.threadFilters.keywords.push({
@@ -990,10 +1138,72 @@ $(".resetChanges").click(function ()
 
 //sets the version number in the about page
 $("#versionNum").text(chrome.runtime.getManifest().version);
-$(".discordLink").click(function ()
+$(".communicateSection").click(function ()
 {
-    chrome.runtime.sendMessage({ event: { cat: "Click", type: "Discord link" } });
+    var name = $(this).attr("id");
+    name = name.substr(0, name.length - 4);
+    chrome.runtime.sendMessage({ event: { cat: "Click", type: name + " communication link" } });
 });
+
+
+
+//combo sequences
+var combos = [
+    [78, 88, 72, 67, 86]
+];
+//functions to activate once the combo is made
+var comboAction = [
+    function ()
+    {
+        $("body").toggleClass("rotateColor");
+    }
+]
+
+var maxComboLength = combos[0].length;
+for (var i = 1; i < combos.length; i++)
+{
+    if (combos[i].length > maxComboLength)
+        maxComboLength = combos[i].length;
+}
+var currentCombo = new Array(maxComboLength); //array of previous combos user made
+for (var i = 0; i < maxComboLength; i++)
+{
+    currentCombo[i] = -1;
+}
+
+//combo detection logic
+$(document).on('keydown', function (e)
+{
+    var tag = e.target.tagName.toLowerCase();
+    var contenteditable = e.target.getAttribute("contenteditable") == "true";
+    if (tag != 'input' && tag != 'textarea' && !contenteditable)
+    {
+        var keycode = e.which; //get key code
+
+        for (var i = 1; i < currentCombo.length; i++) //push at the end of the current combo
+        {
+            currentCombo[i - 1] = currentCombo[i];
+        }
+        currentCombo[currentCombo.length - 1] = keycode;
+
+        var pass = true;
+        for (var i = 0; i < combos.length; i++) //check if matches a combo
+        {
+            pass = true;
+            for (var j = 1; j < combos[i].length && pass; j++)
+            {
+                if (combos[i][combos[i].length - j] != currentCombo[currentCombo.length - j])
+                    pass = false;
+            }
+            if (pass) //matches, activate combo action
+            {
+                comboAction[i]();
+            }
+        }
+    }
+});
+
+
 
 //add user cards for the comments section
 function addUserCard(id, subnick, subnickStyle, hideSignature, disableStyle, hideComments)
@@ -1028,7 +1238,7 @@ function addUserCard(id, subnick, subnickStyle, hideSignature, disableStyle, hid
             $(this).parents(".userCard").find(".subnick").css("font-size", $(this).val() * 1.2 + "px");
         });
 
-        card.find("i.delete").click(function ()
+        card.find("span.delete").click(function ()
         { //delete button
             var card = $(this).parents(".userCard");
             card.removeClass("noAnimation").css({ animation: "sizedownfade 0.4s forwards" })
@@ -1037,6 +1247,9 @@ function addUserCard(id, subnick, subnickStyle, hideSignature, disableStyle, hid
                 card.remove()
             }, 400);
         });
+
+        if (id == highlightUser)
+            card.addClass("highlight");
 
         $("#commentsCards").append(card);
     })
@@ -1057,10 +1270,14 @@ function addStyleThreadsRow(type, selector, validation, action)
             break;
         default:
             row.find("input[value=everyForum]").prop("checked", true);
-            row.find("input[name=forums]").prop("disabled", true);
+            row.find(".tagsContainer").addClass("disabled");
             break;
     }
-    row.find("input[name=forums]").val(validation.forums); //forums text
+    
+    for (var i = 0; i < validation.forums.length; i++) {
+        row.find(".tagsContainer").append(buildGeneralTag(validation.forums[i]));
+    }
+    row.find(".tagsContainer").append(buildGeneralTagAdder());
     row.find("input[name=excludeTitles]").val(validation.excludeTitles); //exclude titles text
     if (action == "bold")
     {
@@ -1076,15 +1293,15 @@ function addStyleThreadsRow(type, selector, validation, action)
         var row = $(this).parents("tr");
         if (row.find("input[value=everyForum]").prop("checked"))
         {
-            row.find("input[name=forums]").prop("disabled", true);
+            row.find(".tagsContainer").addClass("disabled");
         }
         else
         {
-            row.find("input[name=forums]").prop("disabled", false);
+            row.find(".tagsContainer").removeClass("disabled");
         }
     });
 
-    row.find("i.delete").click(function ()
+    row.find("span.delete").click(function ()
     { //delete button
         var row = $(this).parents("tr");
         row.css({ transition: "font-size 0.3s", fontSize: 0 })
@@ -1252,7 +1469,7 @@ function buildUserCard()
                 )
             ).append(
                 $("<td>", { class: "styleSubnick" }).append(
-                    $("<i>", { class: "material-icons" }).text("format_color_text")
+                    $("<span>", { class: "mdi mdi-format-size" })
                 )
             )
         ).append(
@@ -1280,7 +1497,7 @@ function buildUserCard()
                 )
             ).append(
                 $("<td>", { rowspan: "3", class: "delete" }).append(
-                    $("<i>", { class: "material-icons delete" }).text("delete")
+                    $("<span>", { class: "mdi mdi-delete delete" })
                 )
             )
         ).append(
@@ -1375,9 +1592,7 @@ function buildStyleThreadsRow(type)
             )
         ).append(
             $("<td>").append(
-                $("<div>", { class: "balloonInputContainer", "data-balloon-pos": "down", "data-balloon-visible": true }).append(
-                    $("<input>", { class: "seperateByCommaText", type: "text", name: "forums" })
-                )
+                $("<div>", { class: "tagsContainer forums"})
             )
         ).append(
             $("<td>").append(
@@ -1391,13 +1606,13 @@ function buildStyleThreadsRow(type)
                     $("<input>", { type: "checkbox", name: "boldPost", checked: "checked" })
                 ).append(
                     $("<div>", { class: "showHideToggle boldOn" }).append(
-                        $("<i>", { class: "material-icons boldHideIcon" }).text("visibility")
+                        $("<span>", { class: "mdi mdi-eye boldHideIcon" })
                     ).append(
                         $("<div>", { class: "boldHideText" }).text("הדגש")
                     )
                 ).append(
                     $("<div>", { class: "showHideToggle hideOn" }).append(
-                        $("<i>", { class: "material-icons boldHideIcon hideIcon" }).text("visibility_off")
+                        $("<span>", { class: "mdi mdi-eye-off boldHideIcon hideIcon" })
                     ).append(
                         $("<div>", { class: "boldHideText" }).text("הסתר")
                     )
@@ -1405,7 +1620,7 @@ function buildStyleThreadsRow(type)
             )
         ).append(
             $("<td>").append(
-                $("<i>", { class: "material-icons delete" }).text("delete")
+                $("<span>", { class: "mdi mdi-delete delete" })
             )
         )
     return row;
@@ -1427,6 +1642,43 @@ $("#printSettingsToConsole").click(function ()
     chrome.storage.sync.get("settings", function (data)
     {
         console.log(data.settings);
+    })
+})
+$("#editSettingsJson").click(function ()
+{
+    chrome.storage.sync.get("settings", function (data)
+    {
+        var dataJson = JSON.stringify(data.settings);
+        if ($("button#saveJsonBtn").length == 0)
+        {
+            $("#editSettingsJson").after($("<button>", { id: "saveJsonBtn" }).text("שמור").click(function ()
+            {
+                try
+                {
+                    var dataParsed = JSON.parse($("#settingsJsonBox").val());
+                    $(this).hide();
+
+                    chrome.storage.sync.set({ settings: dataParsed }, function ()
+                    {
+                        if (chrome.runtime.lastError)
+                        {
+                            $("#saveJsonBtn").show();
+                            throw chrome.runtime.lastError;
+                        }
+                        else
+                        {
+                            $("#saveJsonBtn").remove();
+                            $("#settingsJsonBox").remove();
+                        }
+                    })
+                }
+                catch (err)
+                {
+                    alert("השמירה נכשלה:\n" + err);
+                }
+            }));
+            $("#editSettingsJson").after($("<textarea>", { id: "settingsJsonBox", style: "display: block; direction: ltr; width: 50%; height: 200px;" }).val(dataJson));
+        }
     })
 })
 
@@ -1703,6 +1955,7 @@ function getRestoreList(callback)
         }
     });
 }
+
 
 /*
 $.ajax({

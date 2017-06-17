@@ -123,10 +123,22 @@ h1 {
     color: black;
 }
 
+.miniQuickThread {
+    border-color: #2b2b2b;
+}
+
+    .miniQuickThread a {
+        color: #e4e4e4;
+    }
+
+.borderelssSelect {
+    color: #fff;
+    background: #0e0e0e;
+}
+
 /*
 FRONT PAGE
 */
-
 #statinfo,
 .greengrnew {
     background: #c0cc3a !important;
@@ -209,6 +221,20 @@ THREADS LIST
     color: #e8e8e8;
 }
 
+.statTable {
+    border-color: #232323;
+}
+
+.popupBottom {
+    background: #0e0e0e;
+    color: #efefef;
+}
+
+.smallPlusButton {
+    border: 1px dashed #505050;
+    background: #051525;
+}
+
 .hideThread .rating0, .hideThread .nonsticky, .hideThread .sticky {
     color: #777777;
 }
@@ -248,23 +274,22 @@ COMMENTS
     border-color: #3e3e3e;
 }
 
-.postbit .userinfo, .postbit .userinfo_noavatar {
+.postbit .userinfo {
     border-color: #191919;
     border-bottom: 1px solid #2b2b2b;
-    position: relative;
     z-index: 2;
     background: linear-gradient(#1d1d1d, #131313);
 }
 
-.userinfo_noavatar .contact, .postbody, .commentsContainer {
+.userinfo .contact, .userinfo .user-picture-holder, .postbody, .commentsContainer {
     filter: invert(100%);
 }
 
-    .userinfo_noavatar img, .userinfo_noavatar video, .postbody img, .postbody video, .postbody iframe, .postbody twitterwidget, .commentsContainer img, .commentsContainer video, .commentsContainer iframe, .commentsContainer twitterwidget {
+    .userinfo img, .userinfo video, .postbody img, .postbody video, .postbody iframe, .postbody twitterwidget, .commentsContainer img, .commentsContainer video, .commentsContainer iframe, .commentsContainer twitterwidget {
         filter: invert(100%);
     }
 
-.userinfo_noavatar div[style*='left:10px;'] {
+.userinfo div[style*='left:10px;'] {
     color: #888 !important;
 }
 
@@ -337,6 +362,11 @@ span.cke_skin_kama {
 .likebox {
     z-index: 3;
 }
+
+.manageThreadDropdown .dropdownLContent {
+    border-color: #3e3e3e;
+}
+
 
 /*
 PMs and settings
@@ -498,7 +528,5 @@ ul.userlist_showavatars li {
 }
 
 .addCreditBtn {
-    color: rgb(226, 247, 255);
-    background: rgb(0, 0, 0);
     border-color: #525252;
 }

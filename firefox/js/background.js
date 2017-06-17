@@ -75,8 +75,24 @@ var factorySettings =
         customBg: {
             day: "",
             night: ""
+        },
+        quickAccessThreads: [
+            {
+                prefix: "פרסום|",
+                title: "+FxPlus - תוסף לכרום",
+                authorId: 967488,
+                threadId: 16859147
+            }
+        ],
+        trackedThreads: {
+            list: [
+            ],
+            refreshRate: 15,
+            lastRefreshTime: 0
         }
     };
+
+var fxpDomain = "https://www.fxp.co.il/";
 
 chrome.browserAction.setBadgeBackgroundColor({ color: "#007cff" });
 
@@ -87,6 +103,8 @@ chrome.storage.sync = (function ()
 })();
 
 var socket;
+
+var alreadyNotifiedTrackedThreads = {}; //tracked threads id-comment pairs that were already notified to the user
 
 chrome.storage.sync.get("settings", function (data)
 {
@@ -120,6 +138,9 @@ chrome.storage.sync.get("settings", function (data)
         console.info("background notifications enabled");
         initSocket(true);
     }
+
+    //update number of comments on tracked threads
+    scheduleTrackedThreadsUpdate(settings.trackedThreads.lastRefreshTime, settings.trackedThreads.refreshRate);
 });
 
 
@@ -143,6 +164,12 @@ chrome.storage.onChanged.addListener(function (changes, areaName)
                 socket.disconnect();
             }
         }
+
+        //refresh rate of tracked threads shortened
+        if (changes.settings.oldValue.trackedThreads.refreshRate > changes.settings.newValue.trackedThreads.refreshRate)
+        {
+            scheduleTrackedThreadsUpdate(changes.settings.newValue.trackedThreads.lastRefreshTime, changes.settings.newValue.trackedThreads.refreshRate);
+        }
     }
 })
 
@@ -162,15 +189,79 @@ chrome.runtime.onMessage.addListener(
               if (isNaN(badgeCount))
                   badgeCount = 0;
 
-              if (badgeCount > request.updateBadge) //badge shows more notifications than are actually present, user probably read a notification
-                  checkNotificationCount(); //update the badge
+              getNotificationsTrackedThreads(function (tracked)
+              {
+                  if (badgeCount - tracked.length > request.updateBadge) //badge shows more notifications than are actually present, user probably read a notification
+                      checkNotificationCount(); //update the badge
+              });
           });
       }
       if (request.hasOwnProperty("event"))
       {
           sendEvent(request.event.cat, request.event.type);
       }
-  });
+    });
+
+
+//listeners for alarms (scheduled events)
+chrome.alarms.onAlarm.addListener(function (alarm)
+{
+    //update comment conunts in tracked threads
+    if (alarm.name == "updateTrackedThreads")
+    {
+        trackedThreadsAlarm();
+    }
+});
+
+//the alarm that fires when the comments of tracked threads should be updated
+function trackedThreadsAlarm()
+{
+    chrome.storage.sync.get("settings", function (data2)
+    {
+        var settings = data2.settings;
+        updateTotalCommentsTrackedThreads(settings.trackedThreads.list, settings.trackedThreads.refreshRate);
+    });
+}
+
+//an asynchronous loop. func runs every iteration and callback runs when the loop is over
+function asyncLoop(iterations, func, callback)
+{
+    var index = 0;
+    var done = false;
+    var loop = {
+        next: function () //next iteration
+        {
+            if (done)
+            {
+                return;
+            }
+
+            if (index < iterations)
+            {
+                index++;
+                func(loop);
+
+            } else
+            {
+                done = true;
+                callback();
+            }
+        },
+
+        getIteration: function () //return current iteration
+        {
+            return index - 1;
+        },
+
+        break: function () //stop the loop
+        {
+            done = true;
+            callback();
+        }
+    };
+    loop.next();
+    return loop;
+}
 
 //sends a (simple) notification
 function sendNotification(title, message, url)
@@ -254,25 +345,7 @@ function httpGetAsync(theUrl, callback)
     xmlHttp.send(null);
 }
 
-//updates the number that appears in the badge
-function updateNotificationCounter()
-{
-    getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id)
-    {
-        if (id != null)
-            httpGetAsync("https://www.fxp.co.il/feed_live.php?userid=" + id + "&format=json", function (data)
-            {
-                var notificationCount = JSON.parse(data);
-                var totalNotifications = parseInt(notificationCount.pm) + parseInt(notificationCount.like) + parseInt(notificationCount.noti);
-                if (totalNotifications > 0)
-                    changeBadge(totalNotifications);
-                else
-                    changeBadge("");
-            })
-        else
-            changeBadge("");
-    });
-}
+var domParser = new DOMParser();
 
 //send GA event
 function sendEvent(cat, type)
@@ -337,7 +410,7 @@ function changeBadge(str)
 //callback function runs only if there are no FXP tabs open
 function noTabsOpen(callback)
 {
-    chrome.tabs.query({ url: "https://www.fxp.co.il/*" }, function (query)
+    chrome.tabs.query({ url: fxpDomain + "*" }, function (query)
     {
         var openFxpTabs = query.length; //number of open fxp tabs
         if (openFxpTabs < 1) //only run callback if there are no tabs
@@ -353,7 +426,7 @@ function initSocket(alertUnreadList)
     socket = undefined;
     console.log("Attempting to get cookies");
     //attempt to get cookies (sometimes chrome can't do that)
-    chrome.cookies.get({ "url": "https://www.fxp.co.il", "name": "bb_livefxpext" }, function (cookie)
+    chrome.cookies.get({ "url": fxpDomain, "name": "bb_livefxpext" }, function (cookie)
     {
         if (chrome.runtime.lastError)
         {
@@ -377,7 +450,7 @@ function connectSocket()
     //general listeners
     socket.on('connect', function ()
     {
-        getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id)
+        getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
         {
             var send = '{"userid":"' + id + '","froum":"f-fe7fdfa8be5eb96fc56f318738a6410e"}';
             socket.send(send);
@@ -386,7 +459,7 @@ function connectSocket()
     });
     socket.on('reconnecting', function ()
     {
-        getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id)
+        getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
         {
             var send = '{"userid":"' + id + '","froum":"f-fe7fdfa8be5eb96fc56f318738a6410e"}';
             socket.send(send);
@@ -405,13 +478,13 @@ function connectSocket()
                 sendNotification(
                     "התראה חדשה!",
                     'המשתמש ' + data.username + ' ציטט את הודעתך באשכול ' + data.title,
-                    'https://www.fxp.co.il/showthread.php?t=' + data.thread_id + '&goto=newpost'
+                    fxpDomain + 'showthread.php?t=' + data.thread_id + '&goto=newpost'
                 );
             else
                 sendNotification(
                     "התראה חדשה!",
                     'המשתמש ' + data.username + ' הגיב באשכול ' + data.title,
-                    'https://www.fxp.co.il/showthread.php?t=' + data.thread_id + '&goto=newpost'
+                    fxpDomain + 'showthread.php?t=' + data.thread_id + '&goto=newpost'
                 );
 
         });
@@ -427,7 +500,7 @@ function connectSocket()
             sendNotification(
                 "דואר נכנס!",
                 'קיבלת הודעה פרטית חדשה מהמשתמש ' + data.username,
-                'https://www.fxp.co.il/private.php?do=showpm&pmid=' + data.pmid
+                fxpDomain + 'private.php?do=showpm&pmid=' + data.pmid
             );
         });
     });
@@ -442,7 +515,7 @@ function connectSocket()
             sendNotification(
                 "לייק חדש!",
                 'המשתמש ' + data.username + ' אהב את ההודעה שלך!',
-                'https://www.fxp.co.il/showthread.php?p=' + data.postid + '#post' + data.postid
+                fxpDomain + 'showthread.php?p=' + data.postid + '#post' + data.postid
             );
         });
     });
@@ -472,77 +545,90 @@ function connectSocket()
 //updates the counter at the navbar
 function checkNotificationCount()
 {
-    getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id)
+    getNotificationsTotalNum(function (total)
     {
-        httpGetAsync("https://www.fxp.co.il/feed_live.php?userid=" + id + "&format=json", function (data)
-        {
-            var notificationCount = JSON.parse(data);
-            var totalNotifications = parseInt(notificationCount.pm) + parseInt(notificationCount.like) + parseInt(notificationCount.noti);
-            if (totalNotifications > 0)
-                changeBadge(totalNotifications);
-            else
-                changeBadge("");
-        })
+        if (total > 0)
+            changeBadge(total);
+        else
+            changeBadge("");
+
     });
 }
 
 //sends a notification with the number of notifications of each type
 function alertUnreadNotifications()
 {
-    getDomainCookies("https://www.fxp.co.il", "bb_livefxpext", function (id)
-    { //get user ID
-        console.log(id);
-        httpGetAsync("https://www.fxp.co.il/feed_live.php?userid=" + id + "&format=json", function (data)
+    var notificationList = [];
+    getNotificationsNormal(function (normal)
+    {
+        //add notification lists
+        if (normal.notifications > 0)
+        { //user has notifications
+            if (normal.notifications == 1)
+                notificationList.push({
+                    title: normal.notifications + "",
+                    message: 'התראה חדשה'
+                });
+            else
+                notificationList.push({
+                    title: normal.notifications + "",
+                    message: 'התראות חדשות'
+                });
+        }
+
+        if (normal.likes > 0)
+        { //user has likes
+            if (normal.likes == 1)
+                notificationList.push({
+                    title: normal.likes + "",
+                    message: 'לייק חדש'
+                });
+            else
+                notificationList.push({
+                    title: normal.likes + "",
+                    message: 'לייקים חדשים'
+                });
+        }
+
+        if (normal.pms > 0)
+        { //user has pms
+            if (normal.pms == 1)
+                notificationList.push({
+                    title: normal.pms + "",
+                    message: 'הודעה פרטית חדשה'
+                });
+            else
+                notificationList.push({
+                    title: normal.pms + "",
+                    message: 'הודעות פרטיות חדשות'
+                });
+        }
+
+        getNotificationsTrackedThreads(function (tracked)
         {
-            var notificationCount = JSON.parse(data);
-            var notificationList = [];
-
-            //add notification lists
-            if (parseInt(notificationCount.noti) > 0)
-            { //user has notifications
-                console.log("has noti");
-                if (parseInt(notificationCount.noti) == 1)
+            if (tracked.length > 0)
+            { //user has new comments from tracked threads
+                if (tracked.length == 1)
                     notificationList.push({
-                        title: notificationCount.noti + "",
-                        message: 'התראה חדשה'
+                        title: tracked.length + "",
+                        message: 'התראה מאשכולות במעקב'
                     });
                 else
                     notificationList.push({
-                        title: notificationCount.noti + "",
-                        message: 'התראות חדשות'
+                        title: tracked.length + "",
+                        message: 'התראות מאשכולות במעקב'
                     });
+
+                for (var i = 0; i < tracked.length; i++)
+                {
+                    //note that the user was notified about this thread
+                    alreadyNotifiedTrackedThreads[tracked[i].threadId] = tracked[i].totalComments;
+                }
             }
 
-            if (parseInt(notificationCount.like) > 0)
-            { //user has likes
-                if (parseInt(notificationCount.like) == 1)
-                    notificationList.push({
-                        title: notificationCount.like + "",
-                        message: 'לייק חדש'
-                    });
-                else
-                    notificationList.push({
-                        title: notificationCount.like + "",
-                        message: 'לייקים חדשים'
-                    });
-            }
-
-            if (parseInt(notificationCount.pm) > 0)
-            { //user has pms
-                if (parseInt(notificationCount.pm) == 1)
-                    notificationList.push({
-                        title: notificationCount.pm + "",
-                        message: 'הודעה פרטית חדשה'
-                    });
-                else
-                    notificationList.push({
-                        title: notificationCount.pm + "",
-                        message: 'הודעות פרטיות חדשות'
-                    });
-            }
 
             //update the badge
-            var totalNotifications = parseInt(notificationCount.pm) + parseInt(notificationCount.like) + parseInt(notificationCount.noti);
+            var totalNotifications = normal.total() + tracked.length;
             if (totalNotifications > 0)
                 changeBadge(totalNotifications);
             else
@@ -557,10 +643,247 @@ function alertUnreadNotifications()
                     listString += notificationList[i].title + " " + notificationList[i].message;
                 }
 
-                sendListNotification("בזמן שלא היית מחובר...", notificationList, "https://www.fxp.co.il", listString);
+                sendListNotification("בזמן שלא היית מחובר...", notificationList, fxpDomain, listString);
             }
+        })
+    })
+}
+
+//returns how many comments there are in a thread
+function getLastCommentDataForThreadById(threadId, callback)
+{
+    //url of the last page (fxp automatically redirects, assuming there are no more than 999999 pages)
+    var fullUrl = fxpDomain + "showthread.php?t=" + threadId + "&page=999999";
+
+    //get the thread
+    httpGetAsync(fullUrl, function (response)
+    {
+        var doc = domParser.parseFromString(response, "text/html");
+
+        var commentCount = parseInt(doc.querySelector(".postbit:last-child .postcounter").textContent.substr(1)) - 1; //extract the number of comments from the index of the last post
+        var last = doc.querySelector(".postbit:last-child .username").textContent.trim();
+        callback({
+            comments: commentCount,
+            lastCommentor: last
         });
     });
+}
+
+var refreshTimeout = setTimeout(function () { }, 0);
+//updates the total number of comments in tracked threads. callback returns the time of last update
+function updateTotalCommentsTrackedThreads(threadList, refreshRate)
+{
+    var i;
+    window.clearTimeout(refreshTimeout);
+    //loop over all threads and update their comment counts
+    asyncLoop(threadList.length,
+        function (loop) //loop body
+        {
+            i = loop.getIteration();
+            getLastCommentDataForThreadById(threadList[i].threadId, function (data)
+            {
+                threadList[i].totalComments = data.comments;
+                threadList[i].lastCommentor = data.lastCommentor;
+                loop.next();
+            });
+        }, function () //done
+        {
+            chrome.storage.sync.get("settings", function (data)
+            {
+                var settings = data.settings;
+                var prev = {}; //threadId-comments pairs - used to determine if there are new comments that should be alerted
+                //update comment counts
+                //not setting directly since the thread list can change while comments are being counted
+                for (var i = 0; i < threadList.length; i++)
+                {
+                    for (var j = 0; j < settings.trackedThreads.list.length; j++)
+                    {
+                        //update the correct thread
+                        if (settings.trackedThreads.list[j].threadId == threadList[i].threadId)
+                        {
+                            prev[threadList[i].threadId] = settings.trackedThreads.list[j].totalComments;
+                            settings.trackedThreads.list[j] = threadList[i];
+                            break;
+                        }
+                    }
+                }
+                settings.trackedThreads.lastRefreshTime = new Date().getTime();
+
+                //save new times
+                chrome.storage.sync.set({ "settings": settings });
+
+                console.log("updated comment count of " + threadList.length + " threads");
+
+                //notify of new comments
+                getNotificationsTrackedThreads(function (tracked)
+                {
+                    var checkedBadge = false;
+                    //new comment, notify the user
+                    for (var i = 0; i < tracked.length; i++)
+                    {
+                        if (prev[tracked[i].threadId] < tracked[i].totalComments || prev[tracked[i].threadId] == undefined)
+                        {
+                            console.log("new comments in tracked thread " + tracked[i].threadId);
+                            var additional = "";
+                            if (tracked[i].newComments < 2)
+                            {
+                                additional = " הגיב באשכול ";
+                            }
+                            else if (tracked[i].newComments == 2)
+                            {
+                                additional = " ומשתמש נוסף הגיבו באשכול ";
+                            }
+                            else
+                            {
+                                additional = " ו-" + (tracked[i].newComments - 1) + " משתמשים נוספים הגיבו באשכול ";
+                            }
+
+                            var url = fxpDomain + "showthread.php?t=" + tracked[i].threadId;
+                            if (tracked[i].totalComments > 15) //add pages
+                            {
+                                url += "&page=" + Math.ceil(tracked[i].totalComments / 15);
+                            }
+
+                            sendNotification(
+                                "התראה חדשה מאשכול במעקב!",
+                                'המשתמש ' + tracked[i].lastCommentor + additional + tracked[i].threadTitle,
+                                url
+                            );
+
+                            prev[tracked[i].threadId] = tracked[i].totalComments;
+
+                            if (!checkedBadge)
+                                checkNotificationCount();
+                        };
+                    }
+                });
+
+
+                //update again after the specified minutes
+                if (refreshRate > 0)
+                {
+                    chrome.storage.sync.get("settings", function (data2)
+                    {
+                        var settings = data2.settings;
+                        scheduleTrackedThreadsUpdate(settings.trackedThreads.lastRefreshTime, settings.trackedThreads.refreshRate);
+                    });
+                }
+            });
+        });
+}
+
+//schedules an update to the tracked threads data
+function scheduleTrackedThreadsUpdate(lastRefresh, refreshRate)
+{
+    var timeToRefresh = lastRefresh - new Date() + (1000 * 60 * refreshRate);
+    var refreshTime = lastRefresh + (1000 * 60 * refreshRate);
+    var nextUpIn = (lastRefresh - new Date() + (1000 * 60 * refreshRate)) / 1000 / 60;
+    //clear previous alarm if exists, and set a new for the next time of update
+    chrome.alarms.clear("updateTrackedThreads", function (wasCleared)
+    {
+        console.log("thread tracker scheduled for " + Math.round(nextUpIn * 100) / 100 + "mins from now");
+        if (nextUpIn < 1)
+        {
+            trackedThreadsAlarm();
+        }
+        else
+        {
+            chrome.alarms.create("updateTrackedThreads", {
+                delayInMinutes: nextUpIn
+            })
+        }
+    }); 
+}
+
+//returns notification objects for tracked threads
+function getNotificationsTrackedThreads(callback)
+{
+    var noti = [];
+    var commentNum, url;
+    chrome.storage.local.get("threadComments", function (data)
+    {
+        var threadComments = data.threadComments || [];
+        chrome.storage.sync.get("settings", function (data2)
+        {
+            var settings = data2.settings || factorySettings;
+
+            for (var i = 0; i < settings.trackedThreads.list.length; i++)
+            {
+                for (var j = 0; j < threadComments.length; j++)
+                {
+                    if (threadComments[j].id == settings.trackedThreads.list[i].threadId)
+                    {
+                        commentNum = settings.trackedThreads.list[i].totalComments - threadComments[j].comments;
+                        url = fxpDomain + "showthread.php?t=" + settings.trackedThreads.list[i].threadId;
+                        if (settings.trackedThreads.list[i].totalComments  > 15) //add pages
+                        {
+                            url += "&page=" + Math.ceil(settings.trackedThreads.list[i].totalComments / 15);
+                        }
+                        if (commentNum > 0)
+                        {
+                            noti.push({
+                                threadTitle: settings.trackedThreads.list[i].title,
+                                threadId: settings.trackedThreads.list[i].threadId,
+                                totalComments: settings.trackedThreads.list[i].totalComments,
+                                newComments: commentNum,
+                                lastCommentor: settings.trackedThreads.list[i].lastCommentor,
+                                url: url
+                            })
+                        }
+                        break;
+                    }
+                }
+            }
+
+            //return the notifications
+            callback(noti);
+        });
+    });
+}
+
+//returns notifications from each kind, and total from FXP itself
+function getNotificationsNormal(callback)
+{
+    var noti = {
+        pms: 0,
+        likes: 0,
+        notifications: 0,
+        total: function ()
+        {
+            return this.pms + this.likes + this.notifications;
+        }
+    };
+    getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
+    {
+        if (id != null)
+            httpGetAsync(fxpDomain + "feed_live.php?userid=" + id + "&format=json", function (data)
+            {
+                var notificationCount = JSON.parse(data);
+
+                noti.pms = parseInt(notificationCount.pm);
+                noti.likes = parseInt(notificationCount.like);
+                noti.notifications = parseInt(notificationCount.noti);
+
+                callback(noti);
+            })
+        else
+            callback(noti);
+    });
+}
+
+//returns the addition of all notification types
+function getNotificationsTotalNum(callback)
+{
+    var total = 0;
+    getNotificationsNormal(function (n1)
+    {
+        total += n1.total();
+        getNotificationsTrackedThreads(function (n2)
+        {
+            total += n2.length
+            callback(total);
+        })
+    })
 }
 
 sendEvent("Passive", "Load");
