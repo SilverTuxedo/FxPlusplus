@@ -79,7 +79,7 @@ var factorySettings =
         quickAccessThreads: [
             {
                 prefix: "פרסום|",
-                title: "+FxPlus - תוסף לכרום",
+                title: "+FxPlus - תוסף לכרום ופיירפוקס",
                 authorId: 967488,
                 threadId: 16859147
             }
@@ -264,12 +264,15 @@ function asyncLoop(iterations, func, callback)
 }
 
 //sends a (simple) notification
-function sendNotification(title, message, url)
+function sendNotification(title, message, url, icon)
 {
+    if (icon == undefined || icon.length == 0)
+        icon == '../images/notificationImg.png';
+
     var randomId = Math.random().toString(36).substr(2, 10); //generates a random 10 character id
     chrome.notifications.create(randomId, {
         type: 'basic',
-        iconUrl: '../images/notificationImg.png',
+        iconUrl: icon,
         title: title,
         message: message,
         isClickable: true
@@ -500,7 +503,7 @@ function connectSocket()
             sendNotification(
                 "דואר נכנס!",
                 'קיבלת הודעה פרטית חדשה מהמשתמש ' + data.username,
-                fxpDomain + 'private.php?do=showpm&pmid=' + data.pmid
+                fxpDomain + 'chat.php?pmid=' + data.pmid
             );
         });
     });
@@ -662,9 +665,15 @@ function getLastCommentDataForThreadById(threadId, callback)
 
         var commentCount = parseInt(doc.querySelector(".postbit:last-child .postcounter").textContent.substr(1)) - 1; //extract the number of comments from the index of the last post
         var last = doc.querySelector(".postbit:last-child .username").textContent.trim();
+
+        var title = doc.querySelector(".titleshowt h1").textContent.trim();
+        var prefix = doc.querySelector(".titleshowt .prefixtit").textContent.trim();
+
         callback({
             comments: commentCount,
-            lastCommentor: last
+            lastCommentor: last,
+            title: title,
+            prefix: prefix
         });
     });
 }
@@ -684,6 +693,9 @@ function updateTotalCommentsTrackedThreads(threadList, refreshRate)
             {
                 threadList[i].totalComments = data.comments;
                 threadList[i].lastCommentor = data.lastCommentor;
+                threadList[i].title = data.title;
+                threadList[i].prefix = data.prefix;
+
                 loop.next();
             });
         }, function () //done

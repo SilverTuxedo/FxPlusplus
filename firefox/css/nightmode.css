@@ -157,11 +157,24 @@ FRONT PAGE
     filter: invert(100%);
 }
 
+.fav_div {
+    background-color: #1b3875;
+    color: #f9f9f9;
+    border-color: #484848;
+}
+
+.personalCategoryHelper {
+    border: 1px solid #232323 !important;
+    background-color: #1d1d1d !important;
+}
+
+    .personalCategoryHelper ul.droptrue.ui-sortable {
+        filter: invert(100%);
+    }
 
 /*
 THREADS LIST
 */
-
 .threadbit {
     color: #d6d6d6;
     border-left: 1px solid #3e3e3e;
@@ -172,6 +185,10 @@ THREADS LIST
     .threadbit .nonsticky,
     .threadbit .rating0 {
         border-bottom: 1px solid #3e3e3e;
+    }
+
+    .threadbit span.typetext {
+        color: #d6d6d6 !important;
     }
 
 .threadlisthead, #thread_controls {
@@ -279,6 +296,10 @@ COMMENTS
     border-bottom: 1px solid #2b2b2b;
     z-index: 2;
     background: linear-gradient(#1d1d1d, #131313);
+}
+
+.userinfo .contact {
+    z-index: 1;
 }
 
 .userinfo .contact, .userinfo .user-picture-holder, .postbody, .commentsContainer {

@@ -92,7 +92,7 @@ var factorySettings =
         quickAccessThreads: [
             {
                 prefix: "פרסום|",
-                title: "+FxPlus - תוסף לכרום",
+                title: "+FxPlus - תוסף לכרום ופיירפוקס",
                 authorId: 967488,
                 threadId: 16859147
             }

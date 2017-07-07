@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "תיקונים למצב לילה, תת-ניקים והגדרות.";
-var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2017/06/112.html";
+var versionDescription = "הערות משתמשים חוזרות! בנוסף לכך, כמה תיקונים ושינויים להתראות והגישה המהירה.";
+var versionBig = true;
+var versionHref = "https://fxplusplus.blogspot.com/2017/07/120.html";
 
 var factorySettings =
     {
@@ -83,7 +83,7 @@ var factorySettings =
         quickAccessThreads: [
             {
                 prefix: "פרסום|",
-                title: "+FxPlus - תוסף לכרום",
+                title: "+FxPlus - תוסף לכרום ופיירפוקס",
                 authorId: 967488,
                 threadId: 16859147
             }
@@ -95,6 +95,11 @@ var factorySettings =
             lastRefreshTime: 0
         }
     };
+
+var defaultNotes = [
+    { id: 967488, content: "רק דברים טובים" },
+    { id: 30976, content: "אושיית רשת וזוכת האירוויזיון עם השיר המקורי מיוטיוב: מור הראפרית FXP" }
+]
 
 //if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
@@ -335,6 +340,9 @@ chrome.storage.sync.get("settings", function (data)
         //        updateKnownIds("967488", "aaaaaaaa");
         //    }
         //    )))
+
+        //add helper for night mode to determine where the personal category is
+        $(".fav_div").parent().addClass("personalCategoryHelper");
 
         //add settings button in FxP toolbar
         $("#settings_pop .popupbody").append($("<div>", { class: "fxpSpopupSeperator" })) //add seperator
@@ -884,7 +892,7 @@ chrome.storage.sync.get("settings", function (data)
                 var commentDifference;
                 threadComments.forEach(function (threadData)
                 {
-                    if (checkTrackThread(threadData.id))
+                    if (checkTrackThreadUnread(threadData.id))
                     {
                         thread = $(".threadbit .title[href$='t=" + threadData.id + "']"); //find threads that is tracked by title
                         if (thread.length > 0) //there is a thread with a tracked id in the page
@@ -954,16 +962,21 @@ chrome.storage.sync.get("settings", function (data)
             var prefix = $(".titleshowt .prefixtit").text().trim();
 
             //change the text in the option "track unread comments" if its turned on or off
-            if (checkTrackThread(currentThreadId))
+            if (checkTrackThreadUnread(currentThreadId))
                 $("#toggleThreadCommentTracking td:first").text("בטל מעקב אחר הודעות שלא נקראו");
             else
                 $("#toggleThreadCommentTracking td:first").text("הפעל מעקב אחר הודעות שלא נקראו");
 
-            //change the text in the option "quick access" if its in there or not
+            //change the text in the option "quick access" if its in there or not and keep title up to date
             if (checkThreadExistsQuickAccess(currentThreadId))
             {
+                //change text to "remove"
                 $("#quickAccessAddRemove td:first").text("הסר מגישה מהירה");
                 $("#quickAccessAddRemove td:eq(1) span").attr("class", "mdi").addClass("mdi-bookmark-remove");
+
+                //verify that the thread title is kept up to date
+                updateQuickAccessTitle(prefix, title, currentThreadId);
+
             }
             else
             {
@@ -982,14 +995,14 @@ chrome.storage.sync.get("settings", function (data)
             $("#toggleThreadCommentTracking").click(function ()
             {
                 var threadId = getThreadIdFromLink($(".postbit:first").find(".postcounter").attr("href")); //extract the id of the thread
-                if (checkTrackThread(threadId))
+                if (checkTrackThreadUnread(threadId)) //cancel tracking unread comments
                 {
-                    setTrackThread(threadId, false);
+                    setTrackThreadUnread(threadId, false);
                     $(this).find("td:first").text("הפעל מעקב אחר הודעות שלא נקראו");
                 }
-                else
+                else //activate tracking unread comments
                 {
-                    setTrackThread(threadId, true);
+                    setTrackThreadUnread(threadId, true);
                     $(this).find("td:first").text("בטל מעקב אחר הודעות שלא נקראו");
 
                     //make sure that the current page is marked as read
@@ -1022,7 +1035,11 @@ chrome.storage.sync.get("settings", function (data)
                         {
                             //change the text in the option
                             $("#quickAccessAddRemove td:first").text("הסר מגישה מהירה");
-                            $("#quickAccessAddRemove td:eq(1) span").attr("class","mdi").addClass("mdi-bookmark-remove");
+                            $("#quickAccessAddRemove td:eq(1) span").attr("class", "mdi").addClass("mdi-bookmark-remove");
+                            //show the user the quick access window
+                            openQuickAccess();
+                            //close the menu
+                            $(".manageThreadDropdown .dropdownLContent").slideUp(200);
                         })
                     }
                     else
@@ -1038,6 +1055,10 @@ chrome.storage.sync.get("settings", function (data)
                                 //change the text in the option
                                 $("#quickAccessAddRemove td:first").text("הסר מגישה מהירה");
                                 $("#quickAccessAddRemove td:eq(1) span").attr("class", "mdi").addClass("mdi-bookmark-remove");
+                                //show the user the quick access window
+                                openQuickAccess();
+                                //close the menu
+                                $(".manageThreadDropdown .dropdownLContent").slideUp(200);
                             })
                         })
                     }
@@ -1509,6 +1530,50 @@ chrome.storage.sync.get("settings", function (data)
                 )
             $('form[action*="signature"] .editor_smiliebox').before(element);
         }
+
+        //custom user notes
+        chrome.storage.local.get("userNotes", function (data)
+        {
+            var notes = data.userNotes || defaultNotes;
+            if (window.location.href.indexOf("member.php") > -1) //on a user's page
+            {
+                var currentProfileId = getUserIdInProfile();
+
+                //add tab
+                var tabParent = $("#userprof_content_container .tabslight");
+                var sampleTab = tabParent.find(".userprof_module:first").clone();
+                sampleTab.attr("class", "userprof_moduleinactive");
+                sampleTab.find("a")
+                    .attr("id", "usernotes-tab")
+                    .attr("href", "#usernotes-content")
+                    .text("הערות");
+                sampleTab.appendTo(tabParent);
+
+                //add tab content
+                $("#userprof_content_container .profile_content.userprof").append(
+                    $("<div>", { id: "view-usernotes-content", class: "view_section" }).append(
+                        $("<h4>", { class: "subsectionhead userprof_title" }).text("הערות")
+                    ).append(
+                        $("<textarea>", { class: "userNotesEditor", "data-user": currentProfileId }).on('input selectionchange propertychange', function ()
+                        {
+                            userNotesEditorSaveChanges($(this), parseInt($(this).attr("data-user")));
+                        }).each(function ()
+                        {
+                            //set the content to the user's note
+                            var editor = $(this);
+                            getNoteByUserId(currentProfileId, function (noteText)
+                            {
+                                editor.val(noteText);
+                            })
+                        })
+                        ).append(
+                        $("<span>").text("הערות שיכתבו כאן ישמרו רק עבור דפדפן זה.")
+                    )
+                )
+
+            }
+        });
+        
 
 
         //var threadForm = $("form[action^='newthread.php']");
@@ -2171,7 +2236,7 @@ function addStyle(style, specialId)
 function updateThreadCommentCount(threadId, comments)
 {
     //track only if thread is not ignored by user
-    if (checkTrackThread(threadId))
+    if (checkTrackThreadUnread(threadId))
     {
         localStorage.setItem("tempTcount", JSON.stringify({ id: threadId, comments: comments })); //store the value in localstorage if the browser does not complete operation
         chrome.storage.local.get("threadComments", function (data)
@@ -2262,7 +2327,7 @@ function getThreadbitViews(threadbit)
 }
 
 //returns if the track should be tracked for its comments
-function checkTrackThread(threadId)
+function checkTrackThreadUnread(threadId)
 {
     //get threads that should not be tracked
     var noTrackThreads = JSON.parse(localStorage.getItem("noTrackThreads")) || [];
@@ -2276,7 +2341,7 @@ function checkTrackThread(threadId)
 }
 
 //changes a thread's tracking status
-function setTrackThread(threadId, track)
+function setTrackThreadUnread(threadId, track)
 {
     var noTrackThreads = JSON.parse(localStorage.getItem("noTrackThreads")) || [];
 
@@ -2308,7 +2373,7 @@ function checkNewComments(threadbit)
         var commentNum = -1;
 
         //add tag if thread should be tracked
-        if (checkTrackThread(id))
+        if (checkTrackThreadUnread(id))
         {
             //search for the thread in storage
             for (var i = 0; i < threadComments.length; i++)
@@ -3094,6 +3159,64 @@ function bindEditorFrameLoad(editorFrame, settings)
     }
 }
 
+var saveNotesTimeout;
+//saves the changes made in the notes'
+function userNotesEditorSaveChanges(editor, id)
+{
+    if (saveNotesTimeout) window.clearTimeout(saveNotesTimeout);
+    //debounce of 0.8secs for the saving
+    saveNotesTimeout = setTimeout(function ()
+    {
+        //always use the latest and greatest notes
+        chrome.storage.local.get("userNotes", function (data)
+        {
+            var notes = data.userNotes || defaultNotes;
+            for (var i = 0; i < notes.length; i++)
+            {
+                if (notes[i].id == id) //remove dupes
+                {
+                    console.log("removing:");
+                    console.log(notes[i]);
+                    notes.splice(i, 1);
+                    break;
+                }
+            }
+            //add the note to the beginning of the note list
+            notes.unshift({ id: id, content: editor.val() });
+            chrome.storage.local.set({ "userNotes": notes }, function () { debug.info("saved note"); }); //save
+        });
+    }, 800);
+}
+
+//returns the text of a note for a user
+function getNoteByUserId(id, callback)
+{
+    var foundNote = false;
+    chrome.storage.local.get("userNotes", function (data)
+    {
+        var notes = data.userNotes || defaultNotes;
+        for (var i = 0; i < notes.length && !foundNote; i++) //search for the note
+        {
+            if (notes[i].id == id)
+            {
+                callback(notes[i].content);
+                foundNote = true;
+            }
+        }
+        if (!foundNote)
+            callback("");
+
+    });
+
+}
+
+//returns the id from the viewed profile. only works on member.php pages
+function getUserIdInProfile()
+{
+    var userLinkElement = $("a[href*='userid='"); //look for a URL with the user's id
+    return userLinkElement.attr("href").match(/userid=[0-9]+/g)[0].substr("userid=".length); //extract the ID from the url
+}
+
 //fixes the caret's position when applying a style to the editor
 function fixCaret(styleElement)
 {
@@ -3200,6 +3323,43 @@ function checkThreadExistsQuickAccess(id)
         }
     }
     return false;
+}
+
+//update the title of the thread if it was changed
+function updateQuickAccessTitle(prefix, title, id)
+{
+    chrome.storage.sync.get("settings", function (data)
+    {
+        settings = data.settings; //update to the newest settings
+
+        var changed = false;
+
+        //search and update 
+        for (var i = 0; i < settings.quickAccessThreads.length && !changed; i++)
+        {
+            if (settings.quickAccessThreads[i].threadId == id)
+            {
+                //update titles
+                if (settings.quickAccessThreads[i].prefix != prefix)
+                {
+                    settings.quickAccessThreads[i].prefix = prefix;
+                    changed = true;
+                }
+                if (settings.quickAccessThreads[i].title != title)
+                {
+                    settings.quickAccessThreads[i].title = title;
+                    changed = true;
+                }
+            }
+        }
+
+        //save if something changed
+        if (changed)
+        {
+            chrome.storage.sync.set({ "settings": settings });
+            debug.info("updated thread's title in quick access");
+        }
+    });
 }
 
 //remove a thread from quick access
@@ -3704,34 +3864,37 @@ function openPopupWindow(id, img, title, content, additionalClass)
         $("body").append($("<div>", {id: "popupBox"}));
     }
 
-    $("body").append($("<div>", { class: "dimScreen", id: "dim_" + id }).click(function ()
+    //do not open a popup if one already exists
+    if ($(".popupContainer").length == 0)
     {
-        removePopupWindow(id);
-    }));
+        $("body").append($("<div>", { class: "dimScreen", id: "dim_" + id }).click(function ()
+        {
+            removePopupWindow(id);
+        }));
 
-    var popup =
-        $("<div>", { class: "popupContainer", id: id }).append(
-            $("<div>", { class: "popupTop" }).append(
-                $("<div>", { class: "popupImg" }).append(
-                    $("<img>", { src: img })
-                )
+        var popup =
+            $("<div>", { class: "popupContainer", id: id }).append(
+                $("<div>", { class: "popupTop" }).append(
+                    $("<div>", { class: "popupImg" }).append(
+                        $("<img>", { src: img })
+                    )
+                ).append(
+                    $("<div>", { class: "popupTitle" }).append(title)
+                    )
             ).append(
-                $("<div>", { class: "popupTitle" }).append(title)
-                )
-        ).append(
-            $("<div>", { class: "popupBottom" }).append(content)
-            );
+                $("<div>", { class: "popupBottom" }).append(content)
+                );
 
-    if (additionalClass)
-        popup.addClass(additionalClass);
+        if (additionalClass)
+            popup.addClass(additionalClass);
 
-    $("#popupBox").append(popup);
+        $("#popupBox").append(popup);
 
-    $("#dim_" + id).fadeIn(300, function ()
-    {
-        $("#" + id).show();
-    });
-
+        $("#dim_" + id).fadeIn(300, function ()
+        {
+            $("#" + id).show();
+        });
+    }
 }
 
 //removes completely a popup window

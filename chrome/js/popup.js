@@ -79,7 +79,7 @@ var factorySettings =
         quickAccessThreads: [
             {
                 prefix: "פרסום|",
-                title: "+FxPlus - תוסף לכרום",
+                title: "+FxPlus - תוסף לכרום ופיירפוקס",
                 authorId: 967488,
                 threadId: 16859147
             }
@@ -326,7 +326,7 @@ function addExtraNotifications(sent, complete, pmCount, tracked)
         {
             var pmNotification = $("<div>", { id: "del_noti" }).append(
                         $("<a>", {
-                            href: "https://www.fxp.co.il/private.php",
+                            href: "https://www.fxp.co.il/chat.php",
                             target: "_blank",
                             style: "text-align: center"
                         }).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) })

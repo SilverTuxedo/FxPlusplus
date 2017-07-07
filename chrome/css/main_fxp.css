@@ -14,7 +14,6 @@
    limitations under the License.
 */
 
-
 .whiteSpoiler {
     color: #000;
     background-color: #000;
@@ -290,6 +289,7 @@
     color: red;
     display: inline-block;
     margin-right: 0.5em;
+    cursor: pointer;
 }
 
 .thumbnailReadtime {
@@ -377,7 +377,7 @@
         opacity: 1;
     }
 
-    .hiddenPostbit .userinfo_noavatar {
+    .hiddenPostbit .userinfo {
         cursor: pointer;
     }
 
@@ -871,6 +871,23 @@ a.qTitle, a.qAuthor, span.qUnread {
     color: #ff0505;
 }
 
+#view-usernotes-content {
+    padding-bottom: 2em;
+    background: #fff;
+}
+
+textarea.userNotesEditor {
+    display: block;
+    min-height: 11em;
+    width: 100%;
+    margin: 11px 0px;
+    background: #fff3a2;
+    font-weight: bold;
+    font-family: Tahoma;
+    color: #353531;
+    border: 1px solid #dec207;
+    border-radius: 0;
+}
 
 /*
 CSS loader from SpinKit: http://tobiasahlin.com/spinkit/

@@ -34,11 +34,13 @@ chrome.storage.sync.get("settings", function (data)
         
         var userId = getUserIdFromLink($(".user-name a").attr("href"));
 
+        //add the balloon to edit the subnick in the settings
         $(".profile div.user-title").attr({ "data-balloon": "לחץ כדי לערוך בהגדרות", "data-balloon-pos": "down"}).css("cursor", "pointer").click(function ()
         {
             window.open(chrome.extension.getURL("html/settings.html") + "?userFilter=" + userId);
         });
 
+        //apply subnick filters
         if (settings.commentFilters)
         {
             for (var i = 0; i < settings.commentFilters.length; i++)
