@@ -107,13 +107,15 @@
                     <span class="optionDesc">שחזר הגדרות ישנות</span>
                 </li>
             </ul>
-            <div id="savedIndicator">
-                <span class="mdi mdi-check savedIndicatorLogo"></span><br />
-                השינויים נשמרו.
-            </div>
-            <div id="resetIndicator">
-                <span class="mdi mdi-undo-variant savedIndicatorLogo"></span><br />
-                השינויים בוטלו.
+            <div id="indicatorsContainer">
+                <div id="savedIndicator">
+                    <span class="mdi mdi-check savedIndicatorLogo"></span><br />
+                    השינויים נשמרו.
+                </div>
+                <div id="resetIndicator">
+                    <span class="mdi mdi-undo-variant savedIndicatorLogo"></span><br />
+                    השינויים בוטלו.
+                </div>
             </div>
         </div>
 
@@ -435,6 +437,23 @@
                         </div>
                     </div>
                     <br /><br />
+                    <div style="display: inline-flex;">
+                        <div class="optionToggle">
+                            <div class="switch"><input type="checkbox" id="styleQuickComment" /><label for="styleQuickComment"></label></div>
+                        </div>
+                        עצב גם את התגובה הצמודה באשכולות
+                    </div>
+                    <br />
+                    <div style="display: inline-flex;"
+                         data-balloon="לתשומת לבך: בשליחת הודעה פרטית חדשה ניתן לעצב רק את ההדגשה, הקו התחתון והצבע של הטקסט. בצ'אט עצמו כל האפשרויות זמינות."
+                         data-balloon-pos="left"
+                         data-balloon-length="large">
+                        <div class="optionToggle">
+                            <div class="switch"><input type="checkbox" id="stylePrivateChat" /><label for="stylePrivateChat"></label></div>
+                        </div>
+                        עצב גם את הצ'אט הפרטי
+                    </div>
+                    <br/>
                     <div class="button blue saveSettings" data-category="comments">שמור שינויים</div>
                     <div class="button clearGray resetChanges" data-category="commentStyle">בטל</div>
                 </div>

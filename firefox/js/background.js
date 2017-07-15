@@ -66,6 +66,8 @@ var factorySettings =
         ],
         customDefaultStyle: {
             active: false,
+            activeQuickComment: false,
+            activePrivateChat: false,
             bold: false,
             italic: false,
             underline: false,

@@ -22,6 +22,8 @@
 var num = 0;
 var num2 = 0;
 
+var fxpDomain = "https://www.fxp.co.il/"
+
 //if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
 {
@@ -79,6 +81,8 @@ var factorySettings =
         ],
         customDefaultStyle: {
             active: false,
+            activeQuickComment: false,
+            activePrivateChat: false,
             bold: false,
             italic: false,
             underline: false,
@@ -213,7 +217,7 @@ $("#tipIcon").click(function ()
 function userIdByName(name, callback)
 {
     if (name != "")
-        httpGetAsync("https://www.fxp.co.il/member.php?username=" + name, function (response)
+        httpGetAsync(fxpDomain + "member.php?username=" + name, function (response)
         { //request user's page
             var doc = $(domParser.parseFromString(response, "text/html"));
             var userLinkElement = doc.find("a[href*='userid='"); //look for a URL with the user's id
@@ -263,7 +267,7 @@ function userNameById(id, callback)
     {
         if (globalKnownIds[id] == undefined)
         { //user's name is not already known
-            httpGetAsync("https://www.fxp.co.il/member.php?u=" + id, function (response)
+            httpGetAsync(fxpDomain + "member.php?u=" + id, function (response)
             { //request user's page
                 var doc = $(domParser.parseFromString(response, "text/html"));
                 var userName = doc.find("#userinfo .member_username").text().trim()
@@ -305,15 +309,45 @@ function updateIdDisplay(element, commonParentSelector)
     {
         if (response.id === null)
         {
-            idElement.text("המשתמש לא נמצא");
+            setIdDisplay(idElement, -1); //not found
         }
         else
         {
-            idElement.text("#" + response.id);
+            setIdDisplay(idElement, response.id);
             element.val(response.name);
         }
     });
 }
+
+//sets the id display and makes sure that there's a href to the user
+function setIdDisplay(idElement, id)
+{
+    if (id == -1) //user was not found
+        idElement.text("המשתמש לא נמצא");
+    else if (id.length == 0) //no id was entered
+        idElement.text("#");
+    else
+        idElement.empty().append(
+            $("<a>", { target: "_blank", href: fxpDomain + "member.php?u=" + id })
+                .text("#" + id)
+        );
+}
+
+//make options depend on other options to be enabled
+function makeOptionDependency(parent, dependArr)
+{
+    parent.change(function ()
+    {
+        for (var i = 0; i < dependArr.length; i++)
+        {
+            $(dependArr[i]).prop("disabled", !parent.prop("checked"));
+        }
+    });
+    parent.change(); //make the function run at least once
+}
+
+makeOptionDependency($("#hidePinned"), ["#hideIncludingRules"]);
+makeOptionDependency($("#enableDefaultStyle"), ["#styleQuickComment", "#stylePrivateChat"]);
 
 var backgroundNames = [
     "sofa",
@@ -451,6 +485,7 @@ $("#optionList li").click(function ()
     changeTab($(this));
 });
 
+
 var customBgButtonPreview = localStorage.getItem("customBgButtonImage");
 if (customBgButtonPreview != null)
 { //show the custom BG image from "cache", since it takes a while to load it from memory
@@ -509,7 +544,7 @@ function loadGeneral(settings)
         $("#automaticCollapse").prop("checked", true);
     }
     $("#enableSpoilers").prop("checked", settings.showSpoilers);
-    $("#hidePinned").prop("checked", settings.hideSticky.active);
+    $("#hidePinned").prop("checked", settings.hideSticky.active).change();
     $("#hidePinnedDays").val(settings.hideSticky.days);
     $("#hideIncludingRules").prop("checked", settings.hideSticky.includingRules);
     $("#showAutoPinned").prop("checked", settings.showAutoPinned);
@@ -634,7 +669,9 @@ function sub_loadCommentFilters(settings)
 function sub_loadDefaultStyle(settings)
 {
     //set style of default style editor
-    $("#enableDefaultStyle").prop("checked", settings.customDefaultStyle.active);
+    $("#enableDefaultStyle").prop("checked", settings.customDefaultStyle.active).change();
+    $("#styleQuickComment").prop("checked", settings.customDefaultStyle.activeQuickComment);
+    $("#stylePrivateChat").prop("checked", settings.customDefaultStyle.activePrivateChat);
 
     if (settings.customDefaultStyle.bold)
         $(".toggleStyle[data-styleaction='bold']").addClass("selected");
@@ -660,7 +697,7 @@ function suggestForumTag(inputElement) {
     var search = inputElement.val().trim();
     if (search.length > 0) {
         $.ajax({
-            url: 'https://www.fxp.co.il/ajax.php',
+            url: fxpDomain + 'ajax.php',
             dataType: "json",
             data: {
                 do: 'forumdisplayqserach',
@@ -1064,6 +1101,8 @@ $(".saveSettings").click(function ()
         { //save settings in comments
             //style of default style editor
             settings.customDefaultStyle.active = $("#enableDefaultStyle").prop("checked");
+            settings.customDefaultStyle.activeQuickComment = $("#styleQuickComment").prop("checked");
+            settings.customDefaultStyle.activePrivateChat = $("#stylePrivateChat").prop("checked");
 
             settings.customDefaultStyle.bold = $(".toggleStyle[data-styleaction='bold']").hasClass("selected");
             settings.customDefaultStyle.italic = $(".toggleStyle[data-styleaction='italic']").hasClass("selected");
@@ -1212,7 +1251,7 @@ function addUserCard(id, subnick, subnickStyle, hideSignature, disableStyle, hid
     userNameById(id, function (userName)
     {
         card.find("input.username").val(userName); //set the username
-        card.find(".userNumber").text("#" + id);
+        setIdDisplay(card.find(".userNumber"), id);
         card.find("input.subnick").val(subnick)
             .css({ color: subnickStyle.color, fontSize: subnickStyle.size * 1.2 + "px" }); //set the subnick
         card.find(".styleSubnick").css("color", subnickStyle.color); //set color of editor opener
@@ -1324,7 +1363,7 @@ function addStyleThreadsRow(type, selector, validation, action)
     if (type == "user")
     {
         row.find("input[name=username]").val(selector.name);
-        row.find(".userNumber").text("#" + selector.id);
+        setIdDisplay(row.find(".userNumber"), selector.id);
         $("#StyleThreadsUser").append(row);
     }
     else

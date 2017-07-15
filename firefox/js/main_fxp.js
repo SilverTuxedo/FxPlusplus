@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "הערות משתמשים חוזרות! בנוסף לכך, כמה תיקונים ושינויים להתראות והגישה המהירה.";
-var versionBig = true;
-var versionHref = "https://fxplusplus.blogspot.com/2017/07/120.html";
+var versionDescription = "שינויים לעיצוב תגובות אוטומטית, להצצה לאשכולות, ולהגדרות";
+var versionBig = false;
+var versionHref = "https://fxplusplus.blogspot.com/2017/07/121.html";
 
 var factorySettings =
     {
@@ -70,6 +70,8 @@ var factorySettings =
         ],
         customDefaultStyle: {
             active: false,
+            activeQuickComment: false,
+            activePrivateChat: false,
             bold: false,
             italic: false,
             underline: false,
@@ -762,6 +764,9 @@ chrome.storage.sync.get("settings", function (data)
                                 checkNewComments(addedThread);
                             }
 
+                            //fix minithreads
+                            fixMinithreadOrdring();
+
                             if (settings.readtime.activePrefixes.length > 0) //calculate read time of new thread if needed
                             {
                                 var threadPrefix = addedThread.find(".prefix").text().trim(); //get the prefix of a thread
@@ -1376,6 +1381,7 @@ chrome.storage.sync.get("settings", function (data)
                     }
             })
         });
+
         if ($(".cke_contents iframe").length > 0) //iframe is accessible, observer won't catch it
         {
             var editorFrame = $(".cke_contents iframe");
@@ -1401,6 +1407,13 @@ chrome.storage.sync.get("settings", function (data)
         //observe new iframes that might appear if the user quotes
         if ($(".editor_textbox").length > 0)
             observers.texteditor.observe($(".editor_textbox")[0], { childList: true, subtree: true });
+
+        //apply the observer for styling also to the quick comment minimal editor, if possible
+        if (settings.customDefaultStyle.active && settings.customDefaultStyle.activeQuickComment)
+        {
+            if ($(".chat-text-input .send-element div#input-textarea").length > 0)
+                observers.insideEditor.observe($(".chat-text-input .send-element div#input-textarea")[0], { childList: true });
+        }
 
         //shortcut to toggle night mode
         if (settings.nightmodeShortcut)
@@ -3235,6 +3248,22 @@ function fixCaret(styleElement)
     debug.info("caret moved");
 }
 
+//fixes the ordering of minithreads so each minithread appears below its parent
+function fixMinithreadOrdring()
+{
+    var threadId, parent, scrollPos;
+    $(".minithread").each(function ()
+    {
+        //get the thread's id by cutting off the prefix (miniXXXXX)
+        threadId = $(this).attr("id").substr("mini".length);
+        scrollPos = this.scrollTop; //store the scroll position so it doesn't change while the element moves
+        //place after the matching thread (if it's still present)
+        parent = $(".threadbit#thread_" + threadId);
+        if (parent.length > 0)
+            $(this).insertAfter(parent)[0].scrollTop = scrollPos;
+    });
+}
+
 
 //returns a dictionary with [value: count] pairs, sorted in descending order
 function getDupeSortedDictionary(arr)
@@ -3611,7 +3640,8 @@ function cardSlideSteps(cardElement)
                 if (completeAction == "updateVersion")
                 {
                     changeNotificationValue("lastKnownVersion", chrome.runtime.getManifest().version);
-                    chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update Auto" } });
+                    if (cardElement.find(".progressBg.shortAutoClose").length > 0)
+                        chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update Auto" } });
                 }
                 closeBottomCard();
             }, closeAfterMs)

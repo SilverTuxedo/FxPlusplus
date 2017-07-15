@@ -889,6 +889,14 @@ textarea.userNotesEditor {
     border-radius: 0;
 }
 
+div#input-textarea em {
+    font-style: italic;
+}
+
+div#input-textarea strong {
+    font-weight: bold;
+}
+
 /*
 CSS loader from SpinKit: http://tobiasahlin.com/spinkit/
 */

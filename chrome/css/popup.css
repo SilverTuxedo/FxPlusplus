@@ -100,7 +100,7 @@ body {
         border: 0.1em solid #dedede;
         overflow: hidden;
         box-sizing: border-box;
-        transition: background-color 0.3s, border 0.1s;
+        transition: background-color 0.3s, border 0.1s, filter 0.3s, opacity 0.3s;
         cursor: pointer;
     }
 
@@ -132,6 +132,11 @@ body {
     .switch input:checked + label {
         background-color: #b3ffb7;
         border: 0.2em solid #7bfd7b;
+    }
+
+    .switch input:disabled + label {
+        filter: grayscale(1);
+        opacity: 0.6;
     }
 
     .switch.noAnimation label:after, .switch.noAnimation label {
