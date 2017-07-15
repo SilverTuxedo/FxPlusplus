@@ -1,10 +1,10 @@
 ﻿{
   "manifest_version": 2,
-  "name": "FxPlus+ for Chrome",
+  "name": "FxPlus+ for Firefox",
   "short_name": "FxPlus+",
   "author": "SilverTuxedo",
   "description": "מעולם לא היה קל יותר לגלוש ב-FxP.",
-  "version": "1.2.1",
+  "version": "1.2.1a",
 
   "browser": "firefox",
 
