@@ -170,7 +170,7 @@ body {
     background: #e5ed02;
 }
 
-#del_noti {
+.del_noti {
     list-style: none;
     animation: slideIn 0.6s;
     transition: transform 0.2s;
@@ -178,15 +178,15 @@ body {
     filter: blur(0);
 }
 
-    #del_noti:hover {
+    .del_noti:hover {
         transform: scale(0.97);
     }
 
-    #del_noti:active {
+    .del_noti:active {
         transform: scale(0.90);
     }
 
-    #del_noti > a {
+    .del_noti > a {
         display: block;
         color: inherit;
         padding: 0.4em 0.8em;
@@ -195,9 +195,13 @@ body {
         font-size: 1em !important;
     }
 
-    #del_noti p {
+    .del_noti p {
         margin: 0;
         padding: 0;
+    }
+
+    .del_noti img {
+        width: 16px;
     }
 
 

@@ -74,6 +74,7 @@ span.ltr {
 
 #sidebar {
     width: 13em;
+    min-height: 100vh;
     background-color: #2C3238;
     color: #fff;
 }
@@ -162,6 +163,10 @@ span.ltr {
 
 #qnaSect {
     color: #4e9837
+}
+
+#githubSect {
+    color: #7e4bad;
 }
 
 .topBarIcon {

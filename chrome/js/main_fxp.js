@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "שינויים לעיצוב תגובות אוטומטית, להצצה לאשכולות, ולהגדרות";
+var versionDescription = "שינויים ותיקונים להצצה לאשכולות, מצב לילה, התראות ועוד";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2017/07/121.html";
+var versionHref = "https://fxplusplus.blogspot.com/2017/07/123.html";
 
 var factorySettings =
     {
@@ -1705,6 +1705,24 @@ chrome.storage.sync.get("settings", function (data)
                 $("<div>").text("+FxPlus שיפר את דף זה תוך " + elapsed + "ms")
             ));
 
+        //vote for forum alert
+        if (endDate.getMonth() == 7 && endDate.getDate() >= 22 && endDate.getFullYear() == 2017 && localStorage.getItem("clickedToVoteForExt") == null)
+        {
+            $(".toplogedin").prepend(
+                $("<div>", {
+                    class: "logedintop", id: "voteForExtIcon",
+                    "data-balloon": "בואו להצביע לפורום +FxPlus!\nההצבעה עומדת להיסגר.",
+                    "data-balloon-pos": "down"
+                }).append(
+                    $("<a>", { class: "mdi mdi-access-point", href: "https://www.fxp.co.il/showthread.php?t=18291435" }).click(function ()
+                    {
+                        localStorage.setItem("clickedToVoteForExt", "yes");
+                    })
+                    )
+            );
+        }
+
+
         $(".imagefooter").append($("<div>", { id: "cgglass" }));
         var topCgglass = 0.45 * (400 / 1000) * $(".imagefooter").width();
         if (topCgglass + $("#cgglass").height() < 400)
@@ -1850,9 +1868,22 @@ function openQuickAccess()
                                                 if (threadComments[j].id == settings.trackedThreads.list[i].threadId)
                                                 {
                                                     commentNum = settings.trackedThreads.list[i].totalComments - threadComments[j].comments;
+
+                                                    if (commentNum < 0)
+                                                    {
+                                                        //there have been new comments since the last check for new comments
+                                                        //the user may have entered the thread before the check interval had been run
+
+                                                        //update the comment number
+                                                        settings.trackedThreads.list[i].totalComments = threadComments[j].comments;
+                                                        chrome.storage.sync.set({ "settings": settings });
+                                                        console.log("corrected tracked thread number");
+                                                        commentNum = 0;
+                                                    }
                                                     break;
                                                 }
                                             }
+
                                             //update text
                                             if (commentNum == 1)
                                                 $(this).text("תגובה חדשה אחת");
@@ -2039,6 +2070,59 @@ function loadMinithread(threadLink, element, pm)
         }
         else
         {
+            //deal with polls
+            doc.find("#pollinfo").each(function ()
+            {
+                var polltitle = $(this).find(".polltitle").text().trim();
+                //user voted on the poll
+                var options = [];
+                var name, votes;
+                var totalVotes = 0;
+                //find the options and add to the array
+
+                //user did not vote on poll, get stats by results url
+                if ($(this).find("#polloptions li").length > 0)
+                {
+                    var resultsHref = fxpDomain + $(this).find("a[href*='&do=showresults']").attr("href");
+                    httpGetAsync(resultsHref, function (response)
+                    {
+                        var doc = $(domParser.parseFromString(response, "text/html"));
+                        doc.find("#pollresults li").each(function ()
+                        {
+                            if ($(this).find("p").text().length > 0) //if there is a name
+                            {
+                                options.push({
+                                    name: $(this).find("p").text().trim(),
+                                    votes: parseInt($(this).find(".numvotes").text()),
+                                    bars: $(this).find(".pollbarwrapper")
+                                });
+                                totalVotes += parseInt($(this).find(".numvotes").text());
+                            }
+                        });
+                        comments.prepend(buildMiniPoll(polltitle, options, totalVotes, false));
+                        comments.find(".minipoll").slideDown();
+                    });
+                }
+                else
+                {
+                    //all of the stats are available, collect and display
+                    $(this).find("#pollresults li").each(function ()
+                    {
+                        if ($(this).find("p").text().length > 0) //if there is a name
+                        {
+                            options.push({
+                                name: $(this).find("p").text().trim(),
+                                votes: parseInt($(this).find(".numvotes").text()),
+                                bars: $(this).find(".pollbarwrapper")
+                            });
+                            totalVotes += parseInt($(this).find(".numvotes").text());
+                        }
+                    });
+                    comments.prepend(buildMiniPoll(polltitle, options, totalVotes, true));
+                    comments.find(".minipoll").slideDown();
+                }
+               
+            });
             doc.find(".postbit").each(function () //process each thread comment
             {
                 var content = $(this).find(".content");
@@ -2131,6 +2215,57 @@ function buildMiniComment(author, content, likes, link)
         comment.find(".miniUser").append($("<span>", { style: "display: inline-block" }).text("(" + text + ")"));
     }
     return comment;
+}
+
+//helper function that builds a poll for the loadMinithread function
+function buildMiniPoll(title, options, totalVotes, voted)
+{
+    var element =
+        $("<div>", { class: "minipoll" }).append(
+            $("<div>", {class: "minipollTitleContainer"}).append(
+                $("<span>").text("סקר: ")
+            ).append(
+                $("<span>", { style: "font-weight: bold" }).text(title)
+                )
+        ).append(
+            $("<ul>", { class: "minipollOptions" })
+            );
+    var optionsElement = element.find("ul.minipollOptions");
+    var percent;
+    //add options
+    for (var i = 0; i < options.length; i++)
+    {
+        if (options[i].votes)
+        {
+            percent = Math.round(options[i].votes / totalVotes * 10000) / 100; //round to 2 decimal places
+            optionsElement.append(
+                $("<li>").append(
+                    $("<div>", {class: "minipollOptionContainer"}).append(
+                        $("<span>", {class: "voteOption"}).text(options[i].name)
+                    ).append(
+                        $("<div>", { class: "voteBar", style: "width: " + percent +"%; background-color: hsla("+i*110+", 100%, 80%, 1);" }).append(
+                            $("<span>", {class: "voteCount"}).text(options[i].votes + " הצבעות (" + percent + "%)")
+                        )
+                    )
+                )
+            );
+        }
+        else
+        {
+            optionsElement.append(
+                $("<li>").text(options[i].name)
+            );
+        }
+    }
+
+    if (!voted)
+    {
+        element.append($("<div>", { class: "voteStatusFooter" }).text("עוד לא הצבעת בסקר זה."));
+    }
+
+    element.hide();
+
+    return element;
 }
 
 //GET http function
@@ -3259,8 +3394,10 @@ function fixMinithreadOrdring()
         scrollPos = this.scrollTop; //store the scroll position so it doesn't change while the element moves
         //place after the matching thread (if it's still present)
         parent = $(".threadbit#thread_" + threadId);
+        
         if (parent.length > 0)
-            $(this).insertAfter(parent)[0].scrollTop = scrollPos;
+            if (parent.index() != $(this).index() - 1) //check if reordering is really necessary
+                $(this).insertAfter(parent)[0].scrollTop = scrollPos;
     });
 }
 

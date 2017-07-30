@@ -266,15 +266,13 @@ function asyncLoop(iterations, func, callback)
 }
 
 //sends a (simple) notification
-function sendNotification(title, message, url, icon)
+function sendNotification(title, message, url)
 {
-    if (icon == undefined || icon.length == 0)
-        icon == '../images/notificationImg.png';
 
     var randomId = Math.random().toString(36).substr(2, 10); //generates a random 10 character id
     chrome.notifications.create(randomId, {
         type: 'basic',
-        iconUrl: icon,
+        iconUrl: '../images/notificationImg.png',
         title: title,
         message: message,
         isClickable: true

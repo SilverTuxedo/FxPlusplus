@@ -114,6 +114,8 @@ $("#settingsLink").attr("href", chrome.extension.getURL("html/settings.html")).c
     chrome.runtime.sendMessage({ event: { cat: "Click", type: "Settings popup" } });
 });
 
+var newNotificationSelector = 'a[style*="background-color:"]';
+
 var updateBadge = true;
 
 var settings;
@@ -180,7 +182,7 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
                 $("<div>", { class: "counterName" }).text("אתה לא מחובר ל-FxP.")
             )
         );
-        $("#notifications").append($("<div>", { id: "del_noti" }).append(
+        $("#notifications").append($("<div>", { class: "del_noti" }).append(
                         $("<a>", {
                             href: "https://www.fxp.co.il/",
                             target: "_blank",
@@ -226,7 +228,7 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
 
                             var doc = $(domParser.parseFromString(response, "text/html"));
 
-                            doc.find('a[style*="background-color: #fafe8a"]').parent().each(function ()
+                            doc.find(newNotificationSelector).parent().each(function ()
                             {
                                 formatNoti($(this));
                                 $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
@@ -247,7 +249,7 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
 
                             var doc = $(domParser.parseFromString(response, "text/html"));
 
-                            doc.find('a[style*="background-color: #fafe8a"]').parent().each(function ()
+                            doc.find(newNotificationSelector).parent().each(function ()
                             {
                                 formatNoti($(this));
                                 $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
@@ -308,9 +310,13 @@ function addHttpsToImage(img)
 //formats the notification element returned by FXP to fit the popup
 function formatNoti(element)
 {
-    element.find("img").each(function () { addHttpsToImage($(this)); });
+    element.find("img").each(function ()
+    {
+        addHttpsToImage($(this)); //add https to the images so they're visible outside of the fxp domain
+        $(this).parents("span").css("top", "8px"); //fix alignment of image
+    });
     var href;
-    element.find("a").each(function ()
+    element.find("a").css("background-color", "").each(function ()
     {
         href = $(this).attr("href");
         $(this).attr("href", fxpDomain + href);
@@ -318,7 +324,7 @@ function formatNoti(element)
     })
 }
 
-//adds the new pm notification if all requests have been completed
+//adds the new pm notification and tracked threads notification if all requests have been completed
 function addExtraNotifications(sent, complete, pmCount, tracked)
 {
     console.log(sent + " " + complete + " " + pmCount);
@@ -326,7 +332,7 @@ function addExtraNotifications(sent, complete, pmCount, tracked)
     {
         if (pmCount > 0)
         {
-            var pmNotification = $("<div>", { id: "del_noti" }).append(
+            var pmNotification = $("<div>", { class: "del_noti" }).append(
                         $("<a>", {
                             href: "https://www.fxp.co.il/chat.php",
                             target: "_blank",
@@ -352,21 +358,21 @@ function addExtraNotifications(sent, complete, pmCount, tracked)
 
                     if (tracked[i].newComments < 2)
                     {
-                        additional = " הגיב באשכול ";
+                        additional = " הגיב באשכול במעקב ";
                     }
                     else if (tracked[i].newComments == 2)
                     {
-                        additional = " ומשתמש נוסף הגיבו באשכול ";
+                        additional = " ומשתמש נוסף הגיבו באשכול במעקב ";
                     }
                     else
                     {
-                        additional = " ו-" + (tracked[i].newComments - 1) + " משתמשים נוספים הגיבו באשכול ";
+                        additional = " ו-" + (tracked[i].newComments - 1) + " משתמשים נוספים הגיבו באשכול במעקב ";
                     }
 
                     notification =
-                        $("<div>", { id: "del_noti" }).append(
-                            $("<span>", { style: "position: relative;float: right;clear: left;top: 12px;padding-right: 3px;" }).append(
-                                $("<img>", { src: "https://images.fxp.co.il/guy/c3.png" })
+                        $("<div>", { class: "del_noti" }).append(
+                            $("<span>", { style: "position: relative;float: right;clear: left;top: 8px;padding-right: 3px;" }).append(
+                                $("<img>", { src: chrome.extension.getURL("images/comments.svg") })
                             )
                         ).append($("<a>", {
                             href: tracked[i].url,

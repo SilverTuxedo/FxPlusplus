@@ -56,8 +56,20 @@
     height: 31px;
 }
 
-.hideThread a, .hideThread em {
-    color: #d5d5d5;
+.hideThread a:not(.understate), .hideThread em, .hideThread .typetext {
+    color: #d5d5d5 !important;
+}
+
+.hideThread .live-typing {
+    font-size: 10px;
+}
+
+.hideThread .live-typing img {
+    height: 15px;
+}
+
+.hideThread .threadstats {
+    opacity: 0.3;
 }
 
 .hideThread img, .hideThread .threadstatus {
@@ -896,6 +908,71 @@ div#input-textarea em {
 div#input-textarea strong {
     font-weight: bold;
 }
+
+.minipoll {
+    box-sizing: border-box;
+    padding: 10px 10px 15px;
+    background: rgb(243, 250, 255);
+}
+
+.minipollOptions {
+    padding: 0 1.5em;
+}
+
+    .minipollOptions li {
+        display: list-item;
+        list-style: circle;
+    }
+
+.minipollTitleContainer {
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 0.5em;
+}
+
+.minipollOptionContainer {
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    position: relative;
+}
+
+.voteOption {
+    position: relative;
+    z-index: 2;
+}
+
+.voteBar {
+    position: absolute;
+    left:0;
+    top:0;
+    height: 100%;
+}
+
+.voteCount {
+    font-weight: bold;
+    padding: 0 0.5em;
+    box-sizing: border-box;
+    height: 1em;
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.voteStatusFooter {
+    text-align: center;
+    font-size: 0.8em;
+}
+
+#voteForExtIcon {
+    margin-top: -1px;
+}
+
+    #voteForExtIcon a {
+        font-size: 16px;
+        color: gold;
+    }
 
 /*
 CSS loader from SpinKit: http://tobiasahlin.com/spinkit/

@@ -408,17 +408,6 @@ function confirmLeave()
 }
 window.onbeforeunload = confirmLeave;
 
-//set sidebar length according to window
-function setSidebarMinLength()
-{
-    $("#sidebar").css("min-height", window.innerHeight);
-}
-
-$(window).resize(function ()
-{
-    setSidebarMinLength();
-});
-setSidebarMinLength();
 
 //elements that are usually animated but shouldn't be when switching tabs
 var animatedElements = [
