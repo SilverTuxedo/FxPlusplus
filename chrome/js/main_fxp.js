@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "שינויים ותיקונים להצצה לאשכולות, מצב לילה, התראות ועוד";
+var versionDescription = "הפונט Open Sans Hebrew נוסף לעיצוב תגובות אוטומטית";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2017/07/123.html";
+var versionHref = "https://fxplusplus.blogspot.com/2017/08/125.html";
 
 var factorySettings =
     {
@@ -1706,21 +1706,21 @@ chrome.storage.sync.get("settings", function (data)
             ));
 
         //vote for forum alert
-        if (endDate.getMonth() == 7 && endDate.getDate() >= 22 && endDate.getFullYear() == 2017 && localStorage.getItem("clickedToVoteForExt") == null)
-        {
-            $(".toplogedin").prepend(
-                $("<div>", {
-                    class: "logedintop", id: "voteForExtIcon",
-                    "data-balloon": "בואו להצביע לפורום +FxPlus!\nההצבעה עומדת להיסגר.",
-                    "data-balloon-pos": "down"
-                }).append(
-                    $("<a>", { class: "mdi mdi-access-point", href: "https://www.fxp.co.il/showthread.php?t=18291435" }).click(function ()
-                    {
-                        localStorage.setItem("clickedToVoteForExt", "yes");
-                    })
-                    )
-            );
-        }
+        //if (endDate.getMonth() == 7 && endDate.getDate() >= 22 && endDate.getFullYear() == 2017 && localStorage.getItem("clickedToVoteForExt") == null)
+        //{
+        //    $(".toplogedin").prepend(
+        //        $("<div>", {
+        //            class: "logedintop", id: "voteForExtIcon",
+        //            "data-balloon": "בואו להצביע לפורום +FxPlus!\nההצבעה עומדת להיסגר.",
+        //            "data-balloon-pos": "down"
+        //        }).append(
+        //            $("<a>", { class: "mdi mdi-access-point", href: "https://www.fxp.co.il/showthread.php?t=18291435" }).click(function ()
+        //            {
+        //                localStorage.setItem("clickedToVoteForExt", "yes");
+        //            })
+        //            )
+        //    );
+        //}
 
 
         $(".imagefooter").append($("<div>", { id: "cgglass" }));

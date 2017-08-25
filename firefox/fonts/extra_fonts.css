@@ -3,37 +3,36 @@
 
 /* hebrew */
 @font-face {
-  font-family: 'Assistant';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Assistant'), local('Assistant-Regular'), url(Assistant-Regular-Hebrew.woff2) format('woff2');
-  unicode-range: U+0590-05FF, U+20AA, U+25CC, U+FB1D-FB4F;
+    font-family: 'Assistant';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Assistant'), local('Assistant-Regular'), url(Assistant-Regular-Hebrew.woff2) format('woff2');
+    unicode-range: U+0590-05FF, U+20AA, U+25CC, U+FB1D-FB4F;
 }
 /* latin */
 @font-face {
-  font-family: 'Assistant';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Assistant'), local('Assistant-Regular'), url(Assistant-Regular-Latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+    font-family: 'Assistant';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Assistant'), local('Assistant-Regular'), url(Assistant-Regular-Latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 }
 /* hebrew */
 @font-face {
-  font-family: 'Assistant';
-  font-style: normal;
-  font-weight: 600;
-  src: local('Assistant SemiBold'), local('Assistant-SemiBold'), url(Assistant-SemiBold-Hebrew.woff2) format('woff2');
-  unicode-range: U+0590-05FF, U+20AA, U+25CC, U+FB1D-FB4F;
+    font-family: 'Assistant';
+    font-style: normal;
+    font-weight: 600;
+    src: local('Assistant SemiBold'), local('Assistant-SemiBold'), url(Assistant-SemiBold-Hebrew.woff2) format('woff2');
+    unicode-range: U+0590-05FF, U+20AA, U+25CC, U+FB1D-FB4F;
 }
 /* latin */
 @font-face {
-  font-family: 'Assistant';
-  font-style: normal;
-  font-weight: 600;
-  src: local('Assistant SemiBold'), local('Assistant-SemiBold'), url(Assistant-SemiBold-Latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+    font-family: 'Assistant';
+    font-style: normal;
+    font-weight: 600;
+    src: local('Assistant SemiBold'), local('Assistant-SemiBold'), url(Assistant-SemiBold-Latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 }
-
 
 /* RANCHO */
 @font-face {
@@ -42,4 +41,69 @@
     font-weight: 400;
     src: local('Rancho'), url(rancho.woff2) format('woff2');
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+/* ALMONI-DL */
+@font-face {
+    font-family: 'almoni-dl';
+    font-weight: 300;
+    font-style: normal;
+    src: url(almoni-dl-aaa-300x.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'almoni-dl';
+    font-weight: 400;
+    font-style: normal;
+    src: url(almoni-dl-aaa-400x.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'almoni-dl';
+    font-weight: 700;
+    font-style: normal;
+    src: url(almoni-dl-aaa-700x.woff) format('woff');
+}
+
+/* OPEN SANS */
+@font-face {
+    font-family: 'Open Sans Hebrew';
+    font-style: italic;
+    font-weight: 300;
+    src: url(OpenSansHebrew-LightItalic.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans Hebrew';
+    font-style: normal;
+    font-weight: 300;
+    src: url(OpenSansHebrew-Light.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans Hebrew';
+    font-style: italic;
+    font-weight: 400;
+    src: url(OpenSansHebrew-Italic.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans Hebrew';
+    font-style: normal;
+    font-weight: 400;
+    src: url(OpenSansHebrew-Regular.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans Hebrew';
+    font-style: italic;
+    font-weight: 700;
+    src: url(OpenSansHebrew-BoldItalic.woff) format('woff');
+}
+
+@font-face {
+    font-family: 'Open Sans Hebrew';
+    font-style: normal;
+    font-weight: 700;
+    src: url(OpenSansHebrew-Bold.woff) format('woff');
 }
