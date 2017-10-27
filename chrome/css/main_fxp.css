@@ -419,7 +419,8 @@
 
 #nightmodeShortcut {
     position: absolute;
-    right: 1em;
+    z-index: 100000;
+    right: 4em;
     top: 0;
     width: 2em;
     height: 2.5em;
@@ -428,7 +429,6 @@
     border-bottom-right-radius: 0.5em;
     background-color: white;
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
-    z-index: 121;
     background-size: 80%;
     background-position: center;
     background-repeat: no-repeat;

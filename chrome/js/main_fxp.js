@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "הפונט Open Sans Hebrew נוסף לעיצוב תגובות אוטומטית";
+var versionDescription = "קיצור הדרך למצב לילה הוסתר על-ידי תפריט הנגישות";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2017/08/125.html";
+var versionHref = "https://fxplusplus.blogspot.co.il/2017/10/126.html";
 
 var factorySettings =
     {
