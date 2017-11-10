@@ -17,86 +17,9 @@
  
 "use strict";
 
-var versionDescription = "קיצור הדרך למצב לילה הוסתר על-ידי תפריט הנגישות";
-var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.co.il/2017/10/126.html";
-
-var factorySettings =
-    {
-        backgroundNotifications: true,
-        resizeSignatures: false,
-        trackUnreadComments: true,
-        peekCloseMethod: "double",
-        showSpoilers: true,
-        hideSuggested: false,
-        classicIcons: false,
-        nightmodeShortcut: true,
-        showForumStats: true,
-        hideSticky: {
-            active: false,
-            includingRules: false,
-            days: 14
-        },
-        showAutoPinned: false,
-        autoNightmode: {
-            active: false,
-            start: "17:05",
-            end: "23:30"
-        },
-        readtime: {
-            speed: 220,
-            activePrefixes: ["מדריך"],
-            newsForums: true
-        },
-        threadFilters: {
-            users: [
-            ],
-            keywords: [
-            ],
-            filterSticky: false
-        },
-        commentFilters: [
-            {
-                id: 967488,
-                subnick: {
-                    value: "היוצר של +FxPlus",
-                    color: "#00afff",
-                    size: 11
-                },
-                hideSignature: false,
-                disableStyle: false,
-                hideComments: false
-            }
-        ],
-        customDefaultStyle: {
-            active: false,
-            activeQuickComment: false,
-            activePrivateChat: false,
-            bold: false,
-            italic: false,
-            underline: false,
-            font: "Arial",
-            color: "#333333"
-        },
-        customBg: {
-            day: "",
-            night: ""
-        },
-        quickAccessThreads: [
-            {
-                prefix: "פרסום|",
-                title: "+FxPlus - תוסף לכרום ופיירפוקס",
-                authorId: 967488,
-                threadId: 16859147
-            }
-        ],
-        trackedThreads: {
-            list: [
-            ],
-            refreshRate: 15,
-            lastRefreshTime: 0
-        }
-    };
+var versionDescription = "הסתירו את ההקלדות שלכם ושנו את גודל הטקסט אוטומטית - כל זאת ועוד בגרסה 1.3.0!";
+var versionBig = true;
+var versionHref = "https://fxplusplus.blogspot.com/2017/11/130.html";
 
 var defaultNotes = [
     { id: 967488, content: "רק דברים טובים" },
@@ -231,31 +154,6 @@ var settings;
 chrome.storage.sync.get("settings", function (data)
 { //get settings
     settings = data.settings || {};
-    //make sure settings has values
-    var settingsReset = false;
-    for (var prop in factorySettings)
-    {
-        if (settings.hasOwnProperty(prop))
-        {
-            if (settings[prop] === null)
-            { //no value for the settings key
-                settings[prop] = factorySettings[prop];
-                settingsReset = true;
-                console.warn(prop + ": value has been reset");
-            }
-        }
-        else
-        { //no settings key
-            settings[prop] = factorySettings[prop];
-            settingsReset = true;
-            console.warn(prop + ": value has been reset");
-        }
-    }
-    if (settingsReset) //save changes (if any)
-        chrome.storage.sync.set({ "settings": settings });
-
-
-
 
     readTimeSpeed = settings.readtime.speed;
 
@@ -329,19 +227,19 @@ chrome.storage.sync.get("settings", function (data)
         addStyle(styleStr);
     }
 
+    //hide the accessibility menu
+    if (settings.hideAccessibilityMenu)
+    {
+        addStyle(".nagish-button { display: none; }");
+    }
+
     $(document).ready(function ()
     { //DOM is ready for manipulation
         debug.info("Page ready");
 
         var beginDate = new Date();
 
-        //$("body").append($("<div>", { style: "position: fixed; bottom: 0; left: 0; background: green; padding: 12px" })
-        //    .append($("<button>").text("DEBUG").click(
-        //    function ()
-        //    {
-        //        updateKnownIds("967488", "aaaaaaaa");
-        //    }
-        //    )))
+        
 
         //add helper for night mode to determine where the personal category is
         $(".fav_div").parent().addClass("personalCategoryHelper");
@@ -445,14 +343,6 @@ chrome.storage.sync.get("settings", function (data)
                         if (hideSticky)
                         {
                             $(this).addClass("hiddenSticky");
-                            //$(this).attr("data-realheight", getActualHeight($(this)) + "px").addClass("hiddenSticky").css("height", "4px"); //size down the sticky and keep the original height
-                            //$(this).hover(function ()
-                            //{
-                            //    $(this).css("height", $(this).attr("data-realheight")); //change to full height when hovering
-                            //}, function ()
-                            //{
-                            //    $(this).css("height", "4px"); //return to small size when not hovering
-                            //})
                         }
                     }
                 });
@@ -1270,6 +1160,10 @@ chrome.storage.sync.get("settings", function (data)
             {
                 styleElements.push($("<span>", { style: "color:" + styleProp.color }));
             }
+            if (styleProp.size != 2) //disable if the size is the default size
+            {
+                styleElements.push($("<font>", { size: styleProp.size }));
+            }
             if (styleProp.underline)
             {
                 styleElements.push($("<u>"));
@@ -1489,6 +1383,13 @@ chrome.storage.sync.get("settings", function (data)
             }
         }
 
+        //hide typing from other users
+        if (settings.disableLiveTyping)
+        {
+            debug.info("disableLiveTyping is enabled");
+            injectScript("js/disable_typing.js");
+        }
+
         //add easy credit to signature
         if (window.location.href.search("editsignature") > -1 || window.location.href.search("updatesignature") > -1)
         {
@@ -1589,104 +1490,6 @@ chrome.storage.sync.get("settings", function (data)
         
 
 
-        //var threadForm = $("form[action^='newthread.php']");
-        //if (threadForm.length > 0) //there is a form for creating a new thread, add the template interface
-        //{
-        //    //build the interface and append
-        //    var section = $("<div>", { class: "section templateInterface" }).append(
-        //            $("<div>", { class: "templateNameContainer" }).append(
-        //                $("<span>", { "data-balloon": "שמור אשכול זה", "data-balloon-pos": "right", class: "balloonNoBorder" }).append(
-        //                    $("<div>", { id: "saveTemplateBtn", class: "material-icons" }).text("save")
-        //                )
-        //            ).append(
-        //                $("<input>", { id: "templateNameInput" })
-        //            )
-        //        ).append(
-        //                $("<div>", { id: "templateList" })
-        //            );
-        //    threadForm.find(".blockbody.formcontrols").append(section);
-
-        //    //update template name to the title on first focus out
-        //    $("input#subject").one("focusout", function ()
-        //    {
-        //        $("#templateNameInput").val($(this).val());
-        //    });
-
-        //    //save template when save is clicked
-        //    $("#saveTemplateBtn").click(function ()
-        //    {
-        //        if ($("#templateNameInput").val().length > 0)
-        //        {
-        //            var html = $(".cke_contents iframe").contents().find("body").html();
-        //            var name = $("#templateNameInput").val();
-
-        //            chrome.storage.local.get("threadTemplates", function (data)
-        //            {
-        //                var threadTemplates = data.threadTemplates || [];
-
-        //                //remove duplicates
-        //                for (var i = 0; i < threadTemplates.length; i++)
-        //                {
-        //                    if (threadTemplates[i].name = name)
-        //                    {
-        //                        threadTemplates[i].splice(i, 1);
-        //                        i--;
-        //                    }
-        //                }
-        //                //push new style
-        //                threadTemplates.push({ name: name, html: html });
-
-        //                chrome.storage.local.set({ "threadTemplates": threadTemplates }, function ()
-        //                {
-        //                    alert("saved");
-        //                })
-        //            });
-        //        }
-        //    });
-
-        //    chrome.storage.local.get("threadTemplates", function (data)
-        //    {
-        //        var threadTemplates = data.threadTemplates || [{ name: "test", html: "test" }, { name: "test2", html: "test2" }];
-        //        var option;
-        //        for (var i = 0; i < threadTemplates.length; i++)
-        //        {
-        //            option = $("<div>", { class: "option" }).append(
-        //                    $("<div>", { class: "optionName" }).text(threadTemplates[i].name)
-        //                );
-
-        //            $("#templateList").append(option);
-        //        }
-
-        //        //clicked on an option
-        //        $("#templateList .optionName").click(function ()
-        //        {
-        //            var name = $(this).text();
-        //            console.log("name: " + name);
-        //            chrome.storage.local.get("threadTemplates", function (data)
-        //            {
-        //                var threadTemplates = data.threadTemplates || [];
-        //                var html = "";
-        //                for (var i = 0; i < threadTemplates.length; i++)
-        //                {
-        //                    if (threadTemplates[i].name == name)
-        //                    {
-        //                        html = threadTemplates[i].html;
-        //                        console.log("found html");
-        //                        break;
-        //                    }
-        //                }
-
-        //                var parsedHtml = domParser.parseFromString(html, "text/html");
-
-        //                var editor = $(".cke_contents iframe").contents().find("body");
-        //                console.log("found editor: " + editor.length);
-        //                editor.empty().append(parsedHtml);
-        //            });
-        //        });
-        //    })
-        //}
-
-
         handleRatingSuggestion();
 
         setTimeout(function ()
@@ -1705,23 +1508,7 @@ chrome.storage.sync.get("settings", function (data)
                 $("<div>").text("+FxPlus שיפר את דף זה תוך " + elapsed + "ms")
             ));
 
-        //vote for forum alert
-        //if (endDate.getMonth() == 7 && endDate.getDate() >= 22 && endDate.getFullYear() == 2017 && localStorage.getItem("clickedToVoteForExt") == null)
-        //{
-        //    $(".toplogedin").prepend(
-        //        $("<div>", {
-        //            class: "logedintop", id: "voteForExtIcon",
-        //            "data-balloon": "בואו להצביע לפורום +FxPlus!\nההצבעה עומדת להיסגר.",
-        //            "data-balloon-pos": "down"
-        //        }).append(
-        //            $("<a>", { class: "mdi mdi-access-point", href: "https://www.fxp.co.il/showthread.php?t=18291435" }).click(function ()
-        //            {
-        //                localStorage.setItem("clickedToVoteForExt", "yes");
-        //            })
-        //            )
-        //    );
-        //}
-
+        
 
         $(".imagefooter").append($("<div>", { id: "cgglass" }));
         var topCgglass = 0.45 * (400 / 1000) * $(".imagefooter").width();
@@ -1963,7 +1750,9 @@ function openQuickAccess()
 //resize signature bigger than 295px
 function resizeSignature(j_signatureElement)
 {
-    //debug.print("signature resize call");
+    if (j_signatureElement.css("display") == "none") //don't process hidden signatures
+        return;
+
     //reset style, in case this signature was already processed
     j_signatureElement.css({
         "height": "auto",
@@ -2378,6 +2167,14 @@ function addStyle(style, specialId)
         css.id = specialId;
 
     document.getElementsByTagName("head")[0].appendChild(css); //append element to head
+}
+
+//safely injects a script to the head
+function injectScript(filename)
+{
+    var s = $("<script>", { type: "text/javascript", src: chrome.extension.getURL(filename) });
+    //This is SAFE, since only web_accessible_resources which are part of the addon can be run.
+    $("head").append(s);
 }
 
 //change the count of comments
@@ -3642,67 +3439,6 @@ function eyesPopup()
         chrome.extension.getURL("images/omelette.svg"),
         "זה היה מול העיניים שלי כל הזמן הזה...",
         "watch?v=De4c9SkMNDA", "orangeTopPopup");
-}
-
-
-//returns an element of an on-screen keyboard
-function buildOnScreenKeyboard()
-{
-    return $("<ul>", { id: "onScreenKeyboard" })
-        .append($("<li>", { class: "letter" }).text("`"))
-        .append($("<li>", { class: "letter" }).text("1"))
-        .append($("<li>", { class: "letter" }).text("2"))
-        .append($("<li>", { class: "letter" }).text("3"))
-        .append($("<li>", { class: "letter" }).text("4"))
-        .append($("<li>", { class: "letter" }).text("5"))
-        .append($("<li>", { class: "letter" }).text("6"))
-        .append($("<li>", { class: "letter" }).text("7"))
-        .append($("<li>", { class: "letter" }).text("8"))
-        .append($("<li>", { class: "letter" }).text("9"))
-        .append($("<li>", { class: "letter" }).text("0"))
-        .append($("<li>", { class: "letter" }).text("-"))
-        .append($("<li>", { class: "letter" }).text("="))
-        .append($("<li>", { class: "delete lastitem" }).text("←"))
-        .append($("<li>", { class: "tab" }).text("Tab"))
-        .append($("<li>", { class: "letter" }).text("/"))
-        .append($("<li>", { class: "letter" }).text("'"))
-        .append($("<li>", { class: "letter" }).text("ק"))
-        .append($("<li>", { class: "letter" }).text("ר"))
-        .append($("<li>", { class: "letter" }).text("א"))
-        .append($("<li>", { class: "letter" }).text("ט"))
-        .append($("<li>", { class: "letter" }).text("ו"))
-        .append($("<li>", { class: "letter" }).text("ן"))
-        .append($("<li>", { class: "letter" }).text("ם"))
-        .append($("<li>", { class: "letter" }).text("פ"))
-        .append($("<li>", { class: "letter" }).text("]"))
-        .append($("<li>", { class: "letter" }).text("["))
-        .append($("<li>", { class: "letter lastitem" }).text("\\"))
-        .append($("<li>", { class: "capslock" }).text("Caps Lock"))
-        .append($("<li>", { class: "letter" }).text("ש"))
-        .append($("<li>", { class: "letter" }).text("ד"))
-        .append($("<li>", { class: "letter" }).text("ג"))
-        .append($("<li>", { class: "letter" }).text("כ"))
-        .append($("<li>", { class: "letter" }).text("ע"))
-        .append($("<li>", { class: "letter" }).text("י"))
-        .append($("<li>", { class: "letter" }).text("ח"))
-        .append($("<li>", { class: "letter" }).text("ל"))
-        .append($("<li>", { class: "letter" }).text("ך"))
-        .append($("<li>", { class: "letter" }).text("ף"))
-        .append($("<li>", { class: "letter" }).text(","))
-        .append($("<li>", { class: "return lastitem" }).text("Enter"))
-        .append($("<li>", { class: "left-shift" }).text("Shift"))
-        .append($("<li>", { class: "letter" }).text("ז"))
-        .append($("<li>", { class: "letter" }).text("ס"))
-        .append($("<li>", { class: "letter" }).text("ב"))
-        .append($("<li>", { class: "letter" }).text("ה"))
-        .append($("<li>", { class: "letter" }).text("נ"))
-        .append($("<li>", { class: "letter" }).text("מ"))
-        .append($("<li>", { class: "letter" }).text("צ"))
-        .append($("<li>", { class: "letter" }).text("ת"))
-        .append($("<li>", { class: "letter" }).text("ץ"))
-        .append($("<li>", { class: "letter" }).text("."))
-        .append($("<li>", { class: "right-shift lastitem" }).text("Shift"))
-        .append($("<li>", { class: "space lastitem" }).text(" "))
 }
 
 //replaces time strings (HH:MM) with time in seconds from midnight

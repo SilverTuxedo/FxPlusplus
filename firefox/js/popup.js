@@ -17,83 +17,6 @@
  
 "use strict";
 
-var factorySettings =
-    {
-        backgroundNotifications: true,
-        resizeSignatures: false,
-        trackUnreadComments: true,
-        peekCloseMethod: "double",
-        showSpoilers: true,
-        hideSuggested: false,
-        classicIcons: false,
-        nightmodeShortcut: true,
-        showForumStats: true,
-        hideSticky: {
-            active: false,
-            includingRules: false,
-            days: 14
-        },
-        showAutoPinned: false,
-        autoNightmode: {
-            active: false,
-            start: "17:05",
-            end: "23:30"
-        },
-        readtime: {
-            speed: 220,
-            activePrefixes: ["מדריך"],
-            newsForums: true
-        },
-        threadFilters: {
-            users: [
-            ],
-            keywords: [
-            ],
-            filterSticky: false
-        },
-        commentFilters: [
-            {
-                id: 967488,
-                subnick: {
-                    value: "היוצר של +FxPlus",
-                    color: "#00afff",
-                    size: 11
-                },
-                hideSignature: false,
-                disableStyle: false,
-                hideComments: false
-            }
-        ],
-        customDefaultStyle: {
-            active: false,
-            activeQuickComment: false,
-            activePrivateChat: false,
-            bold: false,
-            italic: false,
-            underline: false,
-            font: "Arial",
-            color: "#333333"
-        },
-        customBg: {
-            day: "",
-            night: ""
-        },
-        quickAccessThreads: [
-            {
-                prefix: "פרסום|",
-                title: "+FxPlus - תוסף לכרום ופיירפוקס",
-                authorId: 967488,
-                threadId: 16859147
-            }
-        ],
-        trackedThreads: {
-            list: [
-            ],
-            refreshRate: 15,
-            lastRefreshTime: 0
-        }
-    };
-
 //if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
 {
@@ -122,29 +45,6 @@ var settings;
 chrome.storage.sync.get("settings", function (data)
 {
     settings = data.settings || {};
-    //make sure settings has values
-    var settingsReset = false;
-    for (var prop in factorySettings)
-    {
-        if (settings.hasOwnProperty(prop))
-        {
-            if (settings[prop] === null)
-            { //no value for the settings key
-                settings[prop] = factorySettings[prop];
-                settingsReset = true;
-                console.warn(prop + ": value has been reset");
-            }
-        }
-        else
-        { //no settings key
-            settings[prop] = factorySettings[prop];
-            settingsReset = true;
-            console.warn(prop + ": value has been reset");
-        }
-    }
-    if (settingsReset) //save changes (if any)
-        chrome.storage.sync.set({ "settings": settings });
-
 
     if (settings.backgroundNotifications)
     {
@@ -410,7 +310,7 @@ function getNotificationsTrackedThreads(callback)
         var threadComments = data.threadComments || [];
         chrome.storage.sync.get("settings", function (data2)
         {
-            var settings = data2.settings || factorySettings;
+            var settings = data2.settings;
 
             for (var i = 0; i < settings.trackedThreads.list.length; i++)
             {

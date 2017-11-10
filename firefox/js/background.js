@@ -28,6 +28,8 @@ var factorySettings =
         classicIcons: false,
         nightmodeShortcut: true,
         showForumStats: true,
+        hideAccessibilityMenu: false,
+        disableLiveTyping: false,
         hideSticky: {
             active: false,
             includingRules: false,
@@ -72,6 +74,7 @@ var factorySettings =
             italic: false,
             underline: false,
             font: "Arial",
+            size: 2,
             color: "#333333"
         },
         customBg: {
@@ -448,7 +451,7 @@ function initSocket(alertUnreadList)
 //sets the socket to listen to new notifications
 function connectSocket()
 {
-    socket = io.connect('https://socket.fxp.co.il/', { reconnection: true });
+    socket = io.connect('https://socket5.fxp.co.il/', { reconnection: true });
 
     //general listeners
     socket.on('connect', function ()

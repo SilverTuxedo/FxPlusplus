@@ -28,86 +28,8 @@ var fxpDomain = "https://www.fxp.co.il/"
 chrome.storage.sync = (function ()
 {
     return chrome.storage.sync ||
-           chrome.storage.local;
+        chrome.storage.local;
 })();
-
-//the default settings
-var factorySettings =
-    {
-        backgroundNotifications: true,
-        resizeSignatures: false,
-        trackUnreadComments: true,
-        peekCloseMethod: "double",
-        showSpoilers: true,
-        hideSuggested: false,
-        classicIcons: false,
-        nightmodeShortcut: true,
-        showForumStats: true,
-        hideSticky: {
-            active: false,
-            includingRules: false,
-            days: 14
-        },
-        showAutoPinned: false,
-        autoNightmode: {
-            active: false,
-            start: "17:05",
-            end: "23:30"
-        },
-        readtime: {
-            speed: 220,
-            activePrefixes: ["מדריך"],
-            newsForums: true
-        },
-        threadFilters: {
-            users: [
-            ],
-            keywords: [
-            ],
-            filterSticky: false
-        },
-        commentFilters: [
-            {
-                id: 967488,
-                subnick: {
-                    value: "היוצר של +FxPlus",
-                    color: "#00afff",
-                    size: 11
-                },
-                hideSignature: false,
-                disableStyle: false,
-                hideComments: false
-            }
-        ],
-        customDefaultStyle: {
-            active: false,
-            activeQuickComment: false,
-            activePrivateChat: false,
-            bold: false,
-            italic: false,
-            underline: false,
-            font: "Arial",
-            color: "#333333"
-        },
-        customBg: {
-            day: "",
-            night: ""
-        },
-        quickAccessThreads: [
-            {
-                prefix: "פרסום|",
-                title: "+FxPlus - תוסף לכרום ופיירפוקס",
-                authorId: 967488,
-                threadId: 16859147
-            }
-        ],
-        trackedThreads: {
-            list: [
-            ],
-            refreshRate: 15,
-            lastRefreshTime: 0
-        }
-    };
 
 var customBg = {
     day: "",
@@ -142,32 +64,11 @@ var forumCompleteCooldown; //cooldown object for inputs of forum names
 
 $('.clockpicker').clockpicker();
 
-//make sure all settings are valid, and not undefined/not present
+//get all the settings
+var settings;
 chrome.storage.sync.get("settings", function (data)
 {
-    var settings = data.settings || {};
-    //make sure settings has values
-    var settingsReset = false;
-    for (var prop in factorySettings)
-    {
-        if (settings.hasOwnProperty(prop))
-        {
-            if (settings[prop] === null)
-            { //no value for the settings key
-                settings[prop] = factorySettings[prop];
-                settingsReset = true;
-                console.warn(prop + ": value has been reset");
-            }
-        }
-        else
-        { //no settings key
-            settings[prop] = factorySettings[prop];
-            settingsReset = true;
-            console.warn(prop + ": value has been reset");
-        }
-    }
-    if (settingsReset) //save changes (if any)
-        chrome.storage.sync.set({ "settings": settings });
+    settings = data.settings || {};
 });
 
 function httpGetAsync(theUrl, callback)
@@ -376,23 +277,23 @@ var backgroundNames = [
 ];
 
 var forumPrefixes = [
-"דיון",
-"עזרה",
-"שאלה",
-"כתבה",
-"מדריך",
-"בעיה",
-"מידע",
-"הצעה",
-"פרסום",
-"פתרון",
-"עקיבה",
-"הכרזה",
-"ספוילר",
-"הורדה",
-"בקשה",
-"השוואה",
-"סיקור"
+    "דיון",
+    "עזרה",
+    "שאלה",
+    "כתבה",
+    "מדריך",
+    "בעיה",
+    "מידע",
+    "הצעה",
+    "פרסום",
+    "פתרון",
+    "עקיבה",
+    "הכרזה",
+    "ספוילר",
+    "הורדה",
+    "בקשה",
+    "השוואה",
+    "סיקור"
 ]
 
 //   <<<TODO>>>: detect when changes are made
@@ -481,36 +382,11 @@ if (customBgButtonPreview != null)
     $("#changeBgBtn").css("background-image", customBgButtonPreview);
 }
 
-//   <<<TODO>>>
-//read user settings and apply to switched tab
 function setTabs()
 {
     chrome.storage.sync.get("settings", function (data)
     {
         var settings = data.settings || {};
-        //make sure settings has values
-        var settingsReset = false;
-        for (var prop in factorySettings)
-        {
-            if (settings.hasOwnProperty(prop))
-            {
-                if (settings[prop] === null)
-                { //no value for the settings key
-                    settings[prop] = factorySettings[prop];
-                    settingsReset = true;
-                    console.warn(prop + ": value has been reset");
-                }
-            }
-            else
-            { //no settings key
-                settings[prop] = factorySettings[prop];
-                settingsReset = true;
-                console.warn(prop + ": value has been reset");
-            }
-        }
-        if (settingsReset) //save changes (if any)
-            chrome.storage.sync.set({ "settings": settings });
-
 
         loadGeneral(settings);
         loadThreads(settings);
@@ -544,6 +420,8 @@ function loadGeneral(settings)
     $("#nightStartTime").val(settings.autoNightmode.start);
     $("#nightEndTime").val(settings.autoNightmode.end);
     $("#showForumStats").prop("checked", settings.showForumStats);
+    $("#hideAccessibilityMenu").prop("checked", settings.hideAccessibilityMenu);
+    $("#disableLiveTyping").prop("checked", settings.disableLiveTyping);
 
     var customBg = settings.customBg || { day: "", night: "" };
 
@@ -653,7 +531,7 @@ function sub_loadCommentFilters(settings)
     if (highlightUser > 0 && $(".userCard.highlight").length == 0)
     {
         addUserCard(highlightUser, "", { color: "#333333", size: 11 }, false, false, false);
-    } 
+    }
 }
 function sub_loadDefaultStyle(settings)
 {
@@ -676,15 +554,19 @@ function sub_loadDefaultStyle(settings)
         $(".toggleStyle[data-styleaction='underline']").removeClass("selected");
 
     $("#selectFont").val(settings.customDefaultStyle.font);
+    if (settings.customDefaultStyle.size)
+        $("#selectSize").val(settings.customDefaultStyle.size);
     $("#editorTextColor").val(settings.customDefaultStyle.color);
     //update editor to show set styles
     updateDefaultStyleAppearance();
 }
 
 //suggests forums for tags in the filtering section
-function suggestForumTag(inputElement) {
+function suggestForumTag(inputElement)
+{
     var search = inputElement.val().trim();
-    if (search.length > 0) {
+    if (search.length > 0)
+    {
         $.ajax({
             url: fxpDomain + 'ajax.php',
             dataType: "json",
@@ -692,18 +574,23 @@ function suggestForumTag(inputElement) {
                 do: 'forumdisplayqserach',
                 name_startsWith: inputElement.val().trim()
             },
-            success: function(data) {
+            success: function (data)
+            {
                 var suggContainer = inputElement.parent().find(".tagSuggestionsContainer");
 
                 var singleSuggestion;
-                if (data.length == 0) {
+                if (data.length == 0)
+                {
                     suggContainer.hide();
                     console.log("warning: no suggestions for entered forum");
                 }
-                else {
+                else
+                {
                     suggContainer.empty();
-                    for (var i = 0; i < data.length; i++) {
-                        if (i > 10) {
+                    for (var i = 0; i < data.length; i++)
+                    {
+                        if (i > 10)
+                        {
                             suggContainer.append(
                                 $("<div>", { class: "tagSuggestion" }).text("...")
                             );
@@ -772,10 +659,10 @@ for (var i = 0; i < backgroundNames.length; i++)
 {
     $("#bgList").append(
         $("<div>", { class: "customBackground" }).append(
-            $("<div>", { class: "lightBG", style: "background-image: url(" + chrome.extension.getURL("images/bgs/light/" + backgroundNames[i]+".png") + ");" })
+            $("<div>", { class: "lightBG", style: "background-image: url(" + chrome.extension.getURL("images/bgs/light/" + backgroundNames[i] + ".png") + ");" })
         ).append(
             $("<div>", { class: "darkBG", style: "background-image: url(" + chrome.extension.getURL("images/bgs/dark/" + backgroundNames[i] + ".png") + ");" })
-        )
+            )
     )
 }
 
@@ -840,11 +727,15 @@ function updateDefaultStyleAppearance()
         bold = $('[data-styleAction=bold]').hasClass('selected'),
         italic = $('[data-styleAction=italic]').hasClass('selected'),
         underline = $('[data-styleAction=underline]').hasClass('selected'),
+        size = parseInt(editorSettings.find("#selectSize").val()),
         color = editorSettings.find("#editorTextColor").val();
+
+    var fontSizesPx = [13.9, 18, 22.1, 24.9, 33.2, 44.3, 66.4];
 
     preview.css({
         "font-family": fontFamily,
-        "color": color
+        "color": color,
+        "font-size": fontSizesPx[size - 1] + "px"
     });
 
     if (bold)
@@ -872,7 +763,7 @@ function buildPrefixTag(name, addLine)
             $("<input>", { type: "checkbox", class: "prefixControl", name: name })
         ).append(
             $("<div>", { class: "prefixItem" }).text(displayName)
-        )
+            )
     return tag;
 }
 
@@ -882,44 +773,52 @@ function addPrefixTag(name, addLine)
 }
 
 //builds an element for a tag
-function buildGeneralTag(name) {
+function buildGeneralTag(name)
+{
     return $("<div>", { class: "tagBody" }).append(
         $("<span>", { class: "tagName" }).text(name)
     ).append(
-        $("<span>", { class: "tagRemove mdi mdi-close" }).click(function() {
-        $(this).parents(".tagBody").fadeOut(200, function() { $(this).remove() }); //fade out and remove
+        $("<span>", { class: "tagRemove mdi mdi-close" }).click(function ()
+        {
+            $(this).parents(".tagBody").fadeOut(200, function () { $(this).remove() }); //fade out and remove
         })
-    );
+        );
 }
 
 //builds an element for adding tags
-function buildGeneralTagAdder() {
+function buildGeneralTagAdder()
+{
     return $("<div>", { class: "addTagBody" }).append(
-        $("<input>", { class: "tagInput" }).focusin(function() {
+        $("<input>", { class: "tagInput" }).focusin(function ()
+        {
             $(this).css("width", "10em"); //expand on focus in
             forumCompleteCooldown = -1;
-        }).focusout(function(e) {
-            if (e.relatedTarget && $(e.relatedTarget).hasClass("tagSuggestion")) {
+        }).focusout(function (e)
+        {
+            if (e.relatedTarget && $(e.relatedTarget).hasClass("tagSuggestion"))
+            {
                 //if clicked on suggestion, change the value to the suggestion clicked on
                 $(this).val($(e.relatedTarget).text());
                 window.clearTimeout(forumCompleteCooldown); //cancel future suggestions
             }
 
             if ($(this).val().trim().length > 0) //add tag on focus out
-            { 
+            {
                 var tagName = $(this).val();
                 $(this).parents(".addTagBody").before(buildGeneralTag(tagName));
             }
             $(this).val("");
             $(this).css("width", "");
             $(this).parent().find(".tagSuggestionsContainer").hide();
-        }).keypress(function(e) {
+        }).keypress(function (e)
+        {
             if (e.which == 13) //blur on enter
                 $(this).blur();
             else if (forumCompleteCooldown == -1) //first edit, ignore
             {
                 var inputElement = $(this);
-                forumCompleteCooldown = setTimeout(function() {
+                forumCompleteCooldown = setTimeout(function ()
+                {
                     suggestForumTag(inputElement);
                     forumCompleteCooldown = -1;
                 }, 900); //cooldown of 0.9s
@@ -927,7 +826,7 @@ function buildGeneralTagAdder() {
         })
     ).append(
         $("<span>", { class: "tagAdd mdi mdi-plus" })
-    ).append(
+        ).append(
         $("<div>", { class: "tagSuggestionsContainer" })
         );;
 }
@@ -956,11 +855,11 @@ $("#sendTestNotification").click(function ()
     chrome.runtime.sendMessage(
         {
             notification:
-                {
-                    title: "הודעת בדיקה!",
-                    message: "הידעת? הגולש הממוצע באינטרנט ממצמץ רק 7 פעמים בדקה! ממוצע המצמוץ הנורמלי הוא 20 - כמעט פי 3.",
-                    url: ""
-                }
+            {
+                title: "הודעת בדיקה!",
+                message: "הידעת? הגולש הממוצע באינטרנט ממצמץ רק 7 פעמים בדקה! ממוצע המצמוץ הנורמלי הוא 20 - כמעט פי 3.",
+                url: ""
+            }
         });
 })
 
@@ -995,8 +894,9 @@ $(".saveSettings").click(function ()
             settings.autoNightmode.active = $("#autoNight").prop("checked");
             settings.autoNightmode.start = $("#nightStartTime").val();
             settings.autoNightmode.end = $("#nightEndTime").val();
-
             settings.showForumStats = $("#showForumStats").prop("checked");
+            settings.hideAccessibilityMenu = $("#hideAccessibilityMenu").prop("checked");
+            settings.disableLiveTyping = $("#disableLiveTyping").prop("checked");
 
             var customBg = {
                 day: "",
@@ -1045,7 +945,8 @@ $(".saveSettings").click(function ()
                 {
                     var type = $(this).find(".forumTarget:checked").val();
                     var forums = [];
-                    $(this).find(".tagsContainer.forums .tagName").each(function() {
+                    $(this).find(".tagsContainer.forums .tagName").each(function ()
+                    {
                         forums.push($(this).text());
                     });
                     var exception = buildArrayFromCommaString($(this).find("input[name='excludeTitles']").val());
@@ -1068,7 +969,8 @@ $(".saveSettings").click(function ()
                 var words = buildArrayFromCommaString($(this).find("textarea[name='keyword']").val());
                 var type = $(this).find(".forumTarget:checked").val();
                 var forums = [];
-                $(this).find(".tagsContainer.forums .tagName").each(function() {
+                $(this).find(".tagsContainer.forums .tagName").each(function ()
+                {
                     forums.push($(this).text());
                 });
                 var exception = buildArrayFromCommaString($(this).find("input[name='excludeTitles']").val());
@@ -1098,6 +1000,7 @@ $(".saveSettings").click(function ()
             settings.customDefaultStyle.underline = $(".toggleStyle[data-styleaction='underline']").hasClass("selected");
 
             settings.customDefaultStyle.font = $("#selectFont").val();
+            settings.customDefaultStyle.size = parseInt($("#selectSize").val());
             settings.customDefaultStyle.color = $("#editorTextColor").val();
 
             settings.commentFilters = [];
@@ -1301,8 +1204,9 @@ function addStyleThreadsRow(type, selector, validation, action)
             row.find(".tagsContainer").addClass("disabled");
             break;
     }
-    
-    for (var i = 0; i < validation.forums.length; i++) {
+
+    for (var i = 0; i < validation.forums.length; i++)
+    {
         row.find(".tagsContainer").append(buildGeneralTag(validation.forums[i]));
     }
     row.find(".tagsContainer").append(buildGeneralTagAdder());
@@ -1409,9 +1313,9 @@ $("#recalcReadSpeed").click(function ()
         $("<span>").text('בעוד רגעים ספורים יוצג בפניך קטע קצר שלקוח מויקיפדיה. קרא אותו עד סופו, ובסיום הקריאה לחץ על הכפתור בתחתית הדף.')
     ).append(
         $("<br>")
-    ).append(
+        ).append(
         $("<span>").text('התוסף יחלק את מספר המילים בקטע בזמן שלקח לך לקרוא אותו, ובכך יקבע את מהירות הקריאה שלך.')
-    )
+        )
     popup.find(".button:first").attr({ class: "button blue", id: "startReadtime" }).text("התחל");
     $("#cancelReadtime").show();
     $("#startReadtime").unbind().click("presentText", function ()
@@ -1450,9 +1354,9 @@ $("#recalcReadSpeed").click(function ()
                 $("<span>").text("מהירות הקריאה שלך היא:")
             ).append(
                 $("<div>", { id: "timeResult" }).text(speed)
-            ).append(
+                ).append(
                 $("<b>").text("מילים לדקה.")
-            )
+                )
 
             $(this).attr("id", "")
                 .removeClass("red").addClass("blue").text("סגור");
@@ -1489,7 +1393,7 @@ function buildUserCard()
                 )
             ).append(
                 $("<td>", { class: "userNumber" }).text("#")
-            )
+                )
         ).append(
             $("<tr>").append(
                 $("<td>").append(
@@ -1499,60 +1403,60 @@ function buildUserCard()
                 $("<td>", { class: "styleSubnick" }).append(
                     $("<span>", { class: "mdi mdi-format-size" })
                 )
-            )
-        ).append(
+                )
+            ).append(
             $("<tr>").append(
                 $("<td>", { colspan: "2" }).append(
                     $("<div>", { class: "subnickStyleEditor" }).append(
                         $("<span>").text("px")
                     ).append(
                         $("<input>", { type: "number", value: "11", class: "subnickSize" })
-                    ).append(
+                        ).append(
                         $("<input>", { type: "color", class: "subnickColor" })
-                    )
+                        )
                 )
             )
-        ).append(
+            ).append(
             $("<tr>").append(
                 $("<td>", { class: "option" }).append(
                     $("<div>", { class: "switch" }).append(
                         $("<input>", { type: "checkbox", name: "hideSignature", id: "swtc" + num })
                     ).append(
                         $("<label>", { for: "swtc" + (num++) })
-                    )
+                        )
                 ).append(
                     $("<span>").text("הסתר חתימה")
-                )
+                    )
             ).append(
                 $("<td>", { rowspan: "3", class: "delete" }).append(
                     $("<span>", { class: "mdi mdi-delete delete" })
                 )
-            )
-        ).append(
+                )
+            ).append(
             $("<tr>").append(
                 $("<td>", { class: "option" }).append(
                     $("<div>", { class: "switch" }).append(
                         $("<input>", { type: "checkbox", name: "disableStyle", id: "swtc" + num })
                     ).append(
                         $("<label>", { for: "swtc" + (num++) })
-                    )
+                        )
                 ).append(
                     $("<span>").text("נטרל עיצוב תגובות")
-                )
+                    )
             )
-        ).append(
+            ).append(
             $("<tr>").append(
                 $("<td>", { class: "option" }).append(
                     $("<div>", { class: "switch" }).append(
                         $("<input>", { type: "checkbox", name: "hideComments", id: "swtc" + num })
                     ).append(
                         $("<label>", { for: "swtc" + (num++) })
-                    )
+                        )
                 ).append(
                     $("<span>").text("הסתר תגובות")
-                )
+                    )
             )
-        )
+            )
     return card;
 }
 
@@ -1562,21 +1466,21 @@ function buildHelperThreadsRow(type)
     if (type == "user")
     {
         obj = $("<td>").append(
-                $("<input>", { type: "text", name: "username" }).change(function ()
-                {
-                    updateIdDisplay($(this), "td");
-                })
-            ).append(
-                $("<div>", { class: "userNumber" }).text("#")
+            $("<input>", { type: "text", name: "username" }).change(function ()
+            {
+                updateIdDisplay($(this), "td");
+            })
+        ).append(
+            $("<div>", { class: "userNumber" }).text("#")
             );
     }
     else
     {
         obj = $("<td>").append(
-                $("<div>", { class: "balloonInputContainer", "data-balloon-pos": "down", "data-balloon-visible": true }).append(
-                    $("<textarea>", { class: "seperateByCommaText", name: "keyword" })
-                )
-            );
+            $("<div>", { class: "balloonInputContainer", "data-balloon-pos": "down", "data-balloon-visible": true }).append(
+                $("<textarea>", { class: "seperateByCommaText", name: "keyword" })
+            )
+        );
     }
     return obj;
 }
@@ -1593,42 +1497,42 @@ function buildStyleThreadsRow(type)
                         $("<input>", { type: "radio", class: "forumTarget", name: "forumTarget" + num2, value: "everyForum", id: "forumSel" + num, checked: "checked" })
                     ).append(
                         $("<label>", { for: "forumSel" + num++ })
-                    )
+                        )
                 ).append(
                     $("<span>").text(" בכל פורום")
-                )
+                    )
             ).append(
-                 $("<div>", { class: "flex" }).append(
+                $("<div>", { class: "flex" }).append(
                     $("<div>", { class: "switch radio" }).append(
                         $("<input>", { type: "radio", class: "forumTarget", name: "forumTarget" + num2, value: "justForum", id: "forumSel" + num })
                     ).append(
                         $("<label>", { for: "forumSel" + num++ })
-                    )
+                        )
                 ).append(
                     $("<span>").text(" רק ב:")
-                )
-            ).append(
+                    )
+                ).append(
                 $("<div>", { class: "flex" }).append(
                     $("<div>", { class: "switch radio" }).append(
                         $("<input>", { type: "radio", class: "forumTarget", name: "forumTarget" + num2++, value: "notForum", id: "forumSel" + num })
                     ).append(
                         $("<label>", { for: "forumSel" + num++ })
-                    )
+                        )
                 ).append(
                     $("<span>").text(" לא ב:")
+                    )
                 )
-            )
-        ).append(
+            ).append(
             $("<td>").append(
-                $("<div>", { class: "tagsContainer forums"})
+                $("<div>", { class: "tagsContainer forums" })
             )
-        ).append(
+            ).append(
             $("<td>").append(
-        $("<div>", { class: "balloonInputContainer", "data-balloon-pos": "down", "data-balloon-visible": true }).append(
+                $("<div>", { class: "balloonInputContainer", "data-balloon-pos": "down", "data-balloon-visible": true }).append(
                     $("<input>", { class: "seperateByCommaText", type: "text", name: "excludeTitles" })
                 )
             )
-        ).append(
+            ).append(
             $("<td>").append(
                 $("<label>").append(
                     $("<input>", { type: "checkbox", name: "boldPost", checked: "checked" })
@@ -1637,20 +1541,20 @@ function buildStyleThreadsRow(type)
                         $("<span>", { class: "mdi mdi-eye boldHideIcon" })
                     ).append(
                         $("<div>", { class: "boldHideText" }).text("הדגש")
-                    )
-                ).append(
+                        )
+                    ).append(
                     $("<div>", { class: "showHideToggle hideOn" }).append(
                         $("<span>", { class: "mdi mdi-eye-off boldHideIcon hideIcon" })
                     ).append(
                         $("<div>", { class: "boldHideText" }).text("הסתר")
+                        )
                     )
-                )
             )
-        ).append(
+            ).append(
             $("<td>").append(
                 $("<span>", { class: "mdi mdi-delete delete" })
             )
-        )
+            )
     return row;
 }
 
@@ -1755,9 +1659,9 @@ chrome.storage.sync.get(["backupDataRestored", "backupData"], function (data)
                     console.log(oldSettings);
 
                     var newSettings = {};
-                    for (var prop in factorySettings)
+                    for (var prop in settings)
                     {
-                        newSettings[prop] = factorySettings[prop];
+                        newSettings[prop] = settings[prop];
                     }
 
                     newSettings.hideSuggested = oldSettings.hideOutbrain;
@@ -1799,6 +1703,7 @@ chrome.storage.sync.get(["backupDataRestored", "backupData"], function (data)
                     newSettings.customDefaultStyle.italic = oldSettings.defaultStyle[2];
                     newSettings.customDefaultStyle.underline = oldSettings.defaultStyle[3];
                     newSettings.customDefaultStyle.font = oldSettings.defaultStyle[4];
+                    newSettings.customDefaultStyle.size = 2;
                     newSettings.customDefaultStyle.color = oldSettings.defaultStyle[5];
 
                     for (var i = 0; i < oldSettings.importantPost.length; i++)
@@ -1983,19 +1888,3 @@ function getRestoreList(callback)
         }
     });
 }
-
-
-/*
-$.ajax({
-	url : 'https://www.fxp.co.il/ajax.php',
-	dataType: "json",
-	data: {
-	do: 'forumdisplayqserach',
-	   name_startsWith: "ד"
-	},
-	 success: function( data ) {
-
-		 console.log(data);
-	}
-});
- */

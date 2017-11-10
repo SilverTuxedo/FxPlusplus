@@ -40,6 +40,13 @@ chrome.storage.sync.get("settings", function (data)
             window.open(chrome.extension.getURL("html/settings.html") + "?userFilter=" + userId);
         });
 
+        //hide typing from other users
+        if (settings.disableLiveTyping)
+        {
+            console.info("disableLiveTyping is enabled");
+            injectScript("js/disable_typing.js");
+        }
+
         //apply subnick filters
         if (settings.commentFilters)
         {
@@ -67,6 +74,10 @@ chrome.storage.sync.get("settings", function (data)
             {
                 styleElements.push($("<font>", { color: styleProp.color }));
                 wysibbStyleElements.push($("<font>", { color: styleProp.color }));
+            }
+            if (styleProp.size != 2) //disable if the size is the default size
+            {
+                styleElements.push($("<font>", { size: styleProp.size }));
             }
             if (styleProp.underline)
             {
@@ -178,6 +189,14 @@ function setSubnickContainer(subnick, subnickContainer)
             fontWeight: "bold"
         });
     }
+}
+
+//safely injects a script to the head
+function injectScript(filename)
+{
+    var s = $("<script>", { type: "text/javascript", src: chrome.extension.getURL(filename) });
+    //This is SAFE, since only web_accessible_resources which are part of the addon can be run.
+    $("head").append(s);
 }
 
 //returns true if the string given is a url

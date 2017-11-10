@@ -4,7 +4,7 @@
   "short_name": "FxPlus+",
   "author": "SilverTuxedo",
   "description": "מעולם לא היה קל יותר לגלוש ב-FxP.",
-  "version": "1.2.6",
+  "version": "1.3.0",
 
   "browser": "firefox",
 
@@ -52,7 +52,7 @@
     }
   ],
 
-  "web_accessible_resources": [ "html/settings.html", "css/nightmode.css", "images/*", "fonts/*" ],
+  "web_accessible_resources": [ "html/settings.html", "css/nightmode.css", "images/*", "fonts/*", "js/disable_typing.js" ],
 
   "applications": {
     "gecko": {

@@ -271,15 +271,25 @@
                         </div>
                     </div>
 
-                    <!--<div class="setOption">
-                        <div class="optionToggle"><div class="switch"><input type="checkbox" id="hideTyping" /><label for="hideTyping"></label></div></div>
+                    <div class="setOption">
+                        <div class="optionToggle"><div class="switch"><input type="checkbox" id="hideAccessibilityMenu" /><label for="hideAccessibilityMenu"></label></div></div>
+                        <div class="optionName">
+                            הסתר את תפריט הנגישות
+                        </div>
+                        <div class="optionExplain">
+                            תפריט הנגישות (הכפתור השחור עם סימן האדם בכיסא הגלגלים) יוסתר.
+                        </div>
+                    </div>
+
+                    <div class="setOption">
+                        <div class="optionToggle"><div class="switch"><input type="checkbox" id="disableLiveTyping" /><label for="disableLiveTyping"></label></div></div>
                         <div class="optionName">
                             אל תודיע שאני מקליד
                         </div>
                         <div class="optionExplain">
-                            מבטל את ההודעה שאתה מקליד באשכולות והודעות פרטיות. עדיין תוכל לראות אנשים אחרים מקלידים אם הם לא כיבו את האופציה כמוך.
+                            מבטל את ההודעה שאתה מקליד באשכולות והודעות פרטיות. עדיין תוכל לראות אנשים אחרים מקלידים (אם הם לא הפעילו את אפשרות זו).
                         </div>
-                    </div>-->
+                    </div>
 
                     <div class="setOption">
 
@@ -433,6 +443,18 @@
                             </div>
                             <div class="styleDivider"></div>
                             <div class="styleCont">
+                                <select id="selectSize" class="changeStyle">
+                                    <option value="1">1</option>
+                                    <option value="2" selected>2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                </select>
+                            </div>
+                            <div class="styleDivider"></div>
+                            <div class="styleCont">
                                 <input id="editorTextColor" type="color" class="borderlessColor changeStyle" />
                             </div>
                         </div>
@@ -454,7 +476,7 @@
                         </div>
                         עצב גם את הצ'אט הפרטי
                     </div>
-                    <br/>
+                    <br />
                     <div class="button blue saveSettings" data-category="comments">שמור שינויים</div>
                     <div class="button clearGray resetChanges" data-category="commentStyle">בטל</div>
                 </div>
@@ -539,10 +561,9 @@
                 </div>
                 <div id="restoreOld" class="settingsTab">
                     <h2>שחזר את ההגדרות הישנות שלך</h2>
-                    גרסאות 1.0.0 ואילך מאחסנות את ההגדרות שלך בצורה שונה. אם תרצה, תוכל כאן לשחזר את ההגדרות הישנות שלך. התוסף יגדיר מחדש את כל ההגדרות שיש לו גישה אליהן.<br/>
+                    גרסאות 1.0.0 ואילך מאחסנות את ההגדרות שלך בצורה שונה. אם תרצה, תוכל כאן לשחזר את ההגדרות הישנות שלך. התוסף יגדיר מחדש את כל ההגדרות שיש לו גישה אליהן.<br />
                     אם תבחר לשחזר, ההגדרות שישונו הן:
-                    <ul id="restoreList">
-                    </ul>
+                    <ul id="restoreList"></ul>
                     <div class="button red" id="restoreSettingsBtn">שחזר הגדרות</div>
                     <div class="button clearGray" id="deleteRestoreBtn">אל תשחזר</div>
                 </div>
