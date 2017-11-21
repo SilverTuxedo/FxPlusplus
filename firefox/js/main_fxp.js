@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "הסתירו את ההקלדות שלכם ושנו את גודל הטקסט אוטומטית - כל זאת ועוד בגרסה 1.3.0!";
-var versionBig = true;
-var versionHref = "https://fxplusplus.blogspot.com/2017/11/130.html";
+var versionDescription = "תיקונים ויזואליים";
+var versionBig = false;
+var versionHref = "https://fxplusplus.blogspot.com/2017/11/131.html";
 
 var defaultNotes = [
     { id: 967488, content: "רק דברים טובים" },
@@ -849,7 +849,7 @@ chrome.storage.sync.get("settings", function (data)
             //toggle dropdown on click
             $(".manageThreadPP").click(function ()
             {
-                $(".manageThreadDropdown .dropdownLContent").slideToggle(200)
+                toggleManageThreadDropdown(!getManageThreadDropdownOpened());
             });
 
             var currentThreadId = getThreadIdFromLink($(".postbit:first").find(".postcounter").attr("href"));
@@ -934,7 +934,7 @@ chrome.storage.sync.get("settings", function (data)
                             //show the user the quick access window
                             openQuickAccess();
                             //close the menu
-                            $(".manageThreadDropdown .dropdownLContent").slideUp(200);
+                            toggleManageThreadDropdown(false);
                         })
                     }
                     else
@@ -953,7 +953,7 @@ chrome.storage.sync.get("settings", function (data)
                                 //show the user the quick access window
                                 openQuickAccess();
                                 //close the menu
-                                $(".manageThreadDropdown .dropdownLContent").slideUp(200);
+                                toggleManageThreadDropdown(false);
                             })
                         })
                     }
@@ -3463,6 +3463,27 @@ function timeInMinutes(timeStr)
     var minutes = parseInt(parts[1]);
 
     return (hours * 60) + (minutes);
+}
+
+//toggles the manage thread topdown that appears next to titles
+function toggleManageThreadDropdown(open)
+{
+    if (open)
+    {
+        $(".manageThreadDropdown .dropdownLContent").slideDown(200);
+        $(".manageThreadPP").addClass("opened");
+    }
+    else
+    {
+        $(".manageThreadDropdown .dropdownLContent").slideUp(200);
+        $(".manageThreadPP").removeClass("opened");
+    }
+}
+
+//returns true if the manage thread dropdown is opened
+function getManageThreadDropdownOpened()
+{
+    return $(".manageThreadDropdown .dropdownLContent").css("display") != "none";
 }
 
 //slides a card up from the bottom of the screen, shows only the title and shortly afterwards the rest of the card
