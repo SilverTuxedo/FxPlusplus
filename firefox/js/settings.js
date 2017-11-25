@@ -68,7 +68,10 @@ $('.clockpicker').clockpicker();
 var settings;
 chrome.storage.sync.get("settings", function (data)
 {
-    settings = data.settings || {};
+    if (data)
+        settings = data.settings || {};
+    else
+        settings = {};
 });
 
 function httpGetAsync(theUrl, callback)

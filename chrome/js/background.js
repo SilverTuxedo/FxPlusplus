@@ -113,7 +113,12 @@ var alreadyNotifiedTrackedThreads = {}; //tracked threads id-comment pairs that 
 
 chrome.storage.sync.get("settings", function (data)
 {
-    var settings = data.settings || {};
+    var settings;
+    if (data)
+        settings = data.settings || {};
+    else
+        settings = {};
+
     //make sure settings has values
     var settingsReset = false;
     for (var prop in factorySettings)

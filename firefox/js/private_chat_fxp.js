@@ -30,7 +30,11 @@ chrome.storage.sync.get("settings", function (data)
 {
     $(document).ready(function ()
     {
-        var settings = data.settings || {};
+        var settings;
+        if (data)
+            settings = data.settings || {};
+        else
+            settings = {};
         
         var userId = getUserIdFromLink($(".user-name a").attr("href"));
 

@@ -153,7 +153,10 @@ if (localStorage.getItem("nightmodeEnabled") == "true")
 var settings;
 chrome.storage.sync.get("settings", function (data)
 { //get settings
-    settings = data.settings || {};
+    if (data)
+        settings = data.settings || {};
+    else
+        settings = {};
 
     readTimeSpeed = settings.readtime.speed;
 

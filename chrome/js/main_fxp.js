@@ -17,7 +17,7 @@
  
 "use strict";
 
-var versionDescription = "תיקונים ויזואליים";
+var versionDescription = "תיקונים מינוריים";
 var versionBig = false;
 var versionHref = "https://fxplusplus.blogspot.com/2017/11/131.html";
 
@@ -153,7 +153,10 @@ if (localStorage.getItem("nightmodeEnabled") == "true")
 var settings;
 chrome.storage.sync.get("settings", function (data)
 { //get settings
-    settings = data.settings || {};
+    if (data)
+        settings = data.settings || {};
+    else
+        settings = {};
 
     readTimeSpeed = settings.readtime.speed;
 

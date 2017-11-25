@@ -44,7 +44,10 @@ var updateBadge = true;
 var settings;
 chrome.storage.sync.get("settings", function (data)
 {
-    settings = data.settings || {};
+    if (data)
+        settings = data.settings || {};
+    else
+        settings = {};
 
     if (settings.backgroundNotifications)
     {
