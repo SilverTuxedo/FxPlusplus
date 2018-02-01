@@ -163,6 +163,18 @@ FRONT PAGE
     border-color: #484848;
 }
 
+.divmainfav h2 {
+    text-shadow: 1px 1px 4px #000000, -0.5px -0.5px 0 #000000, 0.5px -0.5px 0 #000000, -0.5px 0.5px 0 #000000, 0.5px 0.5px 0 #000000;
+}
+
+.divmainfav a {
+    color: #fff;
+}
+
+.divmainfav:after {
+    background-color: rgba(0,0,0,0.75);
+}
+
 .personalCategoryHelper {
     border: 1px solid #232323 !important;
     background-color: #1d1d1d !important;
@@ -171,6 +183,10 @@ FRONT PAGE
     .personalCategoryHelper ul.droptrue.ui-sortable {
         filter: invert(100%);
     }
+
+.textsik {
+    color: #fff;
+}
 
 /*
 THREADS LIST
@@ -310,8 +326,25 @@ COMMENTS
 }
 
     .userinfo img, .userinfo video, .postbody img, .postbody video, .postbody iframe, .postbody twitterwidget,
-    .commentsContainer img, .commentsContainer video, .commentsContainer iframe, .commentsContainer twitterwidget,
+    .commentsContainer img, .commentsContainer video, .commentsContainer iframe .commentsContainer twitterwidget,
     .userinfo_noavatar img, .userinfo_noavatar video {
+        filter: invert(100%);
+    }
+
+.video_div {
+    filter: invert(100%);
+}
+
+    .video_div video,
+    .video_div iframe {
+        filter: unset;
+    }
+
+.videoyoudiv {
+    background: none;
+}
+
+    .videoyoudiv .trc_related_container.trc_spotlight_widget {
         filter: invert(100%);
     }
 
@@ -337,6 +370,11 @@ COMMENTS
     .postbit .postbody .time {
         color: #3e3e3e;
     }
+
+.postbitignored {
+    background: #0c0c0c;
+    border-color: #333333;
+}
 
 .bbcode_container div.bbcode_quote {
     background: #dadddf none;

@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "תיקונים ויזואליים";
+var versionDescription = "תיקוני באגים ושיפורים למצב הלילה";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2017/11/131.html";
+var versionHref = "https://fxplusplus.blogspot.com/2018/02/134.html";
 
 var defaultNotes = [
     { id: 967488, content: "רק דברים טובים" },
@@ -1043,7 +1043,8 @@ chrome.storage.sync.get("settings", function (data)
             debug.info("readtime.newsForums is enabled");
             $(".images_sik").each(function ()
             {
-                $(this).find(".textsik").append($("<div>", { class: "thumbnailReadtime mdi mdi-clock" }).text("מחשב..."));
+                $(this).css("position", "relative");
+                $(this).append($("<div>", { class: "thumbnailReadtime mdi mdi-clock" }).text("מחשב..."));
                 $(this).addClass("readTimeThumbnail");
                 pushToReadTimeQueue($(this).find(".thumbnailReadtime"), $(this).parents("a").attr("href"), false);
             })
