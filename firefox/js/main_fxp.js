@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2017 SilverTuxedo
+    Copyright 2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "תיקוני באגים ושיפורים למצב הלילה";
+var versionDescription = "תיקוני באגים";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2018/02/134.html";
+var versionHref = "https://fxplusplus.blogspot.com/2018/03/135.html";
 
 var defaultNotes = [
     { id: 967488, content: "רק דברים טובים" },
@@ -1939,6 +1939,14 @@ function loadMinithread(threadLink, element, pm)
                     $(this).find("audio").attr("controls", true);
                     $(this).find(".fxpplayer").remove();
                 })
+
+                //fix for lazy image loading
+                content.find("img[data-src]").each(function ()
+                {
+                    $(this).attr("src", $(this).attr("data-src"));
+                    $(this).removeAttr("data-src");
+                    $(this).removeClass("lazy");
+                });
 
                 var comment = buildMiniComment(author, content, likes, link);
                 //add comments to new element

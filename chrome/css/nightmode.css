@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2017 SilverTuxedo
+    Copyright 2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -326,7 +326,7 @@ COMMENTS
 }
 
     .userinfo img, .userinfo video, .postbody img, .postbody video, .postbody iframe, .postbody twitterwidget,
-    .commentsContainer img, .commentsContainer video, .commentsContainer iframe .commentsContainer twitterwidget,
+    .commentsContainer img, .commentsContainer video, .commentsContainer iframe, .commentsContainer twitterwidget,
     .userinfo_noavatar img, .userinfo_noavatar video {
         filter: invert(100%);
     }

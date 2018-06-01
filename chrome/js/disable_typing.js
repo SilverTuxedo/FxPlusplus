@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2017 SilverTuxedo
+    Copyright 2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 //function to call instead of the function that sends the typing indication
 function altFunctionForTypingSenderFxPlusplus()
 {
-    console.log("prevented sending typing packet")
+    return;
 }
 
 //find functions that send typing indications and override them
