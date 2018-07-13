@@ -310,6 +310,10 @@
     background-color: #C3D825;
 }
 
+.toplogin .niceButton {
+    margin-bottom: 0.3em;
+}
+
 .niceButton {
     display: inline-block;
     font-weight: 600;
@@ -474,6 +478,15 @@
     height: 100%;
     background: black;
     z-index: 999999999999999;
+}
+
+#fxplusplus_quick_subnick {
+    width: 24px;
+    height: 24px;
+    background-size: 24px;
+    left: 24px;
+    position: absolute;
+    cursor: pointer;
 }
 
 #creditAddon {

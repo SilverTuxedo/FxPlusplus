@@ -4,7 +4,7 @@
   "short_name": "FxPlus+",
   "author": "SilverTuxedo",
   "description": "מעולם לא היה קל יותר לגלוש ב-FxP.",
-  "version": "1.3.5",
+  "version": "1.4.0",
 
   "browser": "firefox",
 
@@ -46,13 +46,20 @@
     {
       "matches": [ "https://www.fxp.co.il/private_chat.php*" ],
       "js": [ "js/jquery.min.js", "js/private_chat_fxp.js" ],
-      "css": [ "css/balloon.css" ],
+      "css": [ "css/balloon.css", "css/main_fxp.css" ],
       "run_at": "document_start",
       "all_frames": true
     }
   ],
 
-  "web_accessible_resources": [ "html/settings.html", "css/nightmode.css", "images/*", "fonts/*", "js/disable_typing.js" ],
+  "web_accessible_resources": [
+    "html/settings.html",
+    "css/nightmode.css",
+    "css/private_chat_nightmode.css",
+    "images/*",
+    "fonts/*",
+    "js/disable_typing.js" 
+  ],
 
   "applications": {
     "gecko": {

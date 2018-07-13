@@ -34,7 +34,7 @@ body {
         color: white;
     }
 
-.pagination span a {
+.pagination span a, .pagination span a.popupctrl {
     background: #2b2b2b none;
     border: 1px solid #353535;
     color: #2c85d2;
@@ -45,7 +45,9 @@ body {
 }
 
 .pagination span.selected a {
-    background: #dedede;
+    background: #2c85c7;
+    border: 1px solid #353535;
+    color: #c9dff3;
 }
 
 .dargot {
@@ -227,7 +229,7 @@ THREADS LIST
 }
 
 .threadbit a {
-    color: white;
+    color: #fbfbfb;
 }
 
 .threadbit .sticky {
@@ -337,8 +339,10 @@ COMMENTS
 
     .video_div video,
     .video_div iframe {
-        filter: unset;
+        filter: invert(0) !important;
     }
+
+
 
 .videoyoudiv {
     background: none;
@@ -593,6 +597,10 @@ ul.userlist_showavatars li {
     filter: invert(100%);
 }
 
+.userprof_vmright .member_blockrow label img {
+    filter: invert(100%);
+}
+
 .userprof_content {
     background-color: #0e0e0e;
 }
@@ -618,6 +626,19 @@ ul.userlist_showavatars li {
 .userprof_editor {
     color: #e4e4e4;
     background-color: #1b1b1b;
+}
+
+.userprof_title {
+    color: #ababab;
+}
+
+#view-usernotes-content {
+    background: #0e0e0e;
+    color: #eee;
+}
+
+.usercountfollower span {
+    color: #fff !important;
 }
 
 .profile_editor_border, .profile_content .actionbuttons {

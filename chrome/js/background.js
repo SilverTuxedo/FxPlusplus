@@ -30,6 +30,7 @@ var factorySettings =
         showForumStats: true,
         hideAccessibilityMenu: false,
         disableLiveTyping: false,
+        disableLiveTypingPm: false,
         hideSticky: {
             active: false,
             includingRules: false,
@@ -187,6 +188,22 @@ chrome.storage.onChanged.addListener(function (changes, areaName)
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse)
   {
+      if (request.hasOwnProperty("ttl"))
+      {
+          //forward message to tabs
+          if (request.ttl > 0)
+          {
+              console.log("forwarding request: ");
+              console.log(request);
+              request.ttl = request.ttl - 1;
+              //{ active: true, currentWindow: true }
+              chrome.tabs.query({ url: fxpDomain + "*" }, function (tabs)
+              {
+                  chrome.tabs.sendMessage(tabs[0].id, request);
+              });
+          }
+      }
+
       if (request.hasOwnProperty("notification"))
       {
           sendNotification(request.notification.title, request.notification.message, request.notification.url);
@@ -205,6 +222,14 @@ chrome.runtime.onMessage.addListener(
                       checkNotificationCount(); //update the badge
               });
           });
+      }
+      if (request.hasOwnProperty("forceUpdateBadge"))
+      {
+          checkNotificationCount(); //update the badge
+      }
+      if (request.hasOwnProperty("sendTotalNotifications"))
+      {
+          alertUnreadNotifications();
       }
       if (request.hasOwnProperty("event"))
       {

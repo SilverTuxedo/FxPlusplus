@@ -26,6 +26,51 @@ chrome.storage.sync = (function ()
 
 var fxpDomain = "https://www.fxp.co.il/";
 
+//observer for the default subnick container, used for when the user is typing
+var typingObserver = new MutationObserver(function (mutations)
+{
+    mutations.forEach(function (mutation)
+    {
+        //switch between the custom subnick and the typing notice
+        if (mutation.addedNodes.length > 0)
+        {
+            if (mutation.addedNodes[0].className == "typing-animation") //typing started
+                switchSubnick(true);
+        }
+        else if (mutation.removedNodes.length > 0)
+        {
+            if (mutation.removedNodes[0].className == "typing-animation") //typing stopped
+                switchSubnick(false);
+        }
+    });
+});
+
+//build an animated loading element
+var loadingElement = $("<div>", { class: "sk-cube-grid" });
+for (var i = 1; i <= 9; i++)
+{
+    loadingElement.append($("<div>", { class: ("sk-cube sk-cube" + i) }))
+}
+
+
+if (localStorage.getItem("nightmodeEnabled") === "true")
+{
+    var darkElement = document.createElement("div");
+    darkElement.setAttribute("style", "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background:black; z-index: 999999999999999;");
+    darkElement.setAttribute("id", "happyEyes");
+    darkElement.appendChild(loadingElement[0]);
+    document.documentElement.appendChild(document.importNode(darkElement, true));
+
+    $(document).ready(function ()
+    {
+        activateNightmode();
+        setTimeout(function ()
+        {
+            $("#happyEyes").fadeOut(100, function () { $(this).remove() });
+        }, 200);
+    });
+}
+
 chrome.storage.sync.get("settings", function (data)
 {
     $(document).ready(function ()
@@ -38,16 +83,22 @@ chrome.storage.sync.get("settings", function (data)
         
         var userId = getUserIdFromLink($(".user-name a").attr("href"));
 
-        //add the balloon to edit the subnick in the settings
-        $(".profile div.user-title").attr({ "data-balloon": "לחץ כדי לערוך בהגדרות", "data-balloon-pos": "down"}).css("cursor", "pointer").click(function ()
+        //add the button to edit the subnick in the settings
+        $(".profile div.user-title #cp-color-picker").after($("<div>", {
+            id: "fxplusplus_quick_subnick",
+            "data-balloon": "ערוך משתמש זה בהגדרות",
+            "data-balloon-pos": "right",
+            style: "background-image: url(" + chrome.extension.getURL("images/pencil.svg") +")"
+        }));
+        $("#fxplusplus_quick_subnick").click(function ()
         {
             window.open(chrome.extension.getURL("html/settings.html") + "?userFilter=" + userId);
         });
 
+
         //hide typing from other users
-        if (settings.disableLiveTyping)
+        if (settings.disableLiveTypingPm)
         {
-            console.info("disableLiveTyping is enabled");
             injectScript("js/disable_typing.js");
         }
 
@@ -158,16 +209,32 @@ chrome.storage.sync.get("settings", function (data)
     });
 });
 
+//receive night mode state changes
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse)
+    {
+        if (request.hasOwnProperty("nightmodeState"))
+        {
+            if (request.nightmodeState)
+                activateNightmode();
+            else
+                disableNightmode();
+        }
+    }
+);
+
 //applies a filter to a userbar - in FXP's chat system
 function applyCommentFilterInChat(filter, chatTitle)
 {
     if (filter.subnick.value.length > 0) //a subnick is set
     {
-        console.log("applying custom comment filters");
-        chatTitle.find(".user-title > span").remove();
-        chatTitle.find(".user-title").append($("<span>"));
-        var subnickContainer = chatTitle.find(".user-title > span");
+        var oldUsertitle = chatTitle.find(".user-title span.user_title");
+        oldUsertitle.after($("<span>", { id: "fxplusplus_custom_usernick" }));
+        oldUsertitle.hide();
+        var subnickContainer = chatTitle.find("#fxplusplus_custom_usernick");
         setSubnickContainer(filter.subnick, subnickContainer);
+
+        typingObserver.observe(oldUsertitle[0], { childList: true });
     }
 
     //other filters are irrelevant for this kind of container
@@ -193,6 +260,69 @@ function setSubnickContainer(subnick, subnickContainer)
             fontWeight: "bold"
         });
     }
+}
+
+//switches between showing the typing indicator container and the custon subnick container
+function switchSubnick(typing)
+{
+    if (typing)
+    {
+        $("#fxplusplus_custom_usernick").hide();
+        $(".user-title span.user_title").show();
+    }
+    else
+    {
+        $("#fxplusplus_custom_usernick").show();
+        $(".user-title span.user_title").hide();
+    }
+}
+
+//activates night mode
+function activateNightmode()
+{
+    //add nightmode stylesheet
+    $("body").append($("<link>", { id: "nightmodeStyle", rel: "stylesheet", href: chrome.extension.getURL("css/private_chat_nightmode.css") }));
+    $("body").prepend($("<div>", { id: "nightmodeShade" }));
+    $("body").addClass("nightmodeActive");
+}
+
+//disables night mode
+function disableNightmode()
+{
+    //remove previous stylesheets
+    $("style#customBg, link#nightmodeStyle").remove();
+    $("#nightmodeShade").remove();
+    $("body").removeClass("nightmodeActive");
+}
+
+function nightmodeOnload()
+{
+    var darkElement = document.createElement("div");
+    darkElement.setAttribute("style", "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background:black; z-index: 999999999999999;");
+    darkElement.setAttribute("id", "happyEyes");
+    document.documentElement.appendChild(document.importNode(darkElement, true));
+
+    //check when body is added to the document
+    var htmlTreeObserver = new MutationObserver(function (mutations)
+    {
+        mutations.forEach(function (mutation)
+        {
+            if (mutation.addedNodes.length > 0)
+                if (mutation.addedNodes[0].tagName == "BODY") //body added
+                {
+                    setTimeout(function ()
+                    {
+                        //remove black screen
+                        $("body").append($("<link>", { id: "nightmodeStyle", rel: "stylesheet", href: chrome.extension.getURL("css/private_chat_nightmode.css") }));
+                        $("body").prepend($("<div>", { id: "nightmodeShade" }));
+                        $("body").addClass("nightmodeActive");
+                        $("#happyEyes").fadeOut(100);
+                    }, 200);
+                    htmlTreeObserver.disconnect();
+                }
+        })
+    });
+    htmlTreeObserver.observe(document.documentElement, { childList: true });
 }
 
 //safely injects a script to the head

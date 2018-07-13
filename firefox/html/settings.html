@@ -94,6 +94,10 @@
                     <span class="mdi mdi-message-text optionIcon"></span>
                     <span class="optionDesc">תגובות ותת-ניקים</span>
                 </li>
+                <li data-tab="multiuser">
+                    <span class="mdi mdi-account-multiple optionIcon"></span>
+                    <span class="optionDesc">משתמשים</span>
+                </li>
                 <li data-tab="about">
                     <span class="mdi mdi-information optionIcon"></span>
                     <span class="optionDesc">אודות</span>
@@ -188,7 +192,7 @@
                             הפעל ספוילרים
                         </div>
                         <div class="optionExplain">
-                            טקסט לבן יהפוך ל<span class="spoiler">ספוילר</span>.
+                            טקסט לבן יהפוך ל<span class="whiteSpoiler">ספוילר</span>.
                         </div>
                     </div>
 
@@ -282,12 +286,19 @@
                     </div>
 
                     <div class="setOption">
-                        <div class="optionToggle"><div class="switch"><input type="checkbox" id="disableLiveTyping" /><label for="disableLiveTyping"></label></div></div>
                         <div class="optionName">
-                            אל תודיע שאני מקליד
+                            <div style="display: flex; margin-bottom: 0.15em;">
+                                <div class="switch" style="width: 2em;"><input type="checkbox" id="disableLiveTyping" /><label for="disableLiveTyping"></label></div>
+                                <span>אל תודיע שאני מקליד</span>
+                            </div>
+                            <div style="display: flex;">
+                                <div class="switch" style="width: 2em; margin-right: 2em"><input type="checkbox" id="disableLiveTypingPm" /><label for="disableLiveTypingPm"></label></div>
+                                כולל בצ'אט הפרטי
+                            </div>
                         </div>
+                        <div class="optionToggle"></div>
                         <div class="optionExplain">
-                            מבטל את ההודעה שאתה מקליד באשכולות והודעות פרטיות. עדיין תוכל לראות אנשים אחרים מקלידים (אם הם לא הפעילו את אפשרות זו).
+                            מבטל את ההודעה שאתה מקליד באשכולות והודעות פרטיות לבחירתך. עדיין תוכל לראות אנשים אחרים מקלידים (אם הם לא הפעילו את אפשרות זו).
                         </div>
                     </div>
 
@@ -481,6 +492,32 @@
                     <div class="button clearGray resetChanges" data-category="commentStyle">בטל</div>
                 </div>
                 <!--
+                    Multiuser
+                -->
+                <div class="settingsTab" id="multiuser">
+                    <div id="rateLimitLoginNotice">
+                        <h3>שים לב: יכולת ההתחברות שלך מוגבלת</h3>
+                        ניסית להתחבר יותר מדי פעמים ב-15 הדקות האחרונות. כתוצאה מכך, ההתחברות נכשלה.
+                        אנא נסה להתחבר שנית כש-15 דקות יעברו.
+                    </div>
+                    <h2>משתמשים</h2>
+                    התוסף יכול להחליף בשבילך בין המשתמשים שלך. הזן שם משתמש וסיסמה ותוכל להתחבר לחשבון שלך בלחיצת כפתור.<br />
+                    פרטי ההתחברות שלך מאוחסנים אך ורק על מחשב זה.<br /><br />
+                    <table id="userlistContainer" class="niceTable">
+                        <tbody>
+                            <tr class="controlRow">
+                                <td>שם משתמש</td>
+                                <td>סיסמה</td>
+                                <td></td>
+                                <td>ערוך</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <div class="button blue" id="addMultiuserRow" data-category="multiuser">הוסף משתמש</div>
+                    <div class="button clearGray" id="logoutCurrent" data-category="multiuser">התנתק</div>
+                </div>
+                <!--
                     About
                 -->
                 <div class="settingsTab" id="about">
@@ -575,6 +612,7 @@
 
     <script src="../js/jquery.min.js"></script>
     <script src="../js/jquery-clockpicker.js"></script>
+    <script src="../js/md5.js"></script>
     <script src="../js/settings.js"></script>
 </body>
 </html>

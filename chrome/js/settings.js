@@ -252,6 +252,7 @@ function makeOptionDependency(parent, dependArr)
 
 makeOptionDependency($("#hidePinned"), ["#hideIncludingRules"]);
 makeOptionDependency($("#enableDefaultStyle"), ["#styleQuickComment", "#stylePrivateChat"]);
+makeOptionDependency($("#disableLiveTyping"), ["#disableLiveTypingPm"]);
 
 var backgroundNames = [
     "sofa",
@@ -298,9 +299,6 @@ var forumPrefixes = [
     "השוואה",
     "סיקור"
 ]
-
-//   <<<TODO>>>: detect when changes are made
-var unsavedChanges = false; //true if some changes were made and not saved. Used to prompt the user if needed
 
 function confirmLeave()
 {
@@ -395,6 +393,7 @@ function setTabs()
         loadThreads(settings);
         loadComments(settings);
     });
+    loadMultiuser();
 }
 setTabs(); //initial tab setting
 
@@ -424,7 +423,8 @@ function loadGeneral(settings)
     $("#nightEndTime").val(settings.autoNightmode.end);
     $("#showForumStats").prop("checked", settings.showForumStats);
     $("#hideAccessibilityMenu").prop("checked", settings.hideAccessibilityMenu);
-    $("#disableLiveTyping").prop("checked", settings.disableLiveTyping);
+    $("#disableLiveTyping").prop("checked", settings.disableLiveTyping).change();
+    $("#disableLiveTypingPm").prop("checked", settings.disableLiveTypingPm);
 
     var customBg = settings.customBg || { day: "", night: "" };
 
@@ -562,6 +562,305 @@ function sub_loadDefaultStyle(settings)
     $("#editorTextColor").val(settings.customDefaultStyle.color);
     //update editor to show set styles
     updateDefaultStyleAppearance();
+}
+
+function loadMultiuser()
+{
+    chrome.storage.local.get("savedUserData", function (data)
+    {
+        var savedUserData = data.savedUserData || [];
+
+        var table = $("#userlistContainer tbody");
+
+        var row;
+        for (var i = 0; i < savedUserData.length; i++)
+        {
+            row = buildMultiuserRow(savedUserData[i].user)
+            bindMultiuserRow(row);
+            table.append(row);
+        }
+    })
+}
+
+$("#addMultiuserRow").click(function ()
+{
+    var row = buildMultiuserRow()
+    bindMultiuserRow(row);
+    editMultiuserRow(row);
+    $("#userlistContainer tbody").append(row);
+})
+
+function bindMultiuserRow(row)
+{
+    row.find(".editMultiuser").unbind().click(function ()
+    {
+        editMultiuserRow($(this).parents("tr"))
+        $(this).removeClass("error");
+    })
+
+    row.find(".deleteMultiuser").unbind().click(function ()
+    {
+        var oldUsername = row.find(".multiuserName").text();
+        if (oldUsername.length > 0)
+            saveUserData("", "", oldUsername); //this deletes the user
+        row.fadeOut(200, function () { row.remove(); });
+    });
+
+    row.removeClass("editMode");
+    row.find(".actionBtn").text("התחבר").removeClass("blue red").addClass("darkGreen");
+    row.find("input").each(function ()
+    {
+        $(this).removeClass("close");
+    });
+    row.find(".actionBtn").unbind().click(function ()
+    {
+        logIntoUser(row.find(".multiuserName").text(), $(this));
+    })
+}
+
+function editMultiuserRow(row)
+{
+    var oldUsername = row.find(".multiuserName").text();
+
+    row.find("input[name=multiuserName]").val(oldUsername);
+    row.find("input[name=multiuserPass]").val("");
+
+    if (oldUsername.length > 0)
+    {
+        row.find("input[name=multiuserName]").attr("placeholder", "השאר ריק כדי למחוק");
+        row.find("input[name=multiuserPass]").attr("placeholder", "הזן כדי לשנות");
+    }
+    row.find(".actionBtn").text("שמור").removeClass("red darkGreen").addClass("blue");
+
+    //save click
+    row.find(".actionBtn").unbind().click(function ()
+    {
+        var username = row.find("input[name=multiuserName]").val();
+        var password = row.find("input[name=multiuserPass]").val();
+        var passmd5 = "";
+        if (password.length > 0)
+            passmd5 = hex_md5(password);
+
+        saveUserData(username, passmd5, oldUsername);
+
+        if (username.length == 0) //username not given, remove row
+            row.remove();
+        else
+        {
+            row.find(".multiuserName").text(username);
+            row.find("input").each(function ()
+            {
+                $(this).css("width", $(this).parent().find(".userDisplay").width() + "px");
+            })
+            var button = $(this);
+            setTimeout(function ()
+            {
+                row.removeClass("editMode");
+                button.text("התחבר").removeClass("blue red").addClass("darkGreen");
+                button.unbind();
+                bindMultiuserRow(row);
+                row.find("input").removeClass("smooth").css("width", "");
+            }, 200);
+        }
+    })
+
+    row.find("input").keypress(function (e)
+    {
+        if (e.which == 13) //blur and save on enter
+        {
+            $(this).blur();
+            row.find(".actionBtn").click();
+        }
+    });
+
+    row.find("input").each(function ()
+    {
+        $(this).css("width", $(this).parent().find(".userDisplay").width() + "px");
+    })
+
+    row.find("input").addClass("smooth");
+    setTimeout(function () { row.find("input").css("width", "") }, 20); //slide into width
+
+    row.addClass("editMode");
+}
+
+//logs into a user and shows progress in the button
+function logIntoUser(user, btn)
+{
+    var passmd5 = "";
+    var row = btn.parents("tr");
+    row.addClass("inProgress");
+    btn.unbind();
+    btn.text("טוען...");
+    chrome.storage.local.get("savedUserData", function (data)
+    {
+        var savedUserData = data.savedUserData || [];
+        var changed = false;
+        for (var i = 0; i < savedUserData.length && !changed; i++)
+        {
+            if (savedUserData[i].user == user)
+                passmd5 = savedUserData[i].passmd5;
+        }
+
+        if (passmd5.length > 0)
+        {
+            btn.text("מתנתק...");
+            logout(function (success)
+            {
+                btn.text("מתחבר...");
+                login(user, passmd5, function (status)
+                {
+                    if (status == 1)
+                    {
+                        btn.text("מחובר!");
+                        $("#rateLimitLoginNotice").slideUp(200); //hide rate limit notice if visible
+                        setTimeout(function ()
+                        {
+                            bindMultiuserRow(row);
+                            row.removeClass("inProgress");
+                        }, 2000);
+                        chrome.runtime.sendMessage({ sendTotalNotifications: true }); //update and notify notification count
+                    }
+                    else if (status == 0)
+                    {
+                        row.removeClass("inProgress");
+                        btn.text("שגיאת התחברות!");
+                        btn.removeClass("blue darkGreen").addClass("red");
+                        row.find(".editMultiuser").addClass("error");
+                    }
+                    else
+                    {
+                        $("#rateLimitLoginNotice").slideDown(500);
+                        btn.text("ההתחברות מוגבלת!");
+                        btn.removeClass("blue darkGreen").addClass("red");
+                        setTimeout(function ()
+                        {
+                            bindMultiuserRow(row);
+                            row.removeClass("inProgress");
+                        }, 5000);
+                    }
+                });
+            })
+        }
+    });
+    chrome.runtime.sendMessage({ event: { cat: "Click", type: "MultiUser" } });
+}
+
+//saves username and password hashes to memory
+function saveUserData(username, passmd5, oldUsername)
+{
+    chrome.storage.local.get("savedUserData", function (data)
+    {
+        var savedUserData = data.savedUserData || [];
+        var changed = false;
+        if (oldUsername.length > 0)
+        {
+            for (var i = 0; i < savedUserData.length && !changed; i++)
+            {
+                if (savedUserData[i].user == oldUsername)
+                {
+                    if (username.length == 0) //remove user
+                    {
+                        savedUserData.splice(i, 1);
+                        i--;
+                    }
+                    else
+                    {
+                        savedUserData[i].user = username;
+                        if (passmd5.length > 0)
+                            savedUserData[i].passmd5 = passmd5;
+                    }
+                    changed = true;
+                }
+            }
+        }
+        if (!changed && username.length > 0)
+        {
+            savedUserData.push({
+                user: username,
+                passmd5: passmd5
+            });
+        }
+
+        chrome.storage.local.set({ "savedUserData": savedUserData });
+    });
+}
+
+//log the user out of FXP
+function logout(callback)
+{
+    $.get(fxpDomain, function (data, status)
+    {
+        //get logout URL
+        var doc = domParser.parseFromString(data, "text/html");
+        var logoutA = doc.querySelector("a[href*='do=logout']");
+        if (logoutA === null)
+        {
+            callback(false);
+        }
+        else
+        {
+            var outUrl = fxpDomain + logoutA.getAttribute("href");
+            //request to log out
+            $.get(outUrl, function (data, status)
+            {
+                callback(true);
+            });
+        }
+    });
+}
+
+//log the user into FXP using their password's md5 hash
+function login(username, passmd5, callback)
+{
+    var loginUrl = "https://www.fxp.co.il/login.php?do=login";
+
+    $.post(loginUrl, {
+        vb_login_username: username,
+        vb_login_md5password: passmd5,
+        vb_login_md5password_utf: passmd5,
+
+        vb_login_password_hint: "סיסמה",
+        vb_login_password: "",
+        s: "",
+        securitytoken: "guest",
+        do: "login",
+        cookieuser: 1
+    }, function (data, status)
+        {
+            var response = 0;
+            if (data.indexOf("התחברת בהצלחה") > -1) response = 1;
+            else if (data.indexOf("ניסית להתחבר במספר הפעמים המרבי") > -1) response = 2;
+
+            callback(response);
+        });
+}
+
+$("#logoutCurrent").click(function ()
+{
+    logoutCurrent($(this));
+})
+
+function logoutCurrent(btn)
+{
+    var originalText = btn.text();
+    btn.unbind();
+    btn.text("מתנתק...");
+    logout(function (success)
+    {
+        if (success)
+            btn.text("התנתקת!");
+        else
+            btn.text("לא היית מחובר!");
+
+        setTimeout(function ()
+        {
+            $("#logoutCurrent").click(function ()
+            {
+                logoutCurrent($(this));
+            }).text(originalText);
+        }, 2000)
+    })
 }
 
 //suggests forums for tags in the filtering section
@@ -900,6 +1199,7 @@ $(".saveSettings").click(function ()
             settings.showForumStats = $("#showForumStats").prop("checked");
             settings.hideAccessibilityMenu = $("#hideAccessibilityMenu").prop("checked");
             settings.disableLiveTyping = $("#disableLiveTyping").prop("checked");
+            settings.disableLiveTypingPm = $("#disableLiveTypingPm").prop("checked");
 
             var customBg = {
                 day: "",
@@ -1400,7 +1700,7 @@ function buildUserCard()
         ).append(
             $("<tr>").append(
                 $("<td>").append(
-                    $("<input>", { type: "text", class: "subnick", placeholder: "תת-ניק..." })
+                    $("<input>", { type: "text", class: "subnick", placeholder: "תת-ניק או כתובת תמונה..." })
                 )
             ).append(
                 $("<td>", { class: "styleSubnick" }).append(
@@ -1558,6 +1858,38 @@ function buildStyleThreadsRow(type)
                 $("<span>", { class: "mdi mdi-delete delete" })
             )
             )
+    return row;
+}
+function buildMultiuserRow(username)
+{
+    var row =
+        $("<tr>").append(
+            $("<td>").append(
+                $("<span>", { class: "userDisplay multiuserName" }).text(username)
+            ).append(
+                $("<input>", { type: "text", class: "userInput", name: "multiuserName", autocomplete: "off" })
+                )
+        ).append(
+            $("<td>").append(
+                $("<span>", { class: "userDisplay multiuserPass" }).text("********")
+            ).append(
+                $("<input>", { type: "password", class: "userInput", name: "multiuserPass" })
+                )
+            ).append(
+            $("<td>").append(
+                $("<div>", { class: "button darkGreen inline actionBtn" }).text("התחבר")
+            )
+            ).append(
+            $("<td>").append(
+                $("<div>", { class: "editMultiuser" }).append(
+                    $("<span>", { class: "mdi mdi-account-edit" })
+                )
+            ).append(
+                $("<div>", { class: "deleteMultiuser" }).append(
+                    $("<span>", { class: "mdi mdi-delete" })
+                )
+                )
+            );
     return row;
 }
 

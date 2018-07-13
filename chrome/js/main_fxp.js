@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "תיקוני באגים";
-var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2018/03/135.html";
+var versionDescription = "החליפו בין המשתמשים שלכם בקלות, ותהנו ממצב לילה גם בהודעות פרטיות! גרסה 1.4.0 מביאה את אלה ומתקנת עוד כמה באגים על הדרך.";
+var versionBig = true;
+var versionHref = "https://fxplusplus.blogspot.com/2018/07/140.html";
 
 var defaultNotes = [
     { id: 967488, content: "רק דברים טובים" },
@@ -38,30 +38,43 @@ chrome.storage.sync = (function ()
 var observers = {};
 
 //print functions for debugging
+
 var debug = {
-    big: function (msg)
-    {
-        console.log('%c' + msg, 'background: #000; color: yellow; font-size:2em');
-    },
-    info: function (msg)
-    {
-        console.log('%c' + msg, 'background: #fff; color: #00f; font-weight: bold; font-style: italic;');
-    },
-    error: function (msg)
-    {
-        console.log('%cERROR: ' + msg, 'background: #f00; color: #fff; font-weight: bold;');
-    },
-    notice: function (msg)
-    {
-        console.log('%cNotice: ' + msg, 'background: #ffcc55');
-    },
-    warning: function (msg)
-    {
-        console.log('%cWarning: ' + msg, 'background: #ff3355; color: #fff; font-weight: bold;');
-    },
-    print: function (msg)
-    {
-        console.log(msg);
+    big:     function (msg) { },
+    info:    function (msg) { },
+    error:   function (msg) { },
+    notice:  function (msg) { },
+    warning: function (msg) { },
+    print:   function (msg) { },
+}
+
+if (localStorage.getItem("fxplusplus_debugging"))
+{
+    debug = {
+        big: function (msg)
+        {
+            console.log('%c' + msg, 'background: #000; color: yellow; font-size:2em');
+        },
+        info: function (msg)
+        {
+            console.log('%c' + msg, 'background: #fff; color: #00f; font-weight: bold; font-style: italic;');
+        },
+        error: function (msg)
+        {
+            console.log('%cERROR: ' + msg, 'background: #f00; color: #fff; font-weight: bold;');
+        },
+        notice: function (msg)
+        {
+            console.log('%cNotice: ' + msg, 'background: #ffcc55');
+        },
+        warning: function (msg)
+        {
+            console.log('%cWarning: ' + msg, 'background: #ff3355; color: #fff; font-weight: bold;');
+        },
+        print: function (msg)
+        {
+            console.log(msg);
+        }
     }
 }
 
@@ -76,20 +89,34 @@ var regex = {
 var readTimeSpeed = 220;
 
 var classicIconsList = [ //old, new, width, height
-    ["https://images.fxp.co.il/smilies3/124_40x.png", "https://i.imgur.com/lSrkVhN.png", 20, 20], //replace mad
-    ["https://images.fxp.co.il/smilies3/6_40x.png", "https://i.imgur.com/qpPriMw.png", 18, 18], //replace wink
-    ["https://images.fxp.co.il/smilies3/32_40x.png", "https://i.imgur.com/icnMREx.png", 20, 20], //replace tongue
-    ["https://images.fxp.co.il/smilies3/4_40x.png", "https://i.imgur.com/CgwnVDU.png", 20, 20], //replace blush
-    ["https://images.fxp.co.il/smilies3/200_40x.png", "https://i.imgur.com/3StcOJf.png", 18, 18], //replace bot/nerd
-    ["https://images.fxp.co.il/smilies3/43_40x.png", "https://i.imgur.com/gpEocl5.png", 18, 18], //replace XD
-    ["https://images.fxp.co.il/smilies3/143_40x.png", "https://i.imgur.com/eNdc1XA.png", 20, 20], //replace confused
-    ["https://images.fxp.co.il/smilies3/205_40x.png", "https://i.imgur.com/eq274Ao.png", 74, 30], //replace angel
-    ["https://images.fxp.co.il/smilies3/204_40x.png", "https://i.imgur.com/lPepnzd.png", 20, 20], //replace smile
-    ["https://images.fxp.co.il/smilies3/173_40x.png", "https://i.imgur.com/Y0xWnOV.png", 18, 23], //replace devil
-    ["https://images.fxp.co.il/smilies3/202_40x.png", "https://i.imgur.com/yDHz3MY.png", 19, 19], //replace kiss
-    ["https://images.fxp.co.il/smilies3/131_40x.png", "https://i.imgur.com/FekEBW4.png", 20, 20], //replace cool
-    ["https://images.fxp.co.il/smilies3g/206.gif", "https://i.imgur.com/1htCYLi.gif", 22, 20], //replace i love u
-    ["https://images.fxp.co.il/smilies3g/207.gif", "https://i.imgur.com/WzfVnDk.gif", 20, 20]  //replace tongue 2
+    ["https://static.fcdn.co.il/smilies3/124_40x.png", "https://i.imgur.com/lSrkVhN.png", 20, 20], //replace mad
+    ["https://static.fcdn.co.il/smilies3/6_40x.png", "https://i.imgur.com/qpPriMw.png", 18, 18], //replace wink
+    ["https://static.fcdn.co.il/smilies3/32_40x.png", "https://i.imgur.com/icnMREx.png", 20, 20], //replace tongue
+    ["https://static.fcdn.co.il/smilies3/4_40x.png", "https://i.imgur.com/CgwnVDU.png", 20, 20], //replace blush
+    ["https://static.fcdn.co.il/smilies3/200_40x.png", "https://i.imgur.com/3StcOJf.png", 18, 18], //replace bot/nerd
+    ["https://static.fcdn.co.il/smilies3/43_40x.png", "https://i.imgur.com/gpEocl5.png", 18, 18], //replace XD
+    ["https://static.fcdn.co.il/smilies3/143_40x.png", "https://i.imgur.com/eNdc1XA.png", 20, 20], //replace confused
+    ["https://static.fcdn.co.il/smilies3/205_40x.png", "https://i.imgur.com/eq274Ao.png", 74, 30], //replace angel
+    ["https://static.fcdn.co.il/smilies3/204_40x.png", "https://i.imgur.com/lPepnzd.png", 20, 20], //replace smile
+    ["https://static.fcdn.co.il/smilies3/173_40x.png", "https://i.imgur.com/Y0xWnOV.png", 18, 23], //replace devil
+    ["https://static.fcdn.co.il/smilies3/202_40x.png", "https://i.imgur.com/yDHz3MY.png", 19, 19], //replace kiss
+    ["https://static.fcdn.co.il/smilies3/131_40x.png", "https://i.imgur.com/FekEBW4.png", 20, 20], //replace cool
+    ["https://static.fcdn.co.il/smilies3g/206.gif", "https://i.imgur.com/1htCYLi.gif", 22, 20], //replace i love u
+    ["https://static.fcdn.co.il/smilies3g/207.gif", "https://i.imgur.com/WzfVnDk.gif", 20, 20]  //replace tongue 2
+]
+
+var classicIconsDict = [
+    { old: "https://static.fcdn.co.il/smilies3/205_40x.png", new: "images/old_icons/angel.png", width: 74, height: 30 },
+    { old: "https://static.fcdn.co.il/smilies3/173_40x.png", new: "images/old_icons/devil.png", width: 18, height: 23 },
+    { old: "https://static.fcdn.co.il/smilies3/202_40x.png", new: "images/old_icons/kiss.png", width: 19, height: 19 },
+    { old: "https://static.fcdn.co.il/smilies3g/206.gif", new: "images/old_icons/loveyou.gif", width: 22, height: 20 },
+    { old: "https://static.fcdn.co.il/smilies3g/207.gif", new: "images/old_icons/tongue2.gif", width: 20, height: 20 },
+
+    { old: "https://images.fxp.co.il/smilies3/205_40x.png", new: "images/old_icons/angel.png", width: 74, height: 30 },
+    { old: "https://images.fxp.co.il/smilies3/173_40x.png", new: "images/old_icons/devil.png", width: 18, height: 23 },
+    { old: "https://images.fxp.co.il/smilies3/202_40x.png", new: "images/old_icons/kiss.png", width: 19, height: 19 },
+    { old: "https://images.fxp.co.il/smilies3g/206.gif", new: "images/old_icons/loveyou.gif", width: 22, height: 20 },
+    { old: "https://images.fxp.co.il/smilies3g/207.gif", new: "images/old_icons/tongue2.gif", width: 20, height: 20 }
 ]
 
 //build an animated loading element
@@ -203,31 +230,7 @@ chrome.storage.sync.get("settings", function (data)
     //use classic icons
     if (settings.classicIcons)
     {
-        var styleStr = "";
-
-        //change the element that gets the border in the smiles menu (because of box-sizing)
-        styleStr += '.cke_skin_kama a.cke_smile img {border: none !important;} .cke_skin_kama a.cke_smile {border: 2px solid #eaead1 !important;}';
-
-        //change the src of every new icon to an old mirror
-        for (var i = 0; i < classicIconsList.length; i++)
-        {
-            //styleStr += "img[src='" + classicIconsList[i][0] + "'] { background-image: url(" + classicIconsList[i][1] + ") } ";
-            styleStr += 'img[src*="' + classicIconsList[i][0] + '"] {' +
-                            'box-sizing: border-box;' +
-                            'background-image: url("' + classicIconsList[i][1] + '");' +
-                            'background-repeat: no-repeat;' +
-                            'background-position: center;' +
-                            'width: ' + classicIconsList[i][2] + 'px;' +
-                            'height: ' + classicIconsList[i][3] + 'px;' +
-                            'padding-left: ' + classicIconsList[i][2] + 'px;' +
-                        '}' +
-                        '#smilies ul.smilielist li div.smilie img[src*="' + classicIconsList[i][0] + '"], .editor_smiliebox ul.smiliebox li img[src*="' + classicIconsList[i][0] + '"] {' +
-                            'width: ' + classicIconsList[i][2] + 'px !important;' +
-                            'height: ' + classicIconsList[i][3] + 'px !important;' +
-                        '}'
-            ;
-        }
-        addStyle(styleStr);
+        addStyle(buildOldIconsStylesheet());
     }
 
     //hide the accessibility menu
@@ -255,6 +258,11 @@ chrome.storage.sync.get("settings", function (data)
                     .text("הגדרות +FxPlus").click(function ()
                     {
                         chrome.runtime.sendMessage({ event: {cat: "Click", type:"Settings site"} });
+                    })
+            ).append(
+                $("<a>", { target: "_blank", href: chrome.extension.getURL("html/settings.html") + "#multiuser" }).text("החלף משתמש").click(function ()
+                    {
+                        chrome.runtime.sendMessage({ event: {cat: "Click", type:"User Settings site"} });
                     })
             )
         ); //add button itself
@@ -1214,30 +1222,6 @@ chrome.storage.sync.get("settings", function (data)
             })
         });
 
-        observers.iconsInEditor = new MutationObserver(function (mutations)
-        {
-            mutations.forEach(function (mutation)
-            {
-                if (mutation.addedNodes.length > 0)
-                {
-                    var addedElement = $(mutation.addedNodes[0]);
-                    if (addedElement.hasClass("inlineimg")) //element is probably a smiley
-                    {
-                        console.log("inlineimg in editor");
-                        for (var i = 0; i < classicIconsList.length; i++)
-                        {
-                            if (addedElement.attr("src") == classicIconsList[i][0])
-                            {
-                                addedElement.replaceWith($("<img>", { src: classicIconsList[i][1] }));
-                                debug.info("replaced smiley in editor");
-                                break;
-                            }
-                        }
-                    }
-                }
-            })
-        })
-
         //mutation to track when the iframe editor is added
         observers.texteditor = new MutationObserver(function (mutations)
         {
@@ -1266,12 +1250,12 @@ chrome.storage.sync.get("settings", function (data)
                                         }
                                         if (settings.classicIcons)
                                         {
-                                            observers.iconsInEditor.observe(editorFrame.contents().find("body.forum, body.content")[0], { childList: true, subtree: true });
+                                            addStyle(buildOldIconsStylesheet(), "oldIcons", editorFrame.contents().find("head")[0]);
                                         }
                                     }
                                     else
                                         bindEditorFrameLoad(editorFrame, settings);
-                                }, 50);
+                                }, 100);
                             }
                             else //iframe not loaded yet
                                 bindEditorFrameLoad(editorFrame, settings);
@@ -1291,7 +1275,7 @@ chrome.storage.sync.get("settings", function (data)
                 if (settings.customDefaultStyle.active)
                     observers.insideEditor.observe(editorFrame.contents().find("body")[0], { childList: true });
                 if (settings.classicIcons)
-                    observers.iconsInEditor.observe(editorFrame.contents().find("body")[0], { childList: true, subtree: true });
+                    addStyle(buildOldIconsStylesheet(), "oldIcons", editorFrame.contents().find("head")[0]);
             }
             else //iframe not loaded yet
                 editorFrame.load(function ()
@@ -1299,7 +1283,7 @@ chrome.storage.sync.get("settings", function (data)
                     if (settings.customDefaultStyle.active)
                         observers.insideEditor.observe($(this).contents().find("body")[0], { childList: true });
                     if (settings.classicIcons)
-                        observers.iconsInEditor.observe($(this).contents().find("body")[0], { childList: true, subtree: true });
+                        addStyle(buildOldIconsStylesheet(), "oldIcons", $(this).contents().find("head")[0]);
                 })
         }
         //observe new iframes that might appear if the user quotes
@@ -1344,6 +1328,8 @@ chrome.storage.sync.get("settings", function (data)
                     activateNightmode();
 
                 localStorage.setItem("nightmodeOverride", true); //prevent auto nightmode to change the mode
+
+                chrome.runtime.sendMessage({ nightmodeState: !state, ttl: 1});
             })
         }
 
@@ -1449,6 +1435,8 @@ chrome.storage.sync.get("settings", function (data)
             $('form[action*="signature"] .editor_smiliebox').before(element);
         }
 
+        $(".cats.hi5 .ct[title='אירוחים כללי']").click(function () { eyesPopup(); });
+
         //custom user notes
         chrome.storage.local.get("userNotes", function (data)
         {
@@ -1512,20 +1500,6 @@ chrome.storage.sync.get("settings", function (data)
                 $("<div>").text("+FxPlus שיפר את דף זה תוך " + elapsed + "ms")
             ));
 
-        
-
-        $(".imagefooter").append($("<div>", { id: "cgglass" }));
-        var topCgglass = 0.45 * (400 / 1000) * $(".imagefooter").width();
-        if (topCgglass + $("#cgglass").height() < 400)
-            $("#cgglass").css("top", topCgglass);
-
-        $(window).on('resize', function ()
-        {
-            var topCgglass = 0.18 * $(".imagefooter").width();
-            if (topCgglass + $("#cgglass").height() < 400)
-                $("#cgglass").css("top", topCgglass);
-        });
-
         $(window).on('load', function ()
         {
             if ($(".signaturecontainer img[src='clear.gif']").length == 0) //there are no images in signatures that can change their src
@@ -1540,8 +1514,6 @@ chrome.storage.sync.get("settings", function (data)
             if ($("#bottomCard").css("display") == "none") //card not shown, page loaded
                 cardSlideSteps($("#bottomCard"));
         })
-
-        $("#cgglass").click(function () { eyesPopup(); });
     })
 })
 
@@ -1668,7 +1640,7 @@ function openQuickAccess()
                                                         //update the comment number
                                                         settings.trackedThreads.list[i].totalComments = threadComments[j].comments;
                                                         chrome.storage.sync.set({ "settings": settings });
-                                                        console.log("corrected tracked thread number");
+                                                        debug.info("corrected tracked thread number");
                                                         commentNum = 0;
                                                     }
                                                     break;
@@ -2069,6 +2041,33 @@ function buildMiniPoll(title, options, totalVotes, voted)
     return element;
 }
 
+//returns a stylesheet that changes new icons to look like old ones
+function buildOldIconsStylesheet()
+{
+    var styleStr = "";
+    //change the element that gets the border in the smiles menu (because of box-sizing)
+    styleStr += '.cke_skin_kama a.cke_smile img {border: none !important;} .cke_skin_kama a.cke_smile {border: 2px solid #eaead1 !important;}';
+
+    for (var i = 0; i < classicIconsDict.length; i++)
+    {
+        styleStr += 'img[src*="' + classicIconsDict[i].old + '"] {' +
+            'box-sizing: border-box;' +
+            'background-image: url("' + chrome.extension.getURL(classicIconsDict[i].new) + '");' +
+            'background-repeat: no-repeat;' +
+            'background-position: center;' +
+            'width: ' + classicIconsDict[i].width + 'px;' +
+            'height: ' + classicIconsDict[i].height + 'px;' +
+            'padding-left: ' + classicIconsDict[i].width + 'px;' +
+            '}' +
+            '#smilies ul.smilielist li div.smilie img[src*="' + classicIconsDict[i].old + '"], .editor_smiliebox ul.smiliebox li img[src*="' + classicIconsDict[i].old + '"] {' +
+            'width: ' + classicIconsDict[i].width + 'px !important;' +
+            'height: ' + classicIconsDict[i].height + 'px !important;' +
+            '}'
+            ;
+    }
+    return styleStr;
+}
+
 //GET http function
 function httpGetAsync(theUrl, callback)
 {
@@ -2167,7 +2166,7 @@ function stringToNumber(str)
 }
 
 //adds a <style> tag with the given css rule
-function addStyle(style, specialId)
+function addStyle(style, specialId, container)
 {
     var css = document.createElement('style'); //create element
     css.type = 'text/css';
@@ -2178,7 +2177,10 @@ function addStyle(style, specialId)
     if (specialId)
         css.id = specialId;
 
-    document.getElementsByTagName("head")[0].appendChild(css); //append element to head
+    if (container)
+        container.appendChild(css); //append element to container
+    else
+        document.getElementsByTagName("head")[0].appendChild(css); //append element to head
 }
 
 //safely injects a script to the head
@@ -2786,7 +2788,7 @@ function userNameById(id, callback)
                 var userName = doc.find("#userinfo .member_username").text().trim()
                 if (userName.length > 0)
                 { //found user's name
-                    console.log("new user in memory: " + userName + "#" + id);
+                    debug.print("new user in memory: " + userName + "#" + id);
                     globalKnownIds[id] = userName;
                     chrome.storage.local.set({ "knownIds": globalKnownIds }); //store new name
                     if (typeof callback === "function")
@@ -2794,7 +2796,7 @@ function userNameById(id, callback)
                 }
                 else
                 { //did not find name, user probably does not exist
-                    console.warn("failed to find name by id: " + id);
+                    debug.warning("failed to find name by id: " + id);
                     if (typeof callback === "function")
                         callback(null);
                 }
@@ -2974,7 +2976,7 @@ function quickEditSubnick(subnickElement)
 
     color = convertRgbToHex(color);
 
-    console.log(color + " " + size);
+    debug.print(color + " " + size);
 
     subnickElement.hide().after(
         $("<input>", { class: "quickSubnickInput", style: "color: " + color + "; font-size: " + size + "; width: " + subnickElement.width() + "px;", placeholder: prevNick })
@@ -2992,7 +2994,7 @@ function quickEditSubnick(subnickElement)
                 color: convertRgbToHex($(this).css("color")),
                 size: parseInt($(this).css("font-size"))
             }
-            console.log(subnick);
+            debug.print(subnick);
             updateSubnick(userId, subnick);
             updateKnownIds(userId, userName);
             setSubnickContainer(subnick, $(this).parents(".postbit").find(".usertitle"));
@@ -3096,22 +3098,22 @@ function disableNightmode()
 //binds the load events for ckeeditor iframes
 function bindEditorFrameLoad(editorFrame, settings)
 {
-    console.log(editorFrame);
+    debug.print(editorFrame);
     editorFrame.load(function ()
     {
-        console.log("FRAME LOADED...");
+        debug.print("FRAME LOADED...");
         if (settings.customDefaultStyle.active)
         {
             observers.insideEditor.observe($(this).contents().find("body")[0], { childList: true });
         }
         if (settings.classicIcons)
-            observers.iconsInEditor.observe($(this).contents().find("body")[0], { childList: true, subtree: true });
+            addStyle(buildOldIconsStylesheet(), "oldIcons", $(this).contents().find("head")[0]);
     });
 
-    console.log(editorFrame[0].contentDocument.readyState);
+    debug.print(editorFrame[0].contentDocument.readyState);
     if (editorFrame[0].contentDocument.readyState == 'complete')
     {
-        console.log("already complete");
+        debug.print("already complete");
         editorFrame.load();
     }
 }
@@ -3132,8 +3134,8 @@ function userNotesEditorSaveChanges(editor, id)
             {
                 if (notes[i].id == id) //remove dupes
                 {
-                    console.log("removing:");
-                    console.log(notes[i]);
+                    debug.print("removing:");
+                    debug.print(notes[i]);
                     notes.splice(i, 1);
                     break;
                 }
@@ -3639,7 +3641,7 @@ function handleRatingSuggestion()
 
                     $("body").append($("<div>", { class: "bottomFloat" }).append(
                         $("<div>", { id: "bottomCard", style: "display: none" }).append(
-                                $("<div>", { class: "cardTop" }).append($("<div>", { class: "progressBg", id: "updateLoader" })).append($("<div>", { class: "cardTitle" }).text("עדכון " + versionNew))
+                                $("<div>", { class: "cardTop" }).append($("<div>", { class: "progressBg", id: "updateLoader" })).append($("<div>", { class: "cardTitle" }).text("+FxPlus: עדכון " + versionNew))
                             ).append(
                                 updateContent.append(
                                     $("<a>", { class: "closeBtn", target: "_blank", href: versionHref }).text("גלה מה נשתנה").click(function ()
@@ -3711,7 +3713,7 @@ function handleRatingSuggestion()
                 var daysSince = Math.round((d.getTime() - installTime) / singleDay);
 
                 //at least 5 days since install, show rating popup
-                console.log(daysSince - timeBuffer);
+                debug.print(daysSince - timeBuffer);
                 if (daysSince - timeBuffer >= 5)
                 {
                     localStorage.removeItem("ratingBuffer"); //remove buffer (if it even exists)
