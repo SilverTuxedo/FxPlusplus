@@ -17,9 +17,9 @@
  
 "use strict";
 
-var versionDescription = "החליפו בין המשתמשים שלכם בקלות, ותהנו ממצב לילה גם בהודעות פרטיות! גרסה 1.4.0 מביאה את אלה ומתקנת עוד כמה באגים על הדרך.";
-var versionBig = true;
-var versionHref = "https://fxplusplus.blogspot.com/2018/07/140.html";
+var versionDescription = "שינוי התנהגות במצב לילה ותיקוני באגים.";
+var versionBig = false;
+var versionHref = "https://fxplusplus.blogspot.com/2018/07/141.html";
 
 var defaultNotes = [
     { id: 967488, content: "רק דברים טובים" },
@@ -1516,6 +1516,22 @@ chrome.storage.sync.get("settings", function (data)
         })
     })
 })
+
+
+
+//receive night mode state changes
+chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse)
+    {
+        if (request.hasOwnProperty("nightmodeState"))
+        {
+            if (request.nightmodeState)
+                activateNightmode();
+            else
+                disableNightmode();
+        }
+    }
+);
 
 //returns the pagination argument depending on how many comments there are
 function getPagination(comments)

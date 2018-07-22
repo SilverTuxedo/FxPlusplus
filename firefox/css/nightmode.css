@@ -468,6 +468,9 @@ span.cke_skin_kama {
     border-color: #3e3e3e;
 }
 
+#forum_holder {
+    background-color: #000 !important;
+}
 
 /*
 PMs and settings

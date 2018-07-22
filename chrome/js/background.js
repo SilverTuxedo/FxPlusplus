@@ -199,7 +199,10 @@ chrome.runtime.onMessage.addListener(
               //{ active: true, currentWindow: true }
               chrome.tabs.query({ url: fxpDomain + "*" }, function (tabs)
               {
-                  chrome.tabs.sendMessage(tabs[0].id, request);
+                  tabs.forEach(function (tab)
+                  {
+                      chrome.tabs.sendMessage(tab.id, request);
+                  });
               });
           }
       }

@@ -295,36 +295,6 @@ function disableNightmode()
     $("body").removeClass("nightmodeActive");
 }
 
-function nightmodeOnload()
-{
-    var darkElement = document.createElement("div");
-    darkElement.setAttribute("style", "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background:black; z-index: 999999999999999;");
-    darkElement.setAttribute("id", "happyEyes");
-    document.documentElement.appendChild(document.importNode(darkElement, true));
-
-    //check when body is added to the document
-    var htmlTreeObserver = new MutationObserver(function (mutations)
-    {
-        mutations.forEach(function (mutation)
-        {
-            if (mutation.addedNodes.length > 0)
-                if (mutation.addedNodes[0].tagName == "BODY") //body added
-                {
-                    setTimeout(function ()
-                    {
-                        //remove black screen
-                        $("body").append($("<link>", { id: "nightmodeStyle", rel: "stylesheet", href: chrome.extension.getURL("css/private_chat_nightmode.css") }));
-                        $("body").prepend($("<div>", { id: "nightmodeShade" }));
-                        $("body").addClass("nightmodeActive");
-                        $("#happyEyes").fadeOut(100);
-                    }, 200);
-                    htmlTreeObserver.disconnect();
-                }
-        })
-    });
-    htmlTreeObserver.observe(document.documentElement, { childList: true });
-}
-
 //safely injects a script to the head
 function injectScript(filename)
 {
