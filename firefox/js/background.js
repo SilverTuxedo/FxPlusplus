@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2018 SilverTuxedo
+    Copyright 2015-2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
    limitations under the License.
 
  */
- 
+
 "use strict";
 
 var factorySettings =
@@ -105,7 +105,7 @@ chrome.browserAction.setBadgeBackgroundColor({ color: "#007cff" });
 chrome.storage.sync = (function ()
 {
     return chrome.storage.sync ||
-           chrome.storage.local;
+        chrome.storage.local;
 })();
 
 var socket;
@@ -186,58 +186,58 @@ chrome.storage.onChanged.addListener(function (changes, areaName)
 
 //listener to cross-page messaging
 chrome.runtime.onMessage.addListener(
-  function (request, sender, sendResponse)
-  {
-      if (request.hasOwnProperty("ttl"))
-      {
-          //forward message to tabs
-          if (request.ttl > 0)
-          {
-              console.log("forwarding request: ");
-              console.log(request);
-              request.ttl = request.ttl - 1;
-              //{ active: true, currentWindow: true }
-              chrome.tabs.query({ url: fxpDomain + "*" }, function (tabs)
-              {
-                  tabs.forEach(function (tab)
-                  {
-                      chrome.tabs.sendMessage(tab.id, request);
-                  });
-              });
-          }
-      }
+    function (request, sender, sendResponse)
+    {
+        if (request.hasOwnProperty("ttl"))
+        {
+            //forward message to tabs
+            if (request.ttl > 0)
+            {
+                console.log("forwarding request: ");
+                console.log(request);
+                request.ttl = request.ttl - 1;
+                //{ active: true, currentWindow: true }
+                chrome.tabs.query({ url: fxpDomain + "*" }, function (tabs)
+                {
+                    tabs.forEach(function (tab)
+                    {
+                        chrome.tabs.sendMessage(tab.id, request);
+                    });
+                });
+            }
+        }
 
-      if (request.hasOwnProperty("notification"))
-      {
-          sendNotification(request.notification.title, request.notification.message, request.notification.url);
-      }
-      if (request.hasOwnProperty("updateBadge"))
-      {
-          chrome.browserAction.getBadgeText({}, function (number)
-          {
-              var badgeCount = parseInt(number);
-              if (isNaN(badgeCount))
-                  badgeCount = 0;
+        if (request.hasOwnProperty("notification"))
+        {
+            sendNotification(request.notification.title, request.notification.message, request.notification.url);
+        }
+        if (request.hasOwnProperty("updateBadge"))
+        {
+            chrome.browserAction.getBadgeText({}, function (number)
+            {
+                var badgeCount = parseInt(number);
+                if (isNaN(badgeCount))
+                    badgeCount = 0;
 
-              getNotificationsTrackedThreads(function (tracked)
-              {
-                  if (badgeCount - tracked.length > request.updateBadge) //badge shows more notifications than are actually present, user probably read a notification
-                      checkNotificationCount(); //update the badge
-              });
-          });
-      }
-      if (request.hasOwnProperty("forceUpdateBadge"))
-      {
-          checkNotificationCount(); //update the badge
-      }
-      if (request.hasOwnProperty("sendTotalNotifications"))
-      {
-          alertUnreadNotifications();
-      }
-      if (request.hasOwnProperty("event"))
-      {
-          sendEvent(request.event.cat, request.event.type);
-      }
+                utils.getNotificationsTrackedThreads(function (tracked)
+                {
+                    if (badgeCount - tracked.length > request.updateBadge) //badge shows more notifications than are actually present, user probably read a notification
+                        checkNotificationCount(); //update the badge
+                });
+            });
+        }
+        if (request.hasOwnProperty("forceUpdateBadge"))
+        {
+            checkNotificationCount(); //update the badge
+        }
+        if (request.hasOwnProperty("sendTotalNotifications"))
+        {
+            alertUnreadNotifications();
+        }
+        if (request.hasOwnProperty("event"))
+        {
+            sendEvent(request.event.cat, request.event.type);
+        }
     });
 
 
@@ -301,87 +301,39 @@ function asyncLoop(iterations, func, callback)
     return loop;
 }
 
-//sends a (simple) notification
-function sendNotification(title, message, url)
+//sends a notification
+function sendNotification(title, message, url, list)
 {
-
     var randomId = Math.random().toString(36).substr(2, 10); //generates a random 10 character id
-    chrome.notifications.create(randomId, {
-        type: 'basic',
-        iconUrl: '../images/notificationImg.png',
+
+    var notificationObject = {
+        type: "basic",
+        iconUrl: "../images/notificationImg.png",
         title: title,
         message: message,
         isClickable: true
-    });
+    };
 
-    //play notification sound
-    var audio = new Audio('../sound/notice.mp3');
-    audio.play();
-
-    chrome.notifications.onClicked.addListener(function (notificationId)
+    if (list)
     {
-        if (notificationId == randomId && url.length > 0)
-        {
-            window.open(url); //open the url
-            setTimeout(function () { chrome.notifications.clear(randomId); }, 200); //close notification
-        }
-    })
-}
-
-//sends a list notification
-function sendListNotification(title, list, url, listStr)
-{
-    var randomId = Math.random().toString(36).substr(2, 10); //generates a random 10 character id
-    var listInText = "";
-    chrome.notifications.create(randomId, {
-        type: 'list',
-        iconUrl: '../images/notificationImg.png',
-        title: title,
-        message: listStr,
-        items: list,
-        isClickable: true
-    });
-
-    //play notification sound
-    var audio = new Audio('../sound/notice.mp3');
-    audio.play();
-
-    chrome.notifications.onClicked.addListener(function (notificationId)
-    {
-        if (notificationId == randomId && url.length > 0)
-        {
-            window.open(url); //open the url
-            setTimeout(function () { chrome.notifications.clear(randomId); }, 200); //close notification
-        }
-    })
-}
-
-//gets a cookie from a domain
-function getDomainCookies(domain, name, callback)
-{
-    chrome.cookies.get({ "url": domain, "name": name }, function (cookie)
-    {
-        if (callback)
-        {
-            if (cookie == null)
-                callback(null);
-            else
-                callback(cookie.value);
-        }
-    });
-}
-
-//GET http function
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function ()
-    {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
+        notificationObject.type = "list";
+        notificationObject.items = list;
     }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-    xmlHttp.send(null);
+
+    chrome.notifications.create(randomId, notificationObject);
+
+    //play notification sound
+    var audio = new Audio('../sound/notice.mp3');
+    audio.play();
+
+    chrome.notifications.onClicked.addListener(function (notificationId)
+    {
+        if (notificationId == randomId && url.length > 0)
+        {
+            window.open(url); //open the url
+            setTimeout(function () { chrome.notifications.clear(randomId); }, 200); //close notification
+        }
+    })
 }
 
 var domParser = new DOMParser();
@@ -489,7 +441,7 @@ function connectSocket()
     //general listeners
     socket.on('connect', function ()
     {
-        getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
+        utils.getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
         {
             var send = '{"userid":"' + id + '","froum":"f-fe7fdfa8be5eb96fc56f318738a6410e"}';
             socket.send(send);
@@ -498,7 +450,7 @@ function connectSocket()
     });
     socket.on('reconnecting', function ()
     {
-        getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
+        utils.getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
         {
             var send = '{"userid":"' + id + '","froum":"f-fe7fdfa8be5eb96fc56f318738a6410e"}';
             socket.send(send);
@@ -584,7 +536,7 @@ function connectSocket()
 //updates the counter at the navbar
 function checkNotificationCount()
 {
-    getNotificationsTotalNum(function (total)
+    utils.getNotificationsTotalNum(function (total)
     {
         if (total > 0)
             changeBadge(total);
@@ -598,7 +550,7 @@ function checkNotificationCount()
 function alertUnreadNotifications()
 {
     var notificationList = [];
-    getNotificationsNormal(function (normal)
+    utils.getNotificationsNormal(function (normal)
     {
         //add notification lists
         if (normal.notifications > 0)
@@ -643,7 +595,7 @@ function alertUnreadNotifications()
                 });
         }
 
-        getNotificationsTrackedThreads(function (tracked)
+        utils.getNotificationsTrackedThreads(function (tracked)
         {
             if (tracked.length > 0)
             { //user has new comments from tracked threads
@@ -682,7 +634,7 @@ function alertUnreadNotifications()
                     listString += notificationList[i].title + " " + notificationList[i].message;
                 }
 
-                sendListNotification("בזמן שלא היית מחובר...", notificationList, fxpDomain, listString);
+                sendNotification("בזמן שלא היית מחובר...", listString, fxpDomain, notificationList);
             }
         })
     })
@@ -695,7 +647,7 @@ function getLastCommentDataForThreadById(threadId, callback)
     var fullUrl = fxpDomain + "showthread.php?t=" + threadId + "&page=999999";
 
     //get the thread
-    httpGetAsync(fullUrl, function (response)
+    utils.httpGetAsync(fullUrl, function (response)
     {
         var doc = domParser.parseFromString(response, "text/html");
 
@@ -763,7 +715,7 @@ function updateTotalCommentsTrackedThreads(threadList, refreshRate)
                 console.log("updated comment count of " + threadList.length + " threads");
 
                 //notify of new comments
-                getNotificationsTrackedThreads(function (tracked)
+                utils.getNotificationsTrackedThreads(function (tracked)
                 {
                     var checkedBadge = false;
                     //new comment, notify the user
@@ -840,98 +792,7 @@ function scheduleTrackedThreadsUpdate(lastRefresh, refreshRate)
                 delayInMinutes: nextUpIn
             })
         }
-    }); 
-}
-
-//returns notification objects for tracked threads
-function getNotificationsTrackedThreads(callback)
-{
-    var noti = [];
-    var commentNum, url;
-    chrome.storage.local.get("threadComments", function (data)
-    {
-        var threadComments = data.threadComments || [];
-        chrome.storage.sync.get("settings", function (data2)
-        {
-            var settings = data2.settings || factorySettings;
-
-            for (var i = 0; i < settings.trackedThreads.list.length; i++)
-            {
-                for (var j = 0; j < threadComments.length; j++)
-                {
-                    if (threadComments[j].id == settings.trackedThreads.list[i].threadId)
-                    {
-                        commentNum = settings.trackedThreads.list[i].totalComments - threadComments[j].comments;
-                        url = fxpDomain + "showthread.php?t=" + settings.trackedThreads.list[i].threadId;
-                        if (settings.trackedThreads.list[i].totalComments  > 15) //add pages
-                        {
-                            url += "&page=" + Math.ceil(settings.trackedThreads.list[i].totalComments / 15);
-                        }
-                        if (commentNum > 0)
-                        {
-                            noti.push({
-                                threadTitle: settings.trackedThreads.list[i].title,
-                                threadId: settings.trackedThreads.list[i].threadId,
-                                totalComments: settings.trackedThreads.list[i].totalComments,
-                                newComments: commentNum,
-                                lastCommentor: settings.trackedThreads.list[i].lastCommentor,
-                                url: url
-                            })
-                        }
-                        break;
-                    }
-                }
-            }
-
-            //return the notifications
-            callback(noti);
-        });
     });
-}
-
-//returns notifications from each kind, and total from FXP itself
-function getNotificationsNormal(callback)
-{
-    var noti = {
-        pms: 0,
-        likes: 0,
-        notifications: 0,
-        total: function ()
-        {
-            return this.pms + this.likes + this.notifications;
-        }
-    };
-    getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
-    {
-        if (id != null)
-            httpGetAsync(fxpDomain + "feed_live.php?userid=" + id + "&format=json", function (data)
-            {
-                var notificationCount = JSON.parse(data);
-
-                noti.pms = parseInt(notificationCount.pm);
-                noti.likes = parseInt(notificationCount.like);
-                noti.notifications = parseInt(notificationCount.noti);
-
-                callback(noti);
-            })
-        else
-            callback(noti);
-    });
-}
-
-//returns the addition of all notification types
-function getNotificationsTotalNum(callback)
-{
-    var total = 0;
-    getNotificationsNormal(function (n1)
-    {
-        total += n1.total();
-        getNotificationsTrackedThreads(function (n2)
-        {
-            total += n2.length
-            callback(total);
-        })
-    })
 }
 
 sendEvent("Passive", "Load");

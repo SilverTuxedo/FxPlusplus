@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2018 SilverTuxedo
+    Copyright 2015-2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
 /*
 GENERAL
 */
+
+[data-ogcolor] {
+    transition: color 0.3s;
+}
 
 #nightmodeShortcut {
     background-color: #000;
@@ -101,9 +105,8 @@ h1 {
     border-color: #000000;
 }
 
-.flo .forumbit_post h2 {
-    color: black;
-    filter: invert(100%);
+.forumbit_post h2 {
+    text-shadow: 1px 1px 4px #000000, -0.5px -0.5px 0 #000000, 0.5px -0.5px 0 #000000, -0.5px 0.5px 0 #000000, 0.5px 0.5px 0 #000000;
 }
 
 
@@ -155,8 +158,8 @@ FRONT PAGE
     border: 1px solid #6f6f6f;
 }
 
-.childforum {
-    filter: invert(100%);
+.childforum a {
+    color: #ccc;
 }
 
 .fav_div {
@@ -212,7 +215,7 @@ THREADS LIST
 .threadlisthead, #thread_controls {
     border: 1px solid #3e3e3e;
     background: #212121;
-    color: #6d6d6d;
+    color: #a2a2a2;
 }
 
     .threadlisthead a, #thread_controls a {
@@ -249,6 +252,10 @@ THREADS LIST
     filter: invert(100%);
 }
 
+div#left_block_1 a {
+    color: #cacaca;
+}
+
 
 #forumStatsContainer {
     background: #082746;
@@ -274,7 +281,7 @@ THREADS LIST
     color: #777777;
 }
 
-.hideThread a, .hideThread em {
+.hideThread a:not(.understate), .hideThread em, .hideThread .typetext {
     color: #777777 !important;
 }
 
@@ -288,13 +295,13 @@ THREADS LIST
 
 .minithread {
     color: #3e3e3e;
-    background: #191919;
+    background: #1d1d1d;
     border-bottom: 1px solid #3e3e3e;
     border-right: 1px solid #003ac7 !important;
 }
 
     .minithread a {
-        color: black;
+        color: #ccc;
     }
 
     .minithread .sk-cube-grid .sk-cube {
@@ -304,6 +311,10 @@ THREADS LIST
 /*
 COMMENTS
 */
+
+.postbit a, .miniComment a {
+    color: #ccc;
+}
 
 .titleshowt {
     border-color: #3e3e3e;
@@ -322,27 +333,9 @@ COMMENTS
     z-index: 1;
 }
 
-.userinfo .contact, .userinfo .user-picture-holder, .postbody, .commentsContainer,
-.userinfo_noavatar .contact, .userinfo_noavatar .user-picture-holder {
-    filter: invert(100%);
+.postbit .postbody, .userprof_content, .miniComment {
+    color: #b1b1b1;
 }
-
-    .userinfo img, .userinfo video, .postbody img, .postbody video, .postbody iframe, .postbody twitterwidget,
-    .commentsContainer img, .commentsContainer video, .commentsContainer iframe, .commentsContainer twitterwidget,
-    .userinfo_noavatar img, .userinfo_noavatar video {
-        filter: invert(100%);
-    }
-
-.video_div {
-    filter: invert(100%);
-}
-
-    .video_div video,
-    .video_div iframe {
-        filter: invert(0) !important;
-    }
-
-
 
 .videoyoudiv {
     background: none;
@@ -352,9 +345,14 @@ COMMENTS
         filter: invert(100%);
     }
 
-.userinfo div[style*='left:10px;'],
-.userinfo_noavatar div[style*='left:10px;'] {
-    color: #888 !important;
+div[style*="background: url(//static.fcdn.co.il/images_new/postsm.svg)"] {
+    filter: brightness(3);
+    color: #333;
+}
+
+.userinfo div[style*='left: 10px'],
+.userinfo_noavatar div[style*='left: 10px'] {
+    color: #999 !important;
 }
 
 .postfoot .textcontrols div[style*='margin-right: 5px;'] {
@@ -368,40 +366,62 @@ COMMENTS
 }
 
 .postbit .postbody {
-    background: #e2e2e2 !important;
+    background-color: #1d1d1d !important;
+    border-color: #2d2d2d;
+    transition: background-color 0s;
 }
 
     .postbit .postbody .time {
-        color: #3e3e3e;
+        color: #717171;
     }
+
+.postbit .postfoot .postcontrols {
+    filter: brigtness(180%);
+}
 
 .postbitignored {
     background: #0c0c0c;
     border-color: #333333;
 }
 
+    .postbitignored .postrow {
+        color: #777;
+    }
+
+        .postbitignored .postrow a {
+            color: #888;
+        }
+
 .bbcode_container div.bbcode_quote {
-    background: #dadddf none;
+    background: #171717 none;
 }
 
 .bbcode_container .bbcode_quote_container {
-    filter: brightness(90%);
+    filter: invert(100%) contrast(0.85) hue-rotate(220deg);
+    /*This is a quick and dirty way to make the triangle fit the dark theme without using another image*/
 }
 
-.commentsContainer {
-    filter: invert(100%);
-}
+
 
 .miniComment {
-    background: #efefef;
+    background: #242424;
 }
 
     .miniComment:nth-child(2n+1) {
-        background: #e6e6e6;
+        background: #1d1d1d;
+    }
+
+.minipoll {
+    background: #0d213a;
+    color: #b9b9b9;
+}
+
+    .minipoll .voteBar {
+        color: #404040;
     }
 
 .signature {
-    border-top: 1px solid #cacaca;
+    border-top: 1px solid #4e4e4e;
 }
 
 .navlinks {
@@ -414,11 +434,6 @@ COMMENTS
         color: white;
     }
 
-.postbit.blockrow {
-    color: #3e3e3e;
-    background: #eaeaea;
-    filter: invert(100%);
-}
 
 span.cke_skin_kama {
     border: 1px solid #565656;
@@ -471,6 +486,16 @@ span.cke_skin_kama {
 #forum_holder {
     background-color: #000 !important;
 }
+
+.follow-btn {
+    background-color: #1e1e1e;
+    border-color: #5f78d2;
+}
+
+    .follow-btn span {
+        color: #5f78d2;
+    }
+
 
 /*
 PMs and settings
@@ -552,14 +577,6 @@ ul.userlist_showavatars li {
     box-shadow: -2px 2px 2px #151515;
 }
 
-#sidebar_container #userinfo {
-    filter: invert(100%);
-    color: #424242;
-}
-
-    #sidebar_container #userinfo img {
-        filter: invert(100%);
-    }
 
 #sidebar_container #usermenu img {
     filter: invert(100%);
@@ -596,13 +613,11 @@ ul.userlist_showavatars li {
     border-color: #1e2225;
 }
 
-.userprof_vmright .member_blockrow label {
-    filter: invert(100%);
+.profile_content .friends_list li {
+    background-color: #212327;
+    border-color: #3e424a;
 }
 
-.userprof_vmright .member_blockrow label img {
-    filter: invert(100%);
-}
 
 .userprof_content {
     background-color: #0e0e0e;
@@ -611,14 +626,6 @@ ul.userlist_showavatars li {
 .userprof_content_border {
     border-color: #0e0e0e;
 }
-
-.userprof blockquote {
-    filter: invert(100%);
-}
-
-    .userprof blockquote img, .userprof blockquote video, .userprof blockquote iframe, .userprof blockquote twitterwidget {
-        filter: invert(100%);
-    }
 
 .userprof_button {
     background: #3e3e3e;

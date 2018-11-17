@@ -4,7 +4,7 @@
   "short_name": "FxPlus+",
   "author": "SilverTuxedo",
   "description": "מעולם לא היה קל יותר לגלוש ב-FxP.",
-  "version": "1.4.1",
+  "version": "1.5.0",
 
   "browser": "chrome",
 
@@ -39,13 +39,13 @@
   "content_scripts": [
     {
       "matches": [ "https://www.fxp.co.il/*" ],
-      "js": [ "js/jquery.min.js", "js/main_fxp.js" ],
+      "js": [ "js/jquery.min.js", "js/utils.js", "js/main_fxp.js" ],
       "css": [ "css/main_fxp.css", "css/balloon.css", "fonts/materialdesignicons.css" ],
       "run_at": "document_start"
     },
     {
       "matches": [ "https://www.fxp.co.il/private_chat.php*" ],
-      "js": [ "js/jquery.min.js", "js/private_chat_fxp.js" ],
+      "js": [ "js/jquery.min.js", "js/utils.js", "js/private_chat_fxp.js" ],
       "css": [ "css/balloon.css", "css/main_fxp.css" ],
       "run_at": "document_start",
       "all_frames": true

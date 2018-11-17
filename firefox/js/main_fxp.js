@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2018 SilverTuxedo
+    Copyright 2015-2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
    limitations under the License.
 
  */
- 
+
 "use strict";
 
-var versionDescription = "שינוי התנהגות במצב לילה ותיקוני באגים.";
-var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2018/07/141.html";
+var versionDescription = "מצב לילה קיבל שיפור משמעותי!";
+var versionBig = true;
+var versionHref = "https://fxplusplus.blogspot.com/2018/11/150.html";
 
 var defaultNotes = [
     { id: 967488, content: "רק דברים טובים" },
@@ -30,7 +30,7 @@ var defaultNotes = [
 chrome.storage.sync = (function ()
 {
     return chrome.storage.sync ||
-           chrome.storage.local;
+        chrome.storage.local;
 })();
 
 
@@ -40,12 +40,12 @@ var observers = {};
 //print functions for debugging
 
 var debug = {
-    big:     function (msg) { },
-    info:    function (msg) { },
-    error:   function (msg) { },
-    notice:  function (msg) { },
+    big: function (msg) { },
+    info: function (msg) { },
+    error: function (msg) { },
+    notice: function (msg) { },
     warning: function (msg) { },
-    print:   function (msg) { },
+    print: function (msg) { },
 }
 
 if (localStorage.getItem("fxplusplus_debugging"))
@@ -88,22 +88,6 @@ var regex = {
 
 var readTimeSpeed = 220;
 
-var classicIconsList = [ //old, new, width, height
-    ["https://static.fcdn.co.il/smilies3/124_40x.png", "https://i.imgur.com/lSrkVhN.png", 20, 20], //replace mad
-    ["https://static.fcdn.co.il/smilies3/6_40x.png", "https://i.imgur.com/qpPriMw.png", 18, 18], //replace wink
-    ["https://static.fcdn.co.il/smilies3/32_40x.png", "https://i.imgur.com/icnMREx.png", 20, 20], //replace tongue
-    ["https://static.fcdn.co.il/smilies3/4_40x.png", "https://i.imgur.com/CgwnVDU.png", 20, 20], //replace blush
-    ["https://static.fcdn.co.il/smilies3/200_40x.png", "https://i.imgur.com/3StcOJf.png", 18, 18], //replace bot/nerd
-    ["https://static.fcdn.co.il/smilies3/43_40x.png", "https://i.imgur.com/gpEocl5.png", 18, 18], //replace XD
-    ["https://static.fcdn.co.il/smilies3/143_40x.png", "https://i.imgur.com/eNdc1XA.png", 20, 20], //replace confused
-    ["https://static.fcdn.co.il/smilies3/205_40x.png", "https://i.imgur.com/eq274Ao.png", 74, 30], //replace angel
-    ["https://static.fcdn.co.il/smilies3/204_40x.png", "https://i.imgur.com/lPepnzd.png", 20, 20], //replace smile
-    ["https://static.fcdn.co.il/smilies3/173_40x.png", "https://i.imgur.com/Y0xWnOV.png", 18, 23], //replace devil
-    ["https://static.fcdn.co.il/smilies3/202_40x.png", "https://i.imgur.com/yDHz3MY.png", 19, 19], //replace kiss
-    ["https://static.fcdn.co.il/smilies3/131_40x.png", "https://i.imgur.com/FekEBW4.png", 20, 20], //replace cool
-    ["https://static.fcdn.co.il/smilies3g/206.gif", "https://i.imgur.com/1htCYLi.gif", 22, 20], //replace i love u
-    ["https://static.fcdn.co.il/smilies3g/207.gif", "https://i.imgur.com/WzfVnDk.gif", 20, 20]  //replace tongue 2
-]
 
 var classicIconsDict = [
     { old: "https://static.fcdn.co.il/smilies3/205_40x.png", new: "images/old_icons/angel.png", width: 74, height: 30 },
@@ -138,6 +122,21 @@ chrome.storage.local.get("knownIds", function (data)
         globalKnownIds = {};
 });
 
+//selectors for elements which can have special colors, used for nightmode
+var colorfulElementSelectors = [
+    "[color]",
+    "[style^='color:']",
+    "[style*=' color:']",
+    "[style*=';color:']",
+    ".usertitle",
+    ".usertitle *",
+    ".friend_info .description",
+    ".friend_info .description *",
+    ".postcontent",
+    ".vm_blockrow blockquote",
+    ".prefixtit"
+];
+
 
 //night mode is active
 if (localStorage.getItem("nightmodeEnabled") == "true")
@@ -157,8 +156,7 @@ if (localStorage.getItem("nightmodeEnabled") == "true")
                 if (mutation.addedNodes[0].tagName == "BODY") //body added
                 {
                     //append the style
-                    $("body").append($("<link>", { id: "nightmodeStyle", rel: "stylesheet", href: chrome.extension.getURL("css/nightmode.css") }));
-                    $("body").addClass("nightmodeActive");
+                    activateNightmode();
                     debug.info("night mode applied");
                     setTimeout(function ()
                     {
@@ -245,27 +243,27 @@ chrome.storage.sync.get("settings", function (data)
 
         var beginDate = new Date();
 
-        
+
 
         //add helper for night mode to determine where the personal category is
         $(".fav_div").parent().addClass("personalCategoryHelper");
 
         //add settings button in FxP toolbar
         $("#settings_pop .popupbody").append($("<div>", { class: "fxpSpopupSeperator" })) //add seperator
-        .append(
+            .append(
             $("<div>", { style: "text-align: center;" }).append(
                 $("<a>", { class: "niceButton darkBlueBtn", style: "font-size: 1em; color: #fff; margin-top: 0", target: "_blank", href: chrome.extension.getURL("html/settings.html") })
                     .text("הגדרות +FxPlus").click(function ()
                     {
-                        chrome.runtime.sendMessage({ event: {cat: "Click", type:"Settings site"} });
+                        chrome.runtime.sendMessage({ event: { cat: "Click", type: "Settings site" } });
                     })
             ).append(
                 $("<a>", { target: "_blank", href: chrome.extension.getURL("html/settings.html") + "#multiuser" }).text("החלף משתמש").click(function ()
-                    {
-                        chrome.runtime.sendMessage({ event: {cat: "Click", type:"User Settings site"} });
-                    })
-            )
-        ); //add button itself
+                {
+                    chrome.runtime.sendMessage({ event: { cat: "Click", type: "User Settings site" } });
+                })
+                )
+            ); //add button itself
 
         //show the hidden by FxP pinned 
         if (settings.showAutoPinned)
@@ -632,7 +630,7 @@ chrome.storage.sync.get("settings", function (data)
                             {
                                 removePopupWindow("detailedStats");
                             })
-                            );
+                        );
 
                         //open the window
                         var imgUrl = chrome.extension.getURL("images/graph.svg");
@@ -727,6 +725,11 @@ chrome.storage.sync.get("settings", function (data)
                         });
                     }
 
+                    //brighten new comment content if nightmode is active
+                    if (localStorage.getItem("nightmodeEnabled") == "true")
+                    {
+                        utils.brightenBySelectors(addedComment, colorfulElementSelectors);
+                    }
 
                     checkCommentFilter(settings.commentFilters, addedComment); //apply filters to new comment
 
@@ -741,7 +744,7 @@ chrome.storage.sync.get("settings", function (data)
             //confirm ids fit to usernames, since users can change their names from time to time
             $(".postbit").each(function ()
             {
-                var userId = getUserIdFromLink($(this).find(".username").attr("href")); //get the comment user's id
+                var userId = utils.getUserIdFromLink($(this).find(".username").attr("href")); //get the comment user's id
                 var userName = $(this).find(".username").text().trim();
 
                 if (userId > 0)
@@ -826,7 +829,7 @@ chrome.storage.sync.get("settings", function (data)
                     $("<div>", { class: "dropdownLContent" }).append(
                         $("<table>", { class: "dropTable" }).append(
                             $("<tr>", { id: "quickAccessAddRemove" }).append(
-                                $("<td>", {"data-balloon": "פתח את גישה מהירה עם ALT+Q", "data-balloon-pos": "right"}).text("הוסף לגישה מהירה")
+                                $("<td>", { "data-balloon": "פתח את גישה מהירה עם ALT+Q", "data-balloon-pos": "right" }).text("הוסף לגישה מהירה")
                             ).append(
                                 $("<td>").append(
                                     $("<span>", { class: "mdi mdi-bookmark-plus" })
@@ -840,7 +843,7 @@ chrome.storage.sync.get("settings", function (data)
                                     $("<span>", { class: "mdi mdi-comment-alert" })
                                 )
                                 )
-                        ).append(
+                            ).append(
                             $("<tr>", { id: "toggleThreadCommentTracking" }).append(
                                 $("<td>").text("בטל מעקב אחר הודעות שלא נקראו")
                             ).append(
@@ -848,7 +851,7 @@ chrome.storage.sync.get("settings", function (data)
                                     $("<span>", { class: "mdi mdi-comment-multiple-outline" })
                                 )
                                 )
-                        )
+                            )
                     )
                     ))
             );
@@ -890,12 +893,12 @@ chrome.storage.sync.get("settings", function (data)
                 $("#quickAccessAddRemove td:eq(1) span").attr("class", "mdi").addClass("mdi-bookmark-plus");
             }
 
-             //change the text in the option "track thread" if its turned on or off
+            //change the text in the option "track thread" if its turned on or off
             if (checkThreadExistsTrackList(currentThreadId))
                 $("#toggleTrackThread td:first").text("כבה התראות מאשכול זה");
             else
                 $("#toggleTrackThread td:first").text("קבל התראות מאשכול זה");
-            
+
 
             //toggle tracking new comments
             $("#toggleThreadCommentTracking").click(function ()
@@ -936,17 +939,8 @@ chrome.storage.sync.get("settings", function (data)
                     //the first comment has the OP, no need to search for the correct id
                     if ($(".postbit:first .postcounter").text() == "#1")
                     {
-                        var userId = getUserIdFromLink($(".postbit:first a.username").attr("href"));
-                        addThreadToQuickAccess(prefix, title, userId, currentThreadId, function ()
-                        {
-                            //change the text in the option
-                            $("#quickAccessAddRemove td:first").text("הסר מגישה מהירה");
-                            $("#quickAccessAddRemove td:eq(1) span").attr("class", "mdi").addClass("mdi-bookmark-remove");
-                            //show the user the quick access window
-                            openQuickAccess();
-                            //close the menu
-                            toggleManageThreadDropdown(false);
-                        })
+                        var userId = utils.getUserIdFromLink($(".postbit:first a.username").attr("href"));
+                        addThreadToQuickAccess(prefix, title, userId, currentThreadId, changeQuickAccessThreadBtnAdded)
                     }
                     else
                     {
@@ -956,16 +950,7 @@ chrome.storage.sync.get("settings", function (data)
                         //the first comment is not the OP, need to search for the correct id
                         getAuthorIdByThreadId(currentThreadId, function (userId)
                         {
-                            addThreadToQuickAccess(prefix, title, userId, currentThreadId, function ()
-                            {
-                                //change the text in the option
-                                $("#quickAccessAddRemove td:first").text("הסר מגישה מהירה");
-                                $("#quickAccessAddRemove td:eq(1) span").attr("class", "mdi").addClass("mdi-bookmark-remove");
-                                //show the user the quick access window
-                                openQuickAccess();
-                                //close the menu
-                                toggleManageThreadDropdown(false);
-                            })
+                            addThreadToQuickAccess(prefix, title, userId, currentThreadId, changeQuickAccessThreadBtnAdded)
                         })
                     }
                 }
@@ -1016,7 +1001,7 @@ chrome.storage.sync.get("settings", function (data)
                         //just make sure afterwards that its not the user's own thread
                         if ($(".postbit:first .postcounter").text() == "#1")
                         {
-                            var userId = getUserIdFromLink($(".postbit:first a.username").attr("href"));
+                            var userId = utils.getUserIdFromLink($(".postbit:first a.username").attr("href"));
                             if (getMyUserId() == userId)
                             {
                                 openPopupWindow("dontTrackYourself",
@@ -1159,49 +1144,12 @@ chrome.storage.sync.get("settings", function (data)
         //custom style to comments
         if (settings.customDefaultStyle.active)
         {
-            var styleElements = [];
-            var styleProp = settings.customDefaultStyle;
-
             var noFontsPage = //true if the page's editor does not allow fonts
                 window.location.href.indexOf("member.php") > -1 ||
                 window.location.href.indexOf("converse.php") > -1 ||
                 window.location.href.indexOf("visitormessage.php") > -1;
 
-            //build the elements according to the style
-            if (styleProp.color != "#333333") //disable if the color is the default color
-            {
-                styleElements.push($("<span>", { style: "color:" + styleProp.color }));
-            }
-            if (styleProp.size != 2) //disable if the size is the default size
-            {
-                styleElements.push($("<font>", { size: styleProp.size }));
-            }
-            if (styleProp.underline)
-            {
-                styleElements.push($("<u>"));
-            }
-            if (styleProp.italic)
-            {
-                styleElements.push($("<em>"));
-            }
-            if (styleProp.bold)
-            {
-                styleElements.push($("<strong>"));
-            }
-            if (styleProp.font != "Arial" && !noFontsPage) //disable if default font or a page with no fonts enabled
-            {
-                styleElements.push($("<span>", { style: "font-family: '" + styleProp.font + "'" }));
-            }
-
-            if (styleElements.length > 0)
-            {
-                //wrap elements inside each other
-                styleWrapper = styleElements[0];
-                for (var i = 1; i < styleElements.length; i++)
-                {
-                    getDeepestChild(styleWrapper).append(styleElements[i]);
-                }
-            }
+            styleWrapper = utils.buildStyleWrapper(settings.customDefaultStyle, noFontsPage, false);
         }
 
         //observer to new text, to wrap with style
@@ -1214,9 +1162,12 @@ chrome.storage.sync.get("settings", function (data)
                     if (mutation.addedNodes[0].nodeName == "#text")
                     {
                         //new text node, wrap with the style
-                        $(mutation.addedNodes[0]).wrap(styleWrapper);
-                        fixCaret(mutation.addedNodes[0]); //move the caret to the end of the text element
-                        debug.info("editor style applied");
+                        if (styleWrapper)
+                        {
+                            $(mutation.addedNodes[0]).wrap(styleWrapper);
+                            utils.fixCaret(mutation.addedNodes[0]); //move the caret to the end of the text element
+                            debug.info("editor style applied");
+                        }
                     }
                 }
             })
@@ -1297,6 +1248,11 @@ chrome.storage.sync.get("settings", function (data)
                 observers.insideEditor.observe($(".chat-text-input .send-element div#input-textarea")[0], { childList: true });
         }
 
+        if (localStorage.getItem("nightmodeEnabled") == "true") //make sure nightmode is active after DOM is ready
+        {
+            activateNightmode();
+        }
+
         //shortcut to toggle night mode
         if (settings.nightmodeShortcut)
         {
@@ -1314,7 +1270,7 @@ chrome.storage.sync.get("settings", function (data)
             }
             $("body").append(
                 $("<div>", { id: "nightmodeShortcut", class: "balloonNoBorder", style: "background-image: url(" + img + ")", "data-balloon": balloonText, "data-balloon-pos": "left" })
-                );
+            );
 
             //toggle night mode
             $("#nightmodeShortcut").click(function ()
@@ -1329,7 +1285,7 @@ chrome.storage.sync.get("settings", function (data)
 
                 localStorage.setItem("nightmodeOverride", true); //prevent auto nightmode to change the mode
 
-                chrome.runtime.sendMessage({ nightmodeState: !state, ttl: 1});
+                chrome.runtime.sendMessage({ nightmodeState: !state, ttl: 1 });
             })
         }
 
@@ -1386,51 +1342,42 @@ chrome.storage.sync.get("settings", function (data)
             var publishedThreadUrl = "https://www.fxp.co.il/showthread.php?t=16859147";
             debug.info("adding signature credit buttons");
             var element = $("<div>", { id: "creditAddon" }).append(
-                    $("<div>").text(" שתף את הכיף!™ והוסף קרדיט לתוסף +FxPlus בחתימה שלך:")
+                $("<div>").text(" שתף את הכיף!™ והוסף קרדיט לתוסף +FxPlus בחתימה שלך:")
+            ).append(
+                $("<div>", { class: "addCreditBtn", id: "addLimg" }).append(
+                    $("<img>", { src: "http://i.imgur.com/bsVtJ5o.png" })
                 ).append(
-                    $("<div>", { class: "addCreditBtn", id: "addXLimg" }).append(
-                        $("<img>", { src: "http://signavatar.com/47618_s.jpg" })
-                    ).append(
-                        $("<span>", { class: "addCreditDesc" }).text("500x276 (מתחלף)")
-                    ).click(function() {
+                    $("<span>", { class: "addCreditDesc" }).text("128x128")
+                    ).click(function ()
+                    {
                         $(".cke_contents iframe").contents().find("body").append(
-                                $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
-                                    $("<img>", { border: 0, src: $(this).find("img").attr("src") })
-                                )
+                            $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
+                                $("<img>", { border: 0, src: $(this).find("img").attr("src") })
                             )
+                        )
                     })
                 ).append(
-                    $("<div>", { class: "addCreditBtn", id: "addLimg" }).append(
-                        $("<img>", { src: "http://i.imgur.com/bsVtJ5o.png" })
-                    ).append(
-                        $("<span>", { class: "addCreditDesc" }).text("128x128")
-                    ).click(function() {
+                $("<div>", { class: "addCreditBtn", id: "addMimg" }).append(
+                    $("<img>", { src: "http://i.imgur.com/O7FsbY8.png" })
+                ).append(
+                    $("<span>", { class: "addCreditDesc" }).text("48x48")
+                    ).click(function ()
+                    {
                         $(".cke_contents iframe").contents().find("body").append(
-                                $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
-                                    $("<img>", { border: 0, src: $(this).find("img").attr("src") })
-                                )
+                            $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
+                                $("<img>", { border: 0, src: $(this).find("img").attr("src") })
                             )
+                        )
                     })
                 ).append(
-                    $("<div>", { class: "addCreditBtn", id: "addMimg" }).append(
-                        $("<img>", { src: "http://i.imgur.com/O7FsbY8.png" })
-                    ).append(
-                        $("<span>", { class: "addCreditDesc" }).text("48x48")
-                    ).click(function() {
-                        $(".cke_contents iframe").contents().find("body").append(
-                                $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
-                                    $("<img>", { border: 0, src: $(this).find("img").attr("src") })
-                                )
-                            )
-                    })
-                ).append(
-                    $("<div>", { class: "addCreditBtn", id: "addTextCredit" }).append(
-                        $("<span>", { class: "addCreditDesc" }).text("טקסט")
-                    ).click(function() {
-                        $(".cke_contents iframe").contents().find("body").append(
-                                $("<a>", { href: publishedThreadUrl, target: "_blank" }).text("+FxPlus")
-                            )
-                    })
+                $("<div>", { class: "addCreditBtn", id: "addTextCredit" }).append(
+                    $("<span>", { class: "addCreditDesc" }).text("טקסט")
+                ).click(function ()
+                {
+                    $(".cke_contents iframe").contents().find("body").append(
+                        $("<a>", { href: publishedThreadUrl, target: "_blank" }).text("+FxPlus")
+                    )
+                })
                 )
             $('form[action*="signature"] .editor_smiliebox').before(element);
         }
@@ -1474,12 +1421,12 @@ chrome.storage.sync.get("settings", function (data)
                         })
                         ).append(
                         $("<span>").text("הערות שיכתבו כאן ישמרו רק עבור דפדפן זה.")
-                    )
+                        )
                 )
 
             }
         });
-        
+
 
 
         handleRatingSuggestion();
@@ -1495,9 +1442,9 @@ chrome.storage.sync.get("settings", function (data)
         var elapsed = endDate.getTime() - beginDate.getTime();
 
         $("#footer_copyright").append($("<div>", { id: "bottomfxplusplusstats" }).append(
-                $("<div>").text("FxPlus+ @ " + chrome.runtime.getManifest().version)
-            ).append(
-                $("<div>").text("+FxPlus שיפר את דף זה תוך " + elapsed + "ms")
+            $("<div>").text("FxPlus+ @ " + chrome.runtime.getManifest().version)
+        ).append(
+            $("<div>").text("+FxPlus שיפר את דף זה תוך " + elapsed + "ms")
             ));
 
         $(window).on('load', function ()
@@ -1585,7 +1532,7 @@ function openQuickAccess()
                                 $("<span>", { class: "mdi mdi-email-open qMsgIcon" })
                             ).append(
                                 $("<div>").append(
-                                $("<a>", { class: "qTitle", href: fxpDomain + "showthread.php?t=" + settings.quickAccessThreads[i].threadId }).append(
+                                    $("<a>", { class: "qTitle", href: fxpDomain + "showthread.php?t=" + settings.quickAccessThreads[i].threadId }).append(
                                         $("<span>").text(settings.quickAccessThreads[i].prefix + " ")
                                     ).append(
                                         $("<b>").text(settings.quickAccessThreads[i].title)
@@ -1595,7 +1542,7 @@ function openQuickAccess()
                                         .text("...").each(function ()
                                         {
                                             var e = $(this); //update user id
-                                            userNameById(settings.quickAccessThreads[i].authorId, function (name)
+                                            utils.getUserNameById(settings.quickAccessThreads[i].authorId, globalKnownIds, function (name)
                                             {
                                                 e.text(name);
                                             });
@@ -1735,7 +1682,7 @@ function openQuickAccess()
             });
         });
 
-        
+
     }
 }
 
@@ -1834,7 +1781,7 @@ function loadMinithread(threadLink, element, pm)
     var fullUrl = fxpDomain + threadLink;
 
     //get the thread
-    httpGetAsync(fullUrl, function (response)
+    utils.httpGetAsync(fullUrl, function (response)
     {
         var doc = $(domParser.parseFromString(response, "text/html"));
 
@@ -1846,8 +1793,8 @@ function loadMinithread(threadLink, element, pm)
         {
             comments.append(
                 $("<div>", { class: "miniComment" })
-                .text("לא נמצאו תגובות! ייתכן שהתוכן שאתה מנסה לגשת אליו הוסר.")
-                )
+                    .text("לא נמצאו תגובות! ייתכן שהתוכן שאתה מנסה לגשת אליו הוסר.")
+            )
         }
         else
         {
@@ -1865,44 +1812,22 @@ function loadMinithread(threadLink, element, pm)
                 if ($(this).find("#polloptions li").length > 0)
                 {
                     var resultsHref = fxpDomain + $(this).find("a[href*='&do=showresults']").attr("href");
-                    httpGetAsync(resultsHref, function (response)
+                    utils.httpGetAsync(resultsHref, function (response)
                     {
                         var doc = $(domParser.parseFromString(response, "text/html"));
-                        doc.find("#pollresults li").each(function ()
-                        {
-                            if ($(this).find("p").text().length > 0) //if there is a name
-                            {
-                                options.push({
-                                    name: $(this).find("p").text().trim(),
-                                    votes: parseInt($(this).find(".numvotes").text()),
-                                    bars: $(this).find(".pollbarwrapper")
-                                });
-                                totalVotes += parseInt($(this).find(".numvotes").text());
-                            }
-                        });
-                        comments.prepend(buildMiniPoll(polltitle, options, totalVotes, false));
+                        var stats = extractPollStats(doc.find("#pollresults li"));
+                        comments.prepend(buildMiniPoll(polltitle, stats.options, stats.totalVotes, false));
                         comments.find(".minipoll").slideDown();
                     });
                 }
                 else
                 {
                     //all of the stats are available, collect and display
-                    $(this).find("#pollresults li").each(function ()
-                    {
-                        if ($(this).find("p").text().length > 0) //if there is a name
-                        {
-                            options.push({
-                                name: $(this).find("p").text().trim(),
-                                votes: parseInt($(this).find(".numvotes").text()),
-                                bars: $(this).find(".pollbarwrapper")
-                            });
-                            totalVotes += parseInt($(this).find(".numvotes").text());
-                        }
-                    });
-                    comments.prepend(buildMiniPoll(polltitle, options, totalVotes, true));
+                    var stats = extractPollStats($(this).find("#pollresults li"));
+                    comments.prepend(buildMiniPoll(polltitle, stats.options, stats.totalVotes, true));
                     comments.find(".minipoll").slideDown();
                 }
-               
+
             });
             doc.find(".postbit").each(function () //process each thread comment
             {
@@ -1975,6 +1900,12 @@ function loadMinithread(threadLink, element, pm)
             }
 
         }
+
+        //brighten content if nightmode is active
+        if (localStorage.getItem("nightmodeEnabled") == "true")
+        {
+            utils.brightenBySelectors(element, colorfulElementSelectors);
+        }
     });
 }
 
@@ -2006,12 +1937,35 @@ function buildMiniComment(author, content, likes, link)
     return comment;
 }
 
+//extracts all poll options and the total number of votes
+function extractPollStats(pollList)
+{
+    var options = [];
+    var totalVotes = 0;
+    pollList.each(function ()
+    {
+        if ($(this).find("p").text().length > 0) //if there is a name
+        {
+            options.push({
+                name: $(this).find("p").text().trim(),
+                votes: parseInt($(this).find(".numvotes").text()),
+                bars: $(this).find(".pollbarwrapper")
+            });
+            totalVotes += parseInt($(this).find(".numvotes").text());
+        }
+    });
+    return {
+        options: options,
+        totalVotes: totalVotes
+    };
+}
+
 //helper function that builds a poll for the loadMinithread function
 function buildMiniPoll(title, options, totalVotes, voted)
 {
     var element =
         $("<div>", { class: "minipoll" }).append(
-            $("<div>", {class: "minipollTitleContainer"}).append(
+            $("<div>", { class: "minipollTitleContainer" }).append(
                 $("<span>").text("סקר: ")
             ).append(
                 $("<span>", { style: "font-weight: bold" }).text(title)
@@ -2029,13 +1983,13 @@ function buildMiniPoll(title, options, totalVotes, voted)
             percent = Math.round(options[i].votes / totalVotes * 10000) / 100; //round to 2 decimal places
             optionsElement.append(
                 $("<li>").append(
-                    $("<div>", {class: "minipollOptionContainer"}).append(
-                        $("<span>", {class: "voteOption"}).text(options[i].name)
+                    $("<div>", { class: "minipollOptionContainer" }).append(
+                        $("<span>", { class: "voteOption" }).text(options[i].name)
                     ).append(
-                        $("<div>", { class: "voteBar", style: "width: " + percent +"%; background-color: hsla("+i*110+", 100%, 80%, 1);" }).append(
-                            $("<span>", {class: "voteCount"}).text(options[i].votes + " הצבעות (" + percent + "%)")
+                        $("<div>", { class: "voteBar", style: "width: " + percent + "%; background-color: hsla(" + i * 110 + ", 100%, 80%, 1);" }).append(
+                            $("<span>", { class: "voteCount" }).text(options[i].votes + " הצבעות (" + percent + "%)")
                         )
-                    )
+                        )
                 )
             );
         }
@@ -2082,19 +2036,6 @@ function buildOldIconsStylesheet()
             ;
     }
     return styleStr;
-}
-
-//GET http function
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function ()
-    {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
-    }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-    xmlHttp.send(null);
 }
 
 var domParser = new DOMParser();
@@ -2271,22 +2212,10 @@ function getThreadIdFromLink(link)
         return parseInt(id[0].substr(2)); //remove t= and return
 }
 
-//gets a users's id from a member.php?u=XXXXXXXXX address
-function getUserIdFromLink(link)
-{
-    if (!link)
-        return NaN;
-    var id = link.match(/u=[0-9]+/g); //match u=XXXX
-    if (id == null)
-        return NaN;
-    else
-        return parseInt(id[0].substr(2)); //remove u= and return
-}
-
 //returns the id of the user who uses the extension
 function getMyUserId()
 {
-    return getUserIdFromLink($(".logedintop .log_in6 a").attr("href"));
+    return utils.getUserIdFromLink($(".logedintop .log_in6 a").attr("href"));
 }
 
 //gets the number of comments of a threadbit element
@@ -2480,7 +2409,7 @@ function getLastCommentDataForThreadById(threadId, callback)
     var fullUrl = fxpDomain + "showthread.php?t=" + threadId + "&page=999999";
 
     //get the thread
-    httpGetAsync(fullUrl, function (response)
+    utils.httpGetAsync(fullUrl, function (response)
     {
         var doc = $(domParser.parseFromString(response, "text/html"));
 
@@ -2500,7 +2429,7 @@ function calcThreadReadTime(threadLink, callback)
     var fullUrl = fxpDomain + threadLink;
 
     //get the thread
-    httpGetAsync(fullUrl, function (response)
+    utils.httpGetAsync(fullUrl, function (response)
     {
         var doc = $(domParser.parseFromString(response, "text/html"));
         var txt = doc.find(".postbit:first .content").text();
@@ -2724,7 +2653,7 @@ function filterThread(filter, threadElement)
     else if (filter.id != undefined) //filter by id
     {
         addClass = "yellowMarkedThread";
-        var userId = getUserIdFromLink(threadElement.find(".author a").attr("href"));
+        var userId = utils.getUserIdFromLink(threadElement.find(".author a").attr("href"));
         basicFilterPass = (filter.id == userId); //the user fits the filter
     }
 
@@ -2791,44 +2720,6 @@ function updateKnownIds(id, name)
     chrome.storage.local.set({ "knownIds": globalKnownIds });
 }
 
-//get a user name from user ID
-function userNameById(id, callback)
-{
-    if (id != "" && id != 0)
-    {
-        if (globalKnownIds[id] == undefined)
-        { //user's name is not already known
-            httpGetAsync("https://www.fxp.co.il/member.php?u=" + id, function (response)
-            { //request user's page
-                var doc = $(domParser.parseFromString(response, "text/html"));
-                var userName = doc.find("#userinfo .member_username").text().trim()
-                if (userName.length > 0)
-                { //found user's name
-                    debug.print("new user in memory: " + userName + "#" + id);
-                    globalKnownIds[id] = userName;
-                    chrome.storage.local.set({ "knownIds": globalKnownIds }); //store new name
-                    if (typeof callback === "function")
-                        callback(userName);
-                }
-                else
-                { //did not find name, user probably does not exist
-                    debug.warning("failed to find name by id: " + id);
-                    if (typeof callback === "function")
-                        callback(null);
-                }
-            });
-        }
-        else
-        {
-            if (typeof callback === "function")
-                callback(globalKnownIds[id]);
-        }
-    }
-    else
-        if (typeof callback === "function")
-            callback(null);
-}
-
 //hides a comment that can be opened when clicking the userbar
 function hideComment(comment)
 {
@@ -2857,7 +2748,7 @@ function applyCommentsFilter(filter, userPostbits)
     if (filter.subnick.value.length > 0) //a subnick is set
     {
         var subnickContainer = userPostbits.find(".usertitle");
-        setSubnickContainer(filter.subnick, subnickContainer);
+        utils.setSubnickContainer(filter.subnick, subnickContainer);
     }
 
     if (filter.hideSignature)
@@ -2880,38 +2771,16 @@ function applyCommentFilterInChat(filter, chatTitle)
     if (filter.subnick.value.length > 0) //a subnick is set
     {
         var subnickContainer = chatTitle.find(".user-title");
-        setSubnickContainer(filter.subnick, subnickContainer);
+        utils.setSubnickContainer(filter.subnick, subnickContainer);
     }
 
     //the rest is irrelevant for this kind of container
 }
 
-//sets the content of the subnick container
-function setSubnickContainer(subnick, subnickContainer)
-{
-    if (isURL(subnick.value)) //if it's a url, place as an image/video, not text
-    {
-        subnickContainer.empty()
-        if (subnick.value.endsWith("mp4") || subnick.value.endsWith("webm"))
-            subnickContainer.append($("<video>", { loop: true, autoplay: true }).append($("<source>", { src: subnick.value })));
-        else
-            subnickContainer.append($("<img>", { src: subnick.value }));
-    }
-    else
-    {
-        subnickContainer.text(subnick.value);
-        subnickContainer.css({
-            color: subnick.color,
-            fontSize: subnick.size + "px",
-            fontWeight: "bold"
-        });
-    }
-}
-
 //checks and calls to apply filters to a comment
 function checkCommentFilter(commentFilters, commentElement)
 {
-    var userId = getUserIdFromLink(commentElement.find(".username").attr("href")); //get the comment user's id
+    var userId = utils.getUserIdFromLink(commentElement.find(".username").attr("href")); //get the comment user's id
     for (var i = 0; i < commentFilters.length; i++)
     {
         if (commentFilters[i].id == userId) //match in filters
@@ -2919,17 +2788,6 @@ function checkCommentFilter(commentFilters, commentElement)
             applyCommentsFilter(commentFilters[i], commentElement);
         }
     }
-}
-
-//convert RGB color format to hexadecimal color format (X,X,X > #XXXXXX)
-function convertRgbToHex(rgb)
-{
-    rgb = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
-    function hex(x)
-    {
-        return ("0" + parseInt(x).toString(16)).slice(-2);
-    }
-    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
 }
 
 //updates the storage to the new subnick. returns the settings with the changes
@@ -2981,41 +2839,52 @@ function quickEditSubnick(subnickElement)
     {
         prevNick = subnickElement.find("img").attr("src") ? subnickElement.find("img").attr("src") : "";
     }
-    var color = subnickElement.css("color");
+    var color = getCssOriginalColor(subnickElement);
     var size = subnickElement.css("font-size");
     var innerReference = subnickElement.find("*"); //find inner place for reference of color in case of special sub nick
     if (innerReference.length > 0)
     { //have the correct color and size if has special sub nick
-        color = innerReference.css("color");
+        color = getCssOriginalColor(innerReference);
         size = innerReference.css("font-size");
     }
 
-    color = convertRgbToHex(color);
+    color = utils.convertRgbToHex(color);
 
     debug.print(color + " " + size);
 
     subnickElement.hide().after(
         $("<input>", { class: "quickSubnickInput", style: "color: " + color + "; font-size: " + size + "; width: " + subnickElement.width() + "px;", placeholder: prevNick })
-        )
+    )
     postbit.find(".quickSubnickInput").focus();
 
     postbit.find(".quickSubnickInput").focusout(function ()
     {
+        var usertitle = $(this).parents(".postbit").find(".usertitle");
+
         if ($(this).val().length > 0)
         {
-            var userId = getUserIdFromLink($(this).parents(".postbit").find(".username").attr("href")); //get the comment user's id
+            var userId = utils.getUserIdFromLink($(this).parents(".postbit").find(".username").attr("href")); //get the comment user's id
             var userName = $(this).parents(".postbit").find(".username").text().trim();
             var subnick = {
                 value: $(this).val(),
-                color: convertRgbToHex($(this).css("color")),
+                color: utils.convertRgbToHex($(this).css("color")),
                 size: parseInt($(this).css("font-size"))
             }
             debug.print(subnick);
             updateSubnick(userId, subnick);
             updateKnownIds(userId, userName);
-            setSubnickContainer(subnick, $(this).parents(".postbit").find(".usertitle"));
+
+            if (localStorage.getItem("nightmodeEnabled") == "true") //rebrighten element
+            {
+                utils.reverseBrightening(usertitle);
+                utils.setSubnickContainer(subnick, usertitle);
+                setTimeout(function () { utils.brightenBySelectors(usertitle, colorfulElementSelectors) }, 100); //the DOM doesn't update so wait a bit and then brighten.
+            }
+            else
+                utils.setSubnickContainer(subnick, usertitle);
         }
-        $(this).parents(".postbit").find(".usertitle").show();
+        usertitle.show();
+
         $(this).remove();
     }).on('keydown', function (e)
     {
@@ -3048,32 +2917,28 @@ function changeBadge(str)
     chrome.browserAction.setBadgeText({ text: str });
 }
 
-
-//returns the deepest child of the element
-function getDeepestChild(element)
-{
-    if (element.children().length == 0)
-        return element;
-
-    var target = element.children(),
-    next = target;
-
-    while (next.length)
-    {
-        target = next;
-        next = next.children();
-    }
-
-    return target;
-}
-
 //force activates night mode
 function activateNightmode()
 {
-    //remove previous stylesheets
-    $("style#customBg, link#nightmodeStyle").remove();
+    var oldStyles = $("style#customBg, link#nightmodeStyle");
     //add nightmode stylesheet
     $("body").append($("<link>", { id: "nightmodeStyle", rel: "stylesheet", href: chrome.extension.getURL("css/nightmode.css") }));
+    //remove previous stylesheets (timeout to prevent flicker)
+    setTimeout(function ()
+    {
+        oldStyles.remove();
+    }, 100);
+
+    var dynamicContentContainers = [
+        ".minithread",
+        "#postlist",
+        ".userprof",
+        ".titleshowt",
+        ".childforum",
+        "#left_block_1",
+        "#view-friends-content"
+    ];
+    utils.brightenBySelectors($(dynamicContentContainers.join(", ")), colorfulElementSelectors);
 
     //custom background handler
     if (settings.customBg.night.length > 0)
@@ -3096,6 +2961,8 @@ function disableNightmode()
     //remove previous stylesheets
     $("style#customBg, link#nightmodeStyle").remove();
 
+    utils.reverseBrightening($("body"));
+
     //custom background handler
     if (settings.customBg.day.length > 0)
     {
@@ -3109,6 +2976,14 @@ function disableNightmode()
     }).attr("data-balloon", "הפעל מצב לילה");
 
     $("body").removeClass("nightmodeActive");
+}
+
+//returns the element's original css color even if it was brightened.
+function getCssOriginalColor(el)
+{
+    if (el.attr("data-ogcolor"))
+        return el.attr("data-ogcolor");
+    return el.css("color");
 }
 
 //binds the load events for ckeeditor iframes
@@ -3192,24 +3067,6 @@ function getUserIdInProfile()
     return userLinkElement.attr("href").match(/userid=[0-9]+/g)[0].substr("userid=".length); //extract the ID from the url
 }
 
-//fixes the caret's position when applying a style to the editor
-function fixCaret(styleElement)
-{
-    var doc = styleElement.ownerDocument || styleElement.document; //get the document
-    var win = doc.defaultView || doc.parentWindow; //get the window
-
-    var range = doc.createRange(); //create new range
-    var selection = win.getSelection(); //get the current range
-
-    //set the caret to the end of the element
-    range.setStart(styleElement, styleElement.textContent.length);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    debug.info("caret moved");
-}
-
 //fixes the ordering of minithreads so each minithread appears below its parent
 function fixMinithreadOrdring()
 {
@@ -3221,7 +3078,7 @@ function fixMinithreadOrdring()
         scrollPos = this.scrollTop; //store the scroll position so it doesn't change while the element moves
         //place after the matching thread (if it's still present)
         parent = $(".threadbit#thread_" + threadId);
-        
+
         if (parent.length > 0)
             if (parent.index() != $(this).index() - 1) //check if reordering is really necessary
                 $(this).insertAfter(parent)[0].scrollTop = scrollPos;
@@ -3256,7 +3113,7 @@ function getDupeSortedDictionary(arr)
         }
         else
             return b.count - a.count;
-    }); 
+    });
     return sortedArr;
 }
 
@@ -3266,11 +3123,11 @@ function getAuthorIdByThreadId(id, callback)
     var fullUrl = fxpDomain + "showthread.php?t=" + id;
 
     //get the thread
-    httpGetAsync(fullUrl, function (response)
+    utils.httpGetAsync(fullUrl, function (response)
     {
         var doc = $(domParser.parseFromString(response, "text/html"));
 
-        var userId = getUserIdFromLink(doc.find(".postbit:first a.username").attr("href"));
+        var userId = utils.getUserIdFromLink(doc.find(".postbit:first a.username").attr("href"));
         callback(userId);
     });
 }
@@ -3303,6 +3160,18 @@ function addThreadToQuickAccess(prefix, title, author, id, callback)
                 callback();
         });
     });
+}
+
+//changes the quick access thread button upon clicking on it
+function changeQuickAccessThreadBtnAdded()
+{
+    //change the text in the option
+    $("#quickAccessAddRemove td:first").text("הסר מגישה מהירה");
+    $("#quickAccessAddRemove td:eq(1) span").attr("class", "mdi").addClass("mdi-bookmark-remove");
+    //show the user the quick access window
+    openQuickAccess();
+    //close the menu
+    toggleManageThreadDropdown(false);
 }
 
 //check if a thread exists in quick access
@@ -3626,22 +3495,22 @@ function handleRatingSuggestion()
                     $("<span>").text("תודה על שהורדת את +FxPlus!")
                 ).append($("<br>")).append(
                     $("<span>", { style: "font-weight: bold" }).text("כדי לפתוח את הגדרות התוסף, לחץ על כפתור גלגל השיניים בבר העליון.")
-                ).append(
+                    ).append(
                     $("<img>", { id: "howToSettingsImg", src: chrome.extension.getURL("images/howtoSettings.png"), height: 44 })
-                );
+                    );
 
                 $("body").append($("<div>", { class: "bottomFloat" }).append(
                     $("<div>", { id: "bottomCard", style: "display: none" }).append(
                         $("<div>", { class: "cardTop" }).append($("<div>", { class: "cardTitle" }).text("ברוכים הבאים!"))
                     ).append(welcomeCardContent.append(
-                            $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
-                            {
-                                changeNotificationValue("welcome", true);
-                                closeBottomCard();
-                                chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Welcome" } });
-                            })
-                        ))
-                    )
+                        $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
+                        {
+                            changeNotificationValue("welcome", true);
+                            closeBottomCard();
+                            chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Welcome" } });
+                        })
+                    ))
+                )
                 );
             }
             else if (versionNew != notificationStorage.lastKnownVersion)
@@ -3649,30 +3518,30 @@ function handleRatingSuggestion()
                 if (versionBig) //version deserves big notification
                 {
                     var updateContent = $("<div>", { class: "cardContent" }).append(
-                                $("<div>", { class: "quotedHeavy" }).text("”" + versionDescription + "”")
-                            ).append(
-                                $("<div>", { class: "quotedBtw" }).text("(מידע נוסף על עדכוני גרסה מופיע בבלוג של התוסף)")
-                            );
+                        $("<div>", { class: "quotedHeavy" }).text("”" + versionDescription + "”")
+                    ).append(
+                        $("<div>", { class: "quotedBtw" }).text("(מידע נוסף על עדכוני גרסה מופיע בבלוג של התוסף)")
+                        );
 
 
                     $("body").append($("<div>", { class: "bottomFloat" }).append(
                         $("<div>", { id: "bottomCard", style: "display: none" }).append(
-                                $("<div>", { class: "cardTop" }).append($("<div>", { class: "progressBg", id: "updateLoader" })).append($("<div>", { class: "cardTitle" }).text("+FxPlus: עדכון " + versionNew))
+                            $("<div>", { class: "cardTop" }).append($("<div>", { class: "progressBg", id: "updateLoader" })).append($("<div>", { class: "cardTitle" }).text("+FxPlus: עדכון " + versionNew))
+                        ).append(
+                            updateContent.append(
+                                $("<a>", { class: "closeBtn", target: "_blank", href: versionHref }).text("גלה מה נשתנה").click(function ()
+                                {
+                                    chrome.runtime.sendMessage({ event: { cat: "Popup", type: "See changes" } });
+                                })
                             ).append(
-                                updateContent.append(
-                                    $("<a>", { class: "closeBtn", target: "_blank", href: versionHref }).text("גלה מה נשתנה").click(function ()
-                                    {
-                                        chrome.runtime.sendMessage({ event: { cat: "Popup", type: "See changes" } });
-                                    })
-                                ).append(
-                                    $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
-                                    {
-                                        changeNotificationValue("lastKnownVersion", versionNew);
-                                        closeBottomCard();
-                                        chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update" } });
-                                    })
+                                $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
+                                {
+                                    changeNotificationValue("lastKnownVersion", versionNew);
+                                    closeBottomCard();
+                                    chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update" } });
+                                })
                                 ))
-                        )
+                    )
                     );
 
                     //restore option for old users
@@ -3698,19 +3567,19 @@ function handleRatingSuggestion()
                         updateText += ": " + versionDescription;
 
                     var updateContent = $("<div>", { class: "cardContent" }).append(
-                                $("<a>", { class: "quotedHeavy", target: "_blank", href: versionHref }).text(updateText)
-                            )
+                        $("<a>", { class: "quotedHeavy", target: "_blank", href: versionHref }).text(updateText)
+                    )
                     $("body").append($("<div>", { class: "bottomFloat" }).append(
                         $("<div>", { id: "bottomCard", class: "smallCard", style: "display: none" }).append($("<div>", { class: "progressBg shortAutoClose", "data-completeAction": "updateVersion", "data-closeAfter": 15000 })).append(
-                                updateContent.append(
-                                    $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
-                                    {
-                                        changeNotificationValue("lastKnownVersion", versionNew);
-                                        closeBottomCard();
-                                        chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update" } });
-                                    })
-                                ))
-                        )
+                            updateContent.append(
+                                $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
+                                {
+                                    changeNotificationValue("lastKnownVersion", versionNew);
+                                    closeBottomCard();
+                                    chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update" } });
+                                })
+                            ))
+                    )
                     );
                 }
                 chrome.runtime.sendMessage({ event: { cat: "Passive", type: "Update" } });
@@ -3752,32 +3621,32 @@ function handleRatingSuggestion()
                         $("<b>").text("כבר עברו " + daysSince + " ימים מאז שהורדת את התוסף +FxPlus. אני מקווה שאתה מרוצה ממנו ושהוא עמד בציפיות שלך.")
                     ).append(
                         $("<div>", { style: "margin-top: 1em" }).text("אשמח אם תדרג את התוסף בחנות. הדירוג שלך יעזור למשתמשים אחרים לגלות ולהוריד את התוסף, וזה גם אומר לי שמה שאני עושה שווה את זה.")
-                    ).append(
+                        ).append(
                         ratingLink.click(function () { chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Rate" } }); })
-                    ).append(
+                        ).append(
                         $("<div>", { style: "margin: 0.2em 0 1em 0; font-weight: bold;" }).text("תודה!")
-                    );
+                        );
 
                     $("body").append($("<div>", { class: "bottomFloat" }).append(
                         $("<div>", { id: "bottomCard", style: "display: none" }).append(
-                                $("<div>", { class: "cardTop" }).append($("<div>", { class: "cardTitle" }).text("אז.. מה דעתך?"))
+                            $("<div>", { class: "cardTop" }).append($("<div>", { class: "cardTitle" }).text("אז.. מה דעתך?"))
+                        ).append(
+                            rateCardContent.append(
+                                $("<div>", { class: "closeBtn" }).text("הזכר לי מאוחר יותר").click(function ()
+                                {
+                                    localStorage.setItem("ratingBuffer", daysSince - 3 + 14); //give extra 14 days
+                                    closeBottomCard();
+                                    chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Postpone Rate" } });
+                                })
                             ).append(
-                                rateCardContent.append(
-                                    $("<div>", { class: "closeBtn" }).text("הזכר לי מאוחר יותר").click(function ()
-                                    {
-                                        localStorage.setItem("ratingBuffer", daysSince - 3 + 14); //give extra 14 days
-                                        closeBottomCard();
-                                        chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Postpone Rate" } });
-                                    })
-                                ).append(
-                                    $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
-                                    {
-                                        changeNotificationValue("rateSuggest", true);
-                                        closeBottomCard();
-                                        chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Rate" } });
-                                    })
+                                $("<div>", { class: "closeBtn" }).text("סגור").click(function ()
+                                {
+                                    changeNotificationValue("rateSuggest", true);
+                                    closeBottomCard();
+                                    chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Rate" } });
+                                })
                                 ))
-                        )
+                    )
                     );
                 }
             }
@@ -3815,7 +3684,7 @@ function openPopupWindow(id, img, title, content, additionalClass)
 {
     if ($("#popupBox").length == 0)
     {
-        $("body").append($("<div>", {id: "popupBox"}));
+        $("body").append($("<div>", { id: "popupBox" }));
     }
 
     //do not open a popup if one already exists

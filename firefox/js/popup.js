@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2018 SilverTuxedo
+    Copyright 2015-2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
    limitations under the License.
 
  */
- 
+
 "use strict";
 
 //if sync storage not supported, fallback to local.
@@ -73,7 +73,7 @@ chrome.storage.sync.get("settings", function (data)
     })
 })
 
-getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe id)
+utils.getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe id)
 {
     console.log(id);
     if (id == null) //the user is not logged in
@@ -83,20 +83,20 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
                 $("<div>", { class: "counterNum" }).text("אופס!")
             ).append(
                 $("<div>", { class: "counterName" }).text("אתה לא מחובר ל-FxP.")
-            )
+                )
         );
         $("#notifications").append($("<div>", { class: "del_noti" }).append(
-                        $("<a>", {
-                            href: "https://www.fxp.co.il/",
-                            target: "_blank",
-                            style: "text-align: center"
-                        }).text("אם אתה מחובר ובעיה זו עדיין נשארת, נסה להתנתק ולהתחבר מחדש, או לאפס cookies.")));
+            $("<a>", {
+                href: "https://www.fxp.co.il/",
+                target: "_blank",
+                style: "text-align: center"
+            }).text("אם אתה מחובר ובעיה זו עדיין נשארת, נסה להתנתק ולהתחבר מחדש, או לאפס cookies.")));
     }
     else
     {
-        getNotificationsNormal(function (normal)
+        utils.getNotificationsNormal(function (normal)
         {
-            getNotificationsTrackedThreads(function (tracked)
+            utils.getNotificationsTrackedThreads(function (tracked)
             {
                 $("#likeCount").text(normal.likes);
                 $("#notificationCount").text(normal.notifications + tracked.length);
@@ -117,7 +117,7 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
                     changeBadge("");
                 }
 
-                getDomainCookies(fxpDomain, "bb_userid", function (idNum)
+                utils.getDomainCookies(fxpDomain, "bb_userid", function (idNum)
                 {
                     var requestsComplete = 0;
                     var requestsSent = 0;
@@ -125,19 +125,12 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
                     {
                         //show like messages
                         requestsSent++;
-                        httpGetAsync(fxpDomain + "likesno.php?userid=" + idNum, function (response)
+                        utils.httpGetAsync(fxpDomain + "likesno.php?userid=" + idNum, function (response)
                         {
                             requestsComplete++;
 
                             var doc = $(domParser.parseFromString(response, "text/html"));
-
-                            doc.find(newNotificationSelector).parent().each(function ()
-                            {
-                                formatNoti($(this));
-                                $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
-                                $("#notifications").append($(this))
-                                    .append($("<div>", { class: "seperator" }));
-                            })
+                            appendToNotifications(doc);
 
                             addExtraNotifications(requestsSent, requestsComplete, normal.pms, tracked);
                         })
@@ -146,19 +139,12 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
                     {
                         requestsSent++;
                         //show like messages
-                        httpGetAsync(fxpDomain + "notifc.php?userid=" + idNum, function (response)
+                        utils.httpGetAsync(fxpDomain + "notifc.php?userid=" + idNum, function (response)
                         {
                             requestsComplete++;
 
                             var doc = $(domParser.parseFromString(response, "text/html"));
-
-                            doc.find(newNotificationSelector).parent().each(function ()
-                            {
-                                formatNoti($(this));
-                                $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
-                                $("#notifications").append($(this))
-                                    .append($("<div>", { class: "seperator" }));
-                            })
+                            appendToNotifications(doc);
 
                             addExtraNotifications(requestsSent, requestsComplete, normal.pms, tracked);
                         })
@@ -171,32 +157,16 @@ getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe i
     }
 });
 
-//gets a cookie from a domain
-function getDomainCookies(domain, name, callback)
+//receives a jQuery doc, formats the notifications in it and pushes them to the view
+function appendToNotifications(doc)
 {
-    chrome.cookies.get({ "url": domain, "name": name }, function (cookie)
+    doc.find(newNotificationSelector).parent().each(function ()
     {
-        if (callback)
-        {
-            if (cookie == null)
-                callback(null);
-            else
-                callback(cookie.value);
-        }
-    });
-}
-
-//GET http function
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function ()
-    {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
-    }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-    xmlHttp.send(null);
+        formatNoti($(this));
+        $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
+        $("#notifications").append($(this))
+            .append($("<div>", { class: "seperator" }));
+    })
 }
 
 //adds the https: prefix to images
@@ -236,12 +206,12 @@ function addExtraNotifications(sent, complete, pmCount, tracked)
         if (pmCount > 0)
         {
             var pmNotification = $("<div>", { class: "del_noti" }).append(
-                        $("<a>", {
-                            href: "https://www.fxp.co.il/chat.php",
-                            target: "_blank",
-                            style: "text-align: center"
-                        }).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) })
-                            .text(pmCount + " הודעות פרטיות שלא נקראו"));
+                $("<a>", {
+                    href: "https://www.fxp.co.il/chat.php",
+                    target: "_blank",
+                    style: "text-align: center"
+                }).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) })
+                    .text(pmCount + " הודעות פרטיות שלא נקראו"));
             setTimeout(function ()
             {
                 $("#notifications").append(pmNotification)
@@ -287,7 +257,7 @@ function addExtraNotifications(sent, complete, pmCount, tracked)
                             .append($("<span>").text(additional))
                             .append($("<span>", { style: "font-weight: bold" }).text(tracked[i].threadTitle))
                             );
-                            
+
                     $("#notifications").append(notification)
                         .append($("<div>", { class: "seperator" }))
                 }
@@ -303,95 +273,3 @@ function changeBadge(str)
     chrome.browserAction.setBadgeText({ text: str });
 }
 
-//returns notification objects for tracked threads
-function getNotificationsTrackedThreads(callback)
-{
-    var noti = [];
-    var commentNum, url;
-    chrome.storage.local.get("threadComments", function (data)
-    {
-        var threadComments = data.threadComments || [];
-        chrome.storage.sync.get("settings", function (data2)
-        {
-            var settings = data2.settings;
-
-            for (var i = 0; i < settings.trackedThreads.list.length; i++)
-            {
-                for (var j = 0; j < threadComments.length; j++)
-                {
-                    if (threadComments[j].id == settings.trackedThreads.list[i].threadId)
-                    {
-                        commentNum = settings.trackedThreads.list[i].totalComments - threadComments[j].comments;
-                        url = fxpDomain + "showthread.php?t=" + settings.trackedThreads.list[i].threadId;
-                        if (settings.trackedThreads.list[i].totalComments > 15) //add pages
-                        {
-                            url += "&page=" + Math.ceil(settings.trackedThreads.list[i].totalComments / 15);
-                        }
-                        if (commentNum > 0)
-                        {
-                            noti.push({
-                                threadTitle: settings.trackedThreads.list[i].title,
-                                threadId: settings.trackedThreads.list[i].threadId,
-                                totalComments: settings.trackedThreads.list[i].totalComments,
-                                newComments: commentNum,
-                                lastCommentor: settings.trackedThreads.list[i].lastCommentor,
-                                url: url
-                            })
-                        }
-                        break;
-                    }
-                }
-            }
-
-            //return the notifications
-            console.log(noti.length + " tracked threads notifications");
-            callback(noti);
-        });
-    });
-}
-
-//returns notifications from each kind, and total from FXP itself
-function getNotificationsNormal(callback)
-{
-    var noti = {
-        pms: 0,
-        likes: 0,
-        notifications: 0,
-        total: function ()
-        {
-            return this.pms + this.likes + this.notifications;
-        }
-    };
-    getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
-    {
-        if (id != null)
-            httpGetAsync(fxpDomain + "feed_live.php?userid=" + id + "&format=json", function (data)
-            {
-                var notificationCount = JSON.parse(data);
-
-                noti.pms = parseInt(notificationCount.pm);
-                noti.likes = parseInt(notificationCount.like);
-                noti.notifications = parseInt(notificationCount.noti);
-
-                console.log(noti.total() + " normal notifications");
-                callback(noti);
-            })
-        else
-            callback(noti);
-    });
-}
-
-//returns the addition of all notification types
-function getNotificationsTotalNum(callback)
-{
-    var total = 0;
-    getNotificationsNormal(function (n1)
-    {
-        total += n1.total();
-        getNotificationsTrackedThreads(function (n2)
-        {
-            total += n2.length
-            callback(total);
-        })
-    })
-}

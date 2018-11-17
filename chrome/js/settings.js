@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2018 SilverTuxedo
+    Copyright 2015-2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 
  */
 
-/// <reference path="jquery.min.js" />
 "use strict";
 
 //helping numbers that get incremented to - used mainly for assuring different ids
@@ -74,20 +73,7 @@ chrome.storage.sync.get("settings", function (data)
         settings = {};
 });
 
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function ()
-    {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
-    }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-    xmlHttp.send(null);
-}
-
 var domParser = new DOMParser();
-var useridRegex = /userid=[0-9]+/g; //matches userid={NUMBER}
 
 //selects and displays a random tip
 function showTip(allowSame)
@@ -117,45 +103,6 @@ $("#tipIcon").click(function ()
     showTip(false);
 });
 
-//get a user ID from user name
-function userIdByName(name, callback)
-{
-    if (name != "")
-        httpGetAsync(fxpDomain + "member.php?username=" + name, function (response)
-        { //request user's page
-            var doc = $(domParser.parseFromString(response, "text/html"));
-            var userLinkElement = doc.find("a[href*='userid='"); //look for a URL with the user's id
-            if (userLinkElement.length > 0)
-            { //found a URL with the user's id
-                var userId = userLinkElement.attr("href").match(useridRegex)[0].substr("userid=".length); //extract the ID from the url
-                var userRealName = doc.find("#userinfo .member_username").text().trim();
-                if (userRealName != name)
-                    name = userRealName;
-                console.log(name + "#" + userId);
-                if (typeof callback === "function")
-                    callback({
-                        name: name,
-                        id: userId
-                    });
-            }
-            else
-            { //did not find such url, user probably does not exist
-                console.warn("failed to find id by name: '" + name + "'");
-                if (typeof callback === "function")
-                    callback({
-                        name: name,
-                        id: null
-                    });
-            }
-        });
-    else
-        if (typeof callback === "function")
-            callback({
-                name: name,
-                id: null
-            });
-}
-
 var globalKnownIds = {};
 chrome.storage.local.get("knownIds", function (data)
 {
@@ -164,44 +111,6 @@ chrome.storage.local.get("knownIds", function (data)
         globalKnownIds = {};
 });
 
-//get a user name from user ID
-function userNameById(id, callback)
-{
-    if (id != "" && id != 0)
-    {
-        if (globalKnownIds[id] == undefined)
-        { //user's name is not already known
-            httpGetAsync(fxpDomain + "member.php?u=" + id, function (response)
-            { //request user's page
-                var doc = $(domParser.parseFromString(response, "text/html"));
-                var userName = doc.find("#userinfo .member_username").text().trim()
-                if (userName.length > 0)
-                { //found user's name
-                    console.log("new user in memory: " + userName + "#" + id);
-                    globalKnownIds[id] = userName;
-                    chrome.storage.local.set({ "knownIds": globalKnownIds }); //store new name
-                    if (typeof callback === "function")
-                        callback(userName);
-                }
-                else
-                { //did not find name, user probably does not exist
-                    console.warn("failed to find name by id: " + id);
-                    if (typeof callback === "function")
-                        callback(null);
-                }
-            });
-        }
-        else
-        {
-            if (typeof callback === "function")
-                callback(globalKnownIds[id]);
-        }
-    }
-    else
-        if (typeof callback === "function")
-            callback(null);
-}
-
 
 //update the id showed near the name of the user
 function updateIdDisplay(element, commonParentSelector)
@@ -209,7 +118,7 @@ function updateIdDisplay(element, commonParentSelector)
     var name = element.val();
     var idElement = element.parents(commonParentSelector).find(".userNumber");
     idElement.text("#...");
-    userIdByName(name, function (response)
+    utils.getUserIdByName(name, function (response)
     {
         if (response.id === null)
         {
@@ -472,7 +381,7 @@ function sub_loadThreadFilterLines(settings)
     //add thread selectors by users table lines
     settings.threadFilters.users.forEach(function (user, index)
     {
-        userNameById(user.id, function (userName)
+        utils.getUserNameById(user.id, globalKnownIds, function (userName)
         {
             addStyleThreadsRow(
                 "user",
@@ -786,7 +695,8 @@ function saveUserData(username, passmd5, oldUsername)
     });
 }
 
-//log the user out of FXP
+
+//Makes the user log out.
 function logout(callback)
 {
     $.get(fxpDomain, function (data, status)
@@ -1261,7 +1171,7 @@ $(".saveSettings").click(function ()
                         exception: exception,
                         action: action
                     });
-                    userNameById(id); //make sure the name is known now
+                    utils.getUserNameById(id, globalKnownIds); //make sure the name is known now
                 }
 
             });
@@ -1328,7 +1238,7 @@ $(".saveSettings").click(function ()
                         disableStyle: disableStyle,
                         hideComments: hideComments
                     });
-                    userNameById(id); //make sure the name is known now
+                    utils.getUserNameById(id, globalKnownIds); //make sure the name is known now
                 }
             })
 
@@ -1443,7 +1353,7 @@ $(document).on('keydown', function (e)
 function addUserCard(id, subnick, subnickStyle, hideSignature, disableStyle, hideComments)
 {
     var card = buildUserCard();
-    userNameById(id, function (userName)
+    utils.getUserNameById(id, globalKnownIds, function (userName)
     {
         card.find("input.username").val(userName); //set the username
         setIdDisplay(card.find(".userNumber"), id);

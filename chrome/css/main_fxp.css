@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2018 SilverTuxedo
+    Copyright 2015-2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -1282,13 +1282,13 @@ CSS loader from SpinKit: http://tobiasahlin.com/spinkit/
 
 .nightmodeActive .minithread {
     color: #3e3e3e;
-    background: #191919;
+    background: #1d1d1d;
     border-bottom: 1px solid #3e3e3e;
     border-right: 1px solid #003ac7 !important;
 }
 
     .nightmodeActive .minithread a {
-        color: black;
+        color: #ccc;
     }
 
     .nightmodeActive .minithread .sk-cube-grid .sk-cube {

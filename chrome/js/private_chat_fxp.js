@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2018 SilverTuxedo
+    Copyright 2015-2018 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,6 +26,19 @@ chrome.storage.sync = (function ()
 
 var fxpDomain = "https://www.fxp.co.il/";
 
+//selectors for elements which can have special colors, used for nightmode
+var colorfulElementSelectors = [
+    "[color]",
+    "[style^='color:']",
+    "[style*=' color:']",
+    "[style*=';color:']",
+    ".talktext",
+    ".usertitle",
+    ".usertitle *",
+    ".username",
+    "#fxplusplus_custom_usernick"
+];
+
 //observer for the default subnick container, used for when the user is typing
 var typingObserver = new MutationObserver(function (mutations)
 {
@@ -42,6 +55,26 @@ var typingObserver = new MutationObserver(function (mutations)
             if (mutation.removedNodes[0].className == "typing-animation") //typing stopped
                 switchSubnick(false);
         }
+    });
+});
+
+//observer for new content like PMs and the PM sidebar.
+var newContentObserver = new MutationObserver(function (mutations)
+{
+    mutations.forEach(function (mutation)
+    {
+        mutation.addedNodes.forEach(function (addedNode)
+        {
+            var addedEl = $(addedNode);
+            if (addedEl.hasClass("talk-bubble") || addedEl.hasClass("pm"))
+            {
+                //brighten new pm content if nightmode is active
+                if (localStorage.getItem("nightmodeEnabled") == "true")
+                {
+                    utils.brightenBySelectors(addedEl, colorfulElementSelectors);
+                }
+            }
+        })
     });
 });
 
@@ -80,16 +113,28 @@ chrome.storage.sync.get("settings", function (data)
             settings = data.settings || {};
         else
             settings = {};
-        
+
         var userId = getUserIdFromLink($(".user-name a").attr("href"));
 
         //add the button to edit the subnick in the settings
         $(".profile div.user-title #cp-color-picker").after($("<div>", {
             id: "fxplusplus_quick_subnick",
             "data-balloon": "ערוך משתמש זה בהגדרות",
-            "data-balloon-pos": "right",
-            style: "background-image: url(" + chrome.extension.getURL("images/pencil.svg") +")"
-        }));
+            "data-balloon-pos": "right"
+        }).append(
+            $("<img>", {
+                src: chrome.extension.getURL("images/pencil.svg"),
+                class: "dayImg"
+            })
+            ).append(
+            $("<img>", {
+                src: chrome.extension.getURL("images/pencil_light.svg"),
+                class: "nightImg",
+                style: "display: none"
+            })
+            )
+
+        );
         $("#fxplusplus_quick_subnick").click(function ()
         {
             window.open(chrome.extension.getURL("html/settings.html") + "?userFilter=" + userId);
@@ -112,6 +157,11 @@ chrome.storage.sync.get("settings", function (data)
                     applyCommentFilterInChat(settings.commentFilters[i], $(".profile"));
                 }
             }
+            //brighten the new subnick if needed
+            if (localStorage.getItem("nightmodeEnabled") == "true")
+            {
+                utils.brightenBySelectors($(".profile"), colorfulElementSelectors);
+            }
         }
 
         var styleWrapper; //element to wrap around the text that has the styles
@@ -120,58 +170,9 @@ chrome.storage.sync.get("settings", function (data)
         //custom style to comments
         if (settings.customDefaultStyle.active)
         {
-            var styleElements = [];
-            var wysibbStyleElements = [];
-            var styleProp = settings.customDefaultStyle;
 
-            //build the elements according to the style
-            if (styleProp.color != "#333333") //disable if the color is the default color
-            {
-                styleElements.push($("<font>", { color: styleProp.color }));
-                wysibbStyleElements.push($("<font>", { color: styleProp.color }));
-            }
-            if (styleProp.size != 2) //disable if the size is the default size
-            {
-                styleElements.push($("<font>", { size: styleProp.size }));
-            }
-            if (styleProp.underline)
-            {
-                styleElements.push($("<u>"));
-                wysibbStyleElements.push($("<u>"));
-            }
-            if (styleProp.italic)
-            {
-                styleElements.push($("<em>"));
-            }
-            if (styleProp.bold)
-            {
-                styleElements.push($("<strong>"));
-                wysibbStyleElements.push($("<strong>"));
-            }
-            if (styleProp.font != "Arial") //disable if default font
-            {
-                styleElements.push($("<span>", { style: "font-family: '" + styleProp.font + "'" }));
-            }
-
-            if (styleElements.length > 0)
-            {
-                //wrap elements inside each other
-                styleWrapper = styleElements[0];
-                for (var i = 1; i < styleElements.length; i++)
-                {
-                    getDeepestChild(styleWrapper).append(styleElements[i]);
-                }
-            }
-
-            if (wysibbStyleElements.length > 0)
-            {
-                //wrap elements inside each other
-                wysibbStyleWrapper = wysibbStyleElements[0];
-                for (var i = 1; i < wysibbStyleElements.length; i++)
-                {
-                    getDeepestChild(wysibbStyleWrapper).append(wysibbStyleElements[i]);
-                }
-            }
+            styleWrapper = utils.buildStyleWrapper(settings.customDefaultStyle, false, false);
+            wysibbStyleWrapper = utils.buildStyleWrapper(settings.customDefaultStyle, false, true);
 
             //observer to new text, to wrap with style
             var observerCustomDefaultStyle = new MutationObserver(function (mutations)
@@ -190,7 +191,7 @@ chrome.storage.sync.get("settings", function (data)
                             }
                             else
                                 $(mutation.addedNodes[0]).wrap(styleWrapper);
-                            fixCaret(mutation.addedNodes[0]); //move the caret to the end of the text element
+                            utils.fixCaret(mutation.addedNodes[0]); //move the caret to the end of the text element
                             debug.info("editor style applied");
                         }
                     }
@@ -205,6 +206,16 @@ chrome.storage.sync.get("settings", function (data)
                 if ($("#qrfastfxp .wysibb-text-editor.wysibb-body").length > 0)
                     observerCustomDefaultStyle.observe($("#qrfastfxp .wysibb-text-editor.wysibb-body")[0], { childList: true });
             }
+        }
+
+        if ($(".chat-data").length) //observe new PMs (if view exists)
+        {
+            newContentObserver.observe($(".chat-data")[0], { childList: true });
+        }
+
+        if ($("ul.pm-list").length) //observe PMs list (if view exists)
+        {
+            newContentObserver.observe($("ul.pm-list")[0], { childList: true });
         }
     });
 });
@@ -232,34 +243,12 @@ function applyCommentFilterInChat(filter, chatTitle)
         oldUsertitle.after($("<span>", { id: "fxplusplus_custom_usernick" }));
         oldUsertitle.hide();
         var subnickContainer = chatTitle.find("#fxplusplus_custom_usernick");
-        setSubnickContainer(filter.subnick, subnickContainer);
+        utils.setSubnickContainer(filter.subnick, subnickContainer);
 
         typingObserver.observe(oldUsertitle[0], { childList: true });
     }
 
     //other filters are irrelevant for this kind of container
-}
-
-//sets the content of the subnick container
-function setSubnickContainer(subnick, subnickContainer)
-{
-    if (isURL(subnick.value)) //if it's a url, place as an image/video, not text
-    {
-        subnickContainer.empty()
-        if (subnick.value.endsWith("mp4") || subnick.value.endsWith("webm"))
-            subnickContainer.append($("<video>", { loop: true, autoplay: true }).append($("<source>", { src: subnick.value })));
-        else
-            subnickContainer.append($("<img>", { src: subnick.value }));
-    }
-    else
-    {
-        subnickContainer.text(subnick.value);
-        subnickContainer.css({
-            color: subnick.color,
-            fontSize: subnick.size + "px",
-            fontWeight: "bold"
-        });
-    }
 }
 
 //switches between showing the typing indicator container and the custon subnick container
@@ -283,6 +272,15 @@ function activateNightmode()
     //add nightmode stylesheet
     $("body").append($("<link>", { id: "nightmodeStyle", rel: "stylesheet", href: chrome.extension.getURL("css/private_chat_nightmode.css") }));
     $("body").prepend($("<div>", { id: "nightmodeShade" }));
+
+    var dynamicContentContainers = [
+        ".talktext",
+        ".user-name",
+        ".user-title",
+        ".pm-list .user-name"
+    ];
+    utils.brightenBySelectors($(dynamicContentContainers.join(", ")), colorfulElementSelectors);
+
     $("body").addClass("nightmodeActive");
 }
 
@@ -292,6 +290,9 @@ function disableNightmode()
     //remove previous stylesheets
     $("style#customBg, link#nightmodeStyle").remove();
     $("#nightmodeShade").remove();
+
+    utils.reverseBrightening($("body"));
+    
     $("body").removeClass("nightmodeActive");
 }
 
@@ -321,40 +322,4 @@ function getUserIdFromLink(link)
         return NaN;
     else
         return parseInt(id[0].substr(2)); //remove u= and return
-}
-
-//returns the deepest child of the element
-function getDeepestChild(element)
-{
-    if (element.children().length == 0)
-        return element;
-
-    var target = element.children(),
-        next = target;
-
-    while (next.length)
-    {
-        target = next;
-        next = next.children();
-    }
-
-    return target;
-}
-
-//fixes the caret's position when applying a style to the editor
-function fixCaret(styleElement)
-{
-    var doc = styleElement.ownerDocument || styleElement.document; //get the document
-    var win = doc.defaultView || doc.parentWindow; //get the window
-
-    var range = doc.createRange(); //create new range
-    var selection = win.getSelection(); //get the current range
-
-    //set the caret to the end of the element
-    range.setStart(styleElement, styleElement.textContent.length);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    debug.info("caret moved");
 }
