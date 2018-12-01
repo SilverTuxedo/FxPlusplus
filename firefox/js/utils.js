@@ -421,6 +421,13 @@ var utils = function ()
         return styleWrapper;
     }
 
+    //wraps the target around the deepest element of the wrapper
+    function deepWrap(target, wrapper)
+    {
+        target.parentNode.insertBefore(wrapper, target);
+        getDeepestChild($(wrapper))[0].appendChild(target);
+    }
+
     //fixes the caret's position when applying a style to the editor
     function fixCaret(styleElement)
     {
@@ -436,7 +443,6 @@ var utils = function ()
         selection.removeAllRanges();
         selection.addRange(range);
 
-        debug.info("caret moved");
     }
 
     return {
@@ -460,6 +466,7 @@ var utils = function ()
         convertRgbToHex: convertRgbToHex,
 
         buildStyleWrapper: buildStyleWrapper,
+        deepWrap: deepWrap,
         fixCaret: fixCaret
     }
 }();

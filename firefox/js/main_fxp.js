@@ -17,9 +17,9 @@
 
 "use strict";
 
-var versionDescription = "מצב לילה קיבל שיפור משמעותי!";
-var versionBig = true;
-var versionHref = "https://fxplusplus.blogspot.com/2018/11/150.html";
+var versionDescription = "תיקון לעיצוב תגובות אוטומטית";
+var versionBig = false;
+var versionHref = "https://fxplusplus.blogspot.com/2018/12/151.html";
 
 var defaultNotes = [
     { id: 967488, content: "רק דברים טובים" },
@@ -45,8 +45,8 @@ var debug = {
     error: function (msg) { },
     notice: function (msg) { },
     warning: function (msg) { },
-    print: function (msg) { },
-}
+    print: function (msg) { }
+};
 
 if (localStorage.getItem("fxplusplus_debugging"))
 {
@@ -1161,11 +1161,13 @@ chrome.storage.sync.get("settings", function (data)
                 {
                     if (mutation.addedNodes[0].nodeName == "#text")
                     {
+                        var newNode = mutation.addedNodes[0];
                         //new text node, wrap with the style
                         if (styleWrapper)
                         {
-                            $(mutation.addedNodes[0]).wrap(styleWrapper);
-                            utils.fixCaret(mutation.addedNodes[0]); //move the caret to the end of the text element
+                            var wrapperElement = styleWrapper.clone()[0];
+                            utils.deepWrap(newNode, wrapperElement);
+                            utils.fixCaret(newNode); //move the caret to the end of the text element
                             debug.info("editor style applied");
                         }
                     }
