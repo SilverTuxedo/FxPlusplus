@@ -304,6 +304,18 @@
         padding-left: 0.3em;
     }
 
+#notes-status {
+    font-weight: bold;
+}
+
+    #notes-status.success {
+        color: #43a047;
+    }
+
+    #notes-status.failure {
+        color: #f44336;
+    }
+
 .fxpSpopupSeperator {
     margin: 10px;
     height: 2px;
@@ -325,6 +337,12 @@
     transition: background-color 0.15s ease-in-out;
 }
 
+    .niceButton.inlineBtn {
+        font-size: 1em;
+        padding: 0.4em 1em;
+        margin-left: 0.5em;
+    }
+
     .niceButton.thinBtn {
         padding: 0.5em 1em;
         color: #acacac;
@@ -344,6 +362,17 @@
 
         .niceButton.blueBtn:hover {
             background-color: #34c8ff;
+        }
+
+    .niceButton.grayBtn {
+        background-color: #ececec;
+        font-weight: normal;
+        color: black;
+        border: 1px solid #cccccc;
+    }
+
+        .niceButton.grayBtn:hover {
+            background-color: #e0e0e0;
         }
 
     .niceButton.darkBlueBtn {
@@ -762,6 +791,10 @@
     margin-top: 0.5em;
     font-family: monospace;
     font-size: 0.9em;
+}
+
+#usernotes-tab {
+    cursor: pointer;
 }
 
 .smallPlusButton {

@@ -26,7 +26,7 @@ var utils = function ()
         {
             if (callback)
             {
-                if (cookie == null)
+                if (cookie === null)
                     callback(null);
                 else
                     callback(cookie.value);
@@ -40,9 +40,9 @@ var utils = function ()
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function ()
         {
-            if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
                 callback(xmlHttp.responseText);
-        }
+        };
         xmlHttp.open("GET", theUrl, true); // true for asynchronous 
         xmlHttp.send(null);
     }
@@ -50,15 +50,15 @@ var utils = function ()
     //get a user name from user ID
     function getUserNameById(id, knownIds, callback)
     {
-        if (id != "" && id != 0)
+        if (id !== "" && id !== 0)
         {
-            if (knownIds[id] == undefined)
+            if (knownIds[id] === undefined)
             { //user's name is not already known
                 httpGetAsync(fxpDomain + "member.php?u=" + id, function (response)
                 { //request user's page
                     var domParser = new DOMParser();
                     var doc = $(domParser.parseFromString(response, "text/html"));
-                    var userName = doc.find("#userinfo .member_username").text().trim()
+                    var userName = doc.find("#userinfo .member_username").text().trim();
                     if (userName.length > 0)
                     { //found user's name
                         console.log("new user in memory: " + userName + "#" + id);
@@ -91,7 +91,7 @@ var utils = function ()
     {
         var useridRegex = /userid=[0-9]+/g; //matches userid={NUMBER}
 
-        if (name != "")
+        if (name !== "")
             httpGetAsync(fxpDomain + "member.php?username=" + name, function (response)
             { //request user's page
                 var doc = $(domParser.parseFromString(response, "text/html"));
@@ -100,7 +100,7 @@ var utils = function ()
                 { //found a URL with the user's id
                     var userId = userLinkElement.attr("href").match(useridRegex)[0].substr("userid=".length); //extract the ID from the url
                     var userRealName = doc.find("#userinfo .member_username").text().trim();
-                    if (userRealName != name)
+                    if (userRealName !== name)
                         name = userRealName;
                     console.log(name + "#" + userId);
                     if (typeof callback === "function")
@@ -133,7 +133,7 @@ var utils = function ()
         if (!link)
             return NaN;
         var id = link.match(/u=[0-9]+/g); //match u=XXXX
-        if (id == null)
+        if (id === null)
             return NaN;
         else
             return parseInt(id[0].substr(2)); //remove u= and return
@@ -155,7 +155,7 @@ var utils = function ()
                 {
                     for (var j = 0; j < threadComments.length; j++)
                     {
-                        if (threadComments[j].id == settings.trackedThreads.list[i].threadId)
+                        if (threadComments[j].id === settings.trackedThreads.list[i].threadId)
                         {
                             commentNum = settings.trackedThreads.list[i].totalComments - threadComments[j].comments;
                             url = fxpDomain + "showthread.php?t=" + settings.trackedThreads.list[i].threadId;
@@ -172,7 +172,7 @@ var utils = function ()
                                     newComments: commentNum,
                                     lastCommentor: settings.trackedThreads.list[i].lastCommentor,
                                     url: url
-                                })
+                                });
                             }
                             break;
                         }
@@ -200,7 +200,7 @@ var utils = function ()
         };
         getDomainCookies(fxpDomain, "bb_livefxpext", function (id)
         {
-            if (id != null)
+            if (id !== null)
                 httpGetAsync(fxpDomain + "feed_live.php?userid=" + id + "&format=json", function (data)
                 {
                     var notificationCount = JSON.parse(data);
@@ -211,7 +211,7 @@ var utils = function ()
 
                     console.log(noti.total() + " normal notifications");
                     callback(noti);
-                })
+                });
             else
                 callback(noti);
         });
@@ -226,16 +226,16 @@ var utils = function ()
             total += n1.total();
             getNotificationsTrackedThreads(function (n2)
             {
-                total += n2.length
+                total += n2.length;
                 callback(total);
-            })
-        })
+            });
+        });
     }
 
     //returns the deepest child of the element
     function getDeepestChild(element)
     {
-        if (element.children().length == 0)
+        if (element.children().length === 0)
             return element;
 
         var target = element.children(),
@@ -255,7 +255,7 @@ var utils = function ()
     {
         if (isURL(subnick.value)) //if it's a url, place as an image/video, not text
         {
-            subnickContainer.empty()
+            subnickContainer.empty();
             if (subnick.value.endsWith("mp4") || subnick.value.endsWith("webm"))
                 subnickContainer.append($("<video>", { loop: true, autoplay: true }).append($("<source>", { src: subnick.value })));
             else
@@ -301,7 +301,7 @@ var utils = function ()
         var hasOldValue = hasColorParameterRegex.test($(el).attr("style"));
 
         var brighter = getBrighterColor(hex, 150);
-        if (brighter != hex)
+        if (brighter !== hex)
         {
             $(el).attr("data-ogcolor", color);
             if (hasOldValue) //if going to override, take note
@@ -383,11 +383,11 @@ var utils = function ()
         var styleElements = [];
 
         //build the elements according to the style
-        if (styleProp.color != "#333333") //disable if the color is the default color
+        if (styleProp.color !== "#333333") //disable if the color is the default color
         {
             styleElements.push($("<span>", { style: "color:" + styleProp.color }));
         }
-        if (styleProp.size != 2 && !wysibbBox) //disable if the size is the default size
+        if (styleProp.size !== 2 && !wysibbBox) //disable if the size is the default size
         {
             styleElements.push($("<font>", { size: styleProp.size }));
         }
@@ -403,7 +403,7 @@ var utils = function ()
         {
             styleElements.push($("<strong>"));
         }
-        if (styleProp.font != "Arial" && !noFonts && !wysibbBox) //disable if default font or a page with no fonts enabled
+        if (styleProp.font !== "Arial" && !noFonts && !wysibbBox) //disable if default font or a page with no fonts enabled
         {
             styleElements.push($("<span>", { style: "font-family: '" + styleProp.font + "'" }));
         }
@@ -468,5 +468,5 @@ var utils = function ()
         buildStyleWrapper: buildStyleWrapper,
         deepWrap: deepWrap,
         fixCaret: fixCaret
-    }
+    };
 }();

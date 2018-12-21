@@ -18,85 +18,86 @@
 "use strict";
 
 var factorySettings =
-    {
-        backgroundNotifications: true,
-        resizeSignatures: false,
-        trackUnreadComments: true,
-        peekCloseMethod: "double",
-        showSpoilers: true,
-        hideSuggested: false,
-        classicIcons: false,
-        nightmodeShortcut: true,
-        showForumStats: true,
-        hideAccessibilityMenu: false,
-        disableLiveTyping: false,
-        disableLiveTypingPm: false,
-        hideSticky: {
-            active: false,
-            includingRules: false,
-            days: 14
-        },
-        showAutoPinned: false,
-        autoNightmode: {
-            active: false,
-            start: "17:05",
-            end: "23:30"
-        },
-        readtime: {
-            speed: 220,
-            activePrefixes: ["מדריך"],
-            newsForums: true
-        },
-        threadFilters: {
-            users: [
-            ],
-            keywords: [
-            ],
-            filterSticky: false
-        },
-        commentFilters: [
-            {
-                id: 967488,
-                subnick: {
-                    value: "היוצר של +FxPlus",
-                    color: "#00afff",
-                    size: 11
-                },
-                hideSignature: false,
-                disableStyle: false,
-                hideComments: false
-            }
+{
+    backgroundNotifications: true,
+    overviewNotificationBoot: true,
+    resizeSignatures: false,
+    trackUnreadComments: true,
+    peekCloseMethod: "double",
+    showSpoilers: true,
+    hideSuggested: false,
+    classicIcons: false,
+    nightmodeShortcut: true,
+    showForumStats: true,
+    hideAccessibilityMenu: false,
+    disableLiveTyping: false,
+    disableLiveTypingPm: false,
+    hideSticky: {
+        active: false,
+        includingRules: false,
+        days: 14
+    },
+    showAutoPinned: false,
+    autoNightmode: {
+        active: false,
+        start: "17:05",
+        end: "23:30"
+    },
+    readtime: {
+        speed: 220,
+        activePrefixes: ["מדריך"],
+        newsForums: true
+    },
+    threadFilters: {
+        users: [
         ],
-        customDefaultStyle: {
-            active: false,
-            activeQuickComment: false,
-            activePrivateChat: false,
-            bold: false,
-            italic: false,
-            underline: false,
-            font: "Arial",
-            size: 2,
-            color: "#333333"
-        },
-        customBg: {
-            day: "",
-            night: ""
-        },
-        quickAccessThreads: [
-            {
-                prefix: "פרסום|",
-                title: "+FxPlus - תוסף לכרום ופיירפוקס",
-                authorId: 967488,
-                threadId: 16859147
-            }
+        keywords: [
         ],
-        trackedThreads: {
-            list: [
-            ],
-            refreshRate: 15,
-            lastRefreshTime: 0
+        filterSticky: false
+    },
+    commentFilters: [
+        {
+            id: 967488,
+            subnick: {
+                value: "היוצר של +FxPlus",
+                color: "#00afff",
+                size: 11
+            },
+            hideSignature: false,
+            disableStyle: false,
+            hideComments: false
         }
-    };
+    ],
+    customDefaultStyle: {
+        active: false,
+        activeQuickComment: false,
+        activePrivateChat: false,
+        bold: false,
+        italic: false,
+        underline: false,
+        font: "Arial",
+        size: 2,
+        color: "#333333"
+    },
+    customBg: {
+        day: "",
+        night: ""
+    },
+    quickAccessThreads: [
+        {
+            prefix: "פרסום|",
+            title: "+FxPlus - תוסף לכרום ופיירפוקס",
+            authorId: 967488,
+            threadId: 16859147
+        }
+    ],
+    trackedThreads: {
+        list: [
+        ],
+        refreshRate: 15,
+        lastRefreshTime: 0
+    }
+};
 
 var fxpDomain = "https://www.fxp.co.il/";
 
@@ -147,7 +148,13 @@ chrome.storage.sync.get("settings", function (data)
     if (settings.backgroundNotifications) //background notifications are enabled
     {
         console.info("background notifications enabled");
-        initSocket(true);
+        checkNotificationCount();
+        initSocket();
+    }
+
+    if (settings.overviewNotificationBoot) //send an overview notification on boot
+    {
+        alertUnreadNotifications();
     }
 
     //update number of comments on tracked threads
@@ -161,15 +168,15 @@ chrome.storage.onChanged.addListener(function (changes, areaName)
     {
         if (changes.settings.newValue.backgroundNotifications) //background notificatios turned on
         {
-            if (!socket.connected)
+            if (socket === undefined || !socket.connected)
             {
                 console.log("connecting socket");
-                initSocket(true);
+                initSocket();
             }
         }
         else //background notificatios turned off
         {
-            if (socket.connected)
+            if (socket && socket.connected)
             {
                 console.log("disconnecting socket");
                 socket.disconnect();
@@ -182,7 +189,7 @@ chrome.storage.onChanged.addListener(function (changes, areaName)
             scheduleTrackedThreadsUpdate(changes.settings.newValue.trackedThreads.lastRefreshTime, changes.settings.newValue.trackedThreads.refreshRate);
         }
     }
-})
+});
 
 //listener to cross-page messaging
 chrome.runtime.onMessage.addListener(
@@ -245,7 +252,7 @@ chrome.runtime.onMessage.addListener(
 chrome.alarms.onAlarm.addListener(function (alarm)
 {
     //update comment conunts in tracked threads
-    if (alarm.name == "updateTrackedThreads")
+    if (alarm.name === "updateTrackedThreads")
     {
         trackedThreadsAlarm();
     }
@@ -328,12 +335,12 @@ function sendNotification(title, message, url, list)
 
     chrome.notifications.onClicked.addListener(function (notificationId)
     {
-        if (notificationId == randomId && url.length > 0)
+        if (notificationId === randomId && url.length > 0)
         {
             window.open(url); //open the url
             setTimeout(function () { chrome.notifications.clear(randomId); }, 200); //close notification
         }
-    })
+    });
 }
 
 var domParser = new DOMParser();
@@ -344,7 +351,7 @@ function sendEvent(cat, type)
     chrome.storage.local.get("uuid4", function (data)
     {
         var uuid4 = data.uuid4;
-        if (uuid4 == undefined || uuid4 == null)
+        if (uuid4 === undefined || uuid4 === null)
         {
             uuid4 = generate_uuid4();
             chrome.storage.local.set({ "uuid4": uuid4 });
@@ -389,7 +396,7 @@ function generate_uuid4()
         }
     }
     return uuid;
-};
+}
 
 //changes the badge in the browser navbar
 function changeBadge(str)
@@ -412,7 +419,7 @@ function noTabsOpen(callback)
 }
 
 //initiate socket listeners if cookies are accessible
-function initSocket(alertUnreadList)
+function initSocket()
 {
     socket = undefined;
     console.log("Attempting to get cookies");
@@ -423,11 +430,10 @@ function initSocket(alertUnreadList)
         {
             console.log("Failed to get cookies: " + chrome.runtime.lastError.message);
             setTimeout(
-                function () { initSocket(alertUnreadList) }, 5000);
+                function () { initSocket(); }, 5000);
         } else
         {
             connectSocket();
-            alertUnreadNotifications();
             console.log("Successfully got cookies");
         }
     });
@@ -522,7 +528,7 @@ function connectSocket()
     };
     socket.on("*", function (event, data)
     {
-        if (event != "online_update" && event != "posts_update")
+        if (event !== "online_update" && event !== "posts_update")
         {
             console.log("");
             console.log("EVENT:");
@@ -555,7 +561,7 @@ function alertUnreadNotifications()
         //add notification lists
         if (normal.notifications > 0)
         { //user has notifications
-            if (normal.notifications == 1)
+            if (normal.notifications === 1)
                 notificationList.push({
                     title: normal.notifications + "",
                     message: 'התראה חדשה'
@@ -569,7 +575,7 @@ function alertUnreadNotifications()
 
         if (normal.likes > 0)
         { //user has likes
-            if (normal.likes == 1)
+            if (normal.likes === 1)
                 notificationList.push({
                     title: normal.likes + "",
                     message: 'לייק חדש'
@@ -583,7 +589,7 @@ function alertUnreadNotifications()
 
         if (normal.pms > 0)
         { //user has pms
-            if (normal.pms == 1)
+            if (normal.pms === 1)
                 notificationList.push({
                     title: normal.pms + "",
                     message: 'הודעה פרטית חדשה'
@@ -599,7 +605,7 @@ function alertUnreadNotifications()
         {
             if (tracked.length > 0)
             { //user has new comments from tracked threads
-                if (tracked.length == 1)
+                if (tracked.length === 1)
                     notificationList.push({
                         title: tracked.length + "",
                         message: 'התראה מאשכולות במעקב'
@@ -617,14 +623,6 @@ function alertUnreadNotifications()
                 }
             }
 
-
-            //update the badge
-            var totalNotifications = normal.total() + tracked.length;
-            if (totalNotifications > 0)
-                changeBadge(totalNotifications);
-            else
-                changeBadge("");
-
             if (notificationList.length > 0) //notifications exist
             {
                 var listString = ""; //backup string in case the browser does not support list
@@ -636,8 +634,8 @@ function alertUnreadNotifications()
 
                 sendNotification("בזמן שלא היית מחובר...", listString, fxpDomain, notificationList);
             }
-        })
-    })
+        });
+    });
 }
 
 //returns how many comments there are in a thread
@@ -699,7 +697,7 @@ function updateTotalCommentsTrackedThreads(threadList, refreshRate)
                     for (var j = 0; j < settings.trackedThreads.list.length; j++)
                     {
                         //update the correct thread
-                        if (settings.trackedThreads.list[j].threadId == threadList[i].threadId)
+                        if (settings.trackedThreads.list[j].threadId === threadList[i].threadId)
                         {
                             prev[threadList[i].threadId] = settings.trackedThreads.list[j].totalComments;
                             settings.trackedThreads.list[j] = threadList[i];
@@ -721,7 +719,7 @@ function updateTotalCommentsTrackedThreads(threadList, refreshRate)
                     //new comment, notify the user
                     for (var i = 0; i < tracked.length; i++)
                     {
-                        if (prev[tracked[i].threadId] < tracked[i].totalComments || prev[tracked[i].threadId] == undefined)
+                        if (prev[tracked[i].threadId] < tracked[i].totalComments || prev[tracked[i].threadId] === undefined)
                         {
                             console.log("new comments in tracked thread " + tracked[i].threadId);
                             var additional = "";
@@ -729,7 +727,7 @@ function updateTotalCommentsTrackedThreads(threadList, refreshRate)
                             {
                                 additional = " הגיב באשכול ";
                             }
-                            else if (tracked[i].newComments == 2)
+                            else if (tracked[i].newComments === 2)
                             {
                                 additional = " ומשתמש נוסף הגיבו באשכול ";
                             }
@@ -754,7 +752,7 @@ function updateTotalCommentsTrackedThreads(threadList, refreshRate)
 
                             if (!checkedBadge)
                                 checkNotificationCount();
-                        };
+                        }
                     }
                 });
 
@@ -790,7 +788,7 @@ function scheduleTrackedThreadsUpdate(lastRefresh, refreshRate)
         {
             chrome.alarms.create("updateTrackedThreads", {
                 delayInMinutes: nextUpIn
-            })
+            });
         }
     });
 }

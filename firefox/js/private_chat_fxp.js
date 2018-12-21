@@ -47,12 +47,12 @@ var typingObserver = new MutationObserver(function (mutations)
         //switch between the custom subnick and the typing notice
         if (mutation.addedNodes.length > 0)
         {
-            if (mutation.addedNodes[0].className == "typing-animation") //typing started
+            if (mutation.addedNodes[0].className === "typing-animation") //typing started
                 switchSubnick(true);
         }
         else if (mutation.removedNodes.length > 0)
         {
-            if (mutation.removedNodes[0].className == "typing-animation") //typing stopped
+            if (mutation.removedNodes[0].className === "typing-animation") //typing stopped
                 switchSubnick(false);
         }
     });
@@ -69,12 +69,12 @@ var newContentObserver = new MutationObserver(function (mutations)
             if (addedEl.hasClass("talk-bubble") || addedEl.hasClass("pm"))
             {
                 //brighten new pm content if nightmode is active
-                if (localStorage.getItem("nightmodeEnabled") == "true")
+                if (localStorage.getItem("nightmodeEnabled") === "true")
                 {
                     utils.brightenBySelectors(addedEl, colorfulElementSelectors);
                 }
             }
-        })
+        });
     });
 });
 
@@ -82,7 +82,7 @@ var newContentObserver = new MutationObserver(function (mutations)
 var loadingElement = $("<div>", { class: "sk-cube-grid" });
 for (var i = 1; i <= 9; i++)
 {
-    loadingElement.append($("<div>", { class: ("sk-cube sk-cube" + i) }))
+    loadingElement.append($("<div>", { class: "sk-cube sk-cube" + i }));
 }
 
 
@@ -99,7 +99,7 @@ if (localStorage.getItem("nightmodeEnabled") === "true")
         activateNightmode();
         setTimeout(function ()
         {
-            $("#happyEyes").fadeOut(100, function () { $(this).remove() });
+            $("#happyEyes").fadeOut(100, function () { $(this).remove(); });
         }, 200);
     });
 }
@@ -152,7 +152,7 @@ chrome.storage.sync.get("settings", function (data)
         {
             for (var i = 0; i < settings.commentFilters.length; i++)
             {
-                if (settings.commentFilters[i].id == userId) //match in filters
+                if (settings.commentFilters[i].id === userId) //match in filters
                 {
                     applyCommentFilterInChat(settings.commentFilters[i], $(".profile"));
                 }
@@ -181,7 +181,7 @@ chrome.storage.sync.get("settings", function (data)
                 {
                     if (mutation.addedNodes.length > 0)
                     {
-                        if (mutation.addedNodes[0].nodeName == "#text")
+                        if (mutation.addedNodes[0].nodeName === "#text")
                         {
                             //new text node, wrap with the style
                             if ($(mutation.addedNodes[0]).parents(".wysibb-text-editor.wysibb-body").length > 0)
@@ -195,7 +195,7 @@ chrome.storage.sync.get("settings", function (data)
                             debug.info("editor style applied");
                         }
                     }
-                })
+                });
             });
 
             //add observer to minimal designers
@@ -318,7 +318,7 @@ function getUserIdFromLink(link)
     if (!link)
         return NaN;
     var id = link.match(/u=[0-9]+/g); //match u=XXXX
-    if (id == null)
+    if (id === null)
         return NaN;
     else
         return parseInt(id[0].substr(2)); //remove u= and return

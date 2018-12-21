@@ -31,7 +31,7 @@ if (localStorage.getItem("nightmodeEnabled") === "true")
         activateNightmode();
         setTimeout(function ()
         {
-            $("#happyEyes").fadeOut(100, function () { $(this).remove() });
+            $("#happyEyes").fadeOut(100, function () { $(this).remove(); });
         }, 200);
     });
 }

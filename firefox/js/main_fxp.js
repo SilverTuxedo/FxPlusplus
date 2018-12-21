@@ -17,14 +17,9 @@
 
 "use strict";
 
-var versionDescription = "תיקון לעיצוב תגובות אוטומטית";
+var versionDescription = "נוספה אפשרות לייצוא הערות, הפרדה בין התראות ברקע ובהפעלה, ותיקוני באגים";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2018/12/151.html";
-
-var defaultNotes = [
-    { id: 967488, content: "רק דברים טובים" },
-    { id: 30976, content: "אושיית רשת וזוכת האירוויזיון עם השיר המקורי מיוטיוב: מור הראפרית FXP" }
-]
+var versionHref = "https://fxplusplus.blogspot.com/2018/12/152.html";
 
 //if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
@@ -33,12 +28,10 @@ chrome.storage.sync = (function ()
         chrome.storage.local;
 })();
 
-
 //observers that detect DOM changes
 var observers = {};
 
 //print functions for debugging
-
 var debug = {
     big: function (msg) { },
     info: function (msg) { },
@@ -48,7 +41,7 @@ var debug = {
     print: function (msg) { }
 };
 
-if (localStorage.getItem("fxplusplus_debugging"))
+if (localStorage.getItem("fxplusplus_debugging")) //debug functions only output when enabled
 {
     debug = {
         big: function (msg)
@@ -75,7 +68,7 @@ if (localStorage.getItem("fxplusplus_debugging"))
         {
             console.log(msg);
         }
-    }
+    };
 }
 
 var fxpDomain = "https://www.fxp.co.il/";
@@ -84,7 +77,7 @@ var fxpDomain = "https://www.fxp.co.il/";
 var regex = {
     fullWord: /([^\s.,\/#?!$%\^&\*+;:{}|=\-_`~()]+)/g,
     notNumber: /^\D+/g
-}
+};
 
 var readTimeSpeed = 220;
 
@@ -101,24 +94,27 @@ var classicIconsDict = [
     { old: "https://images.fxp.co.il/smilies3/202_40x.png", new: "images/old_icons/kiss.png", width: 19, height: 19 },
     { old: "https://images.fxp.co.il/smilies3g/206.gif", new: "images/old_icons/loveyou.gif", width: 22, height: 20 },
     { old: "https://images.fxp.co.il/smilies3g/207.gif", new: "images/old_icons/tongue2.gif", width: 20, height: 20 }
-]
+];
 
 //build an animated loading element
 var loadingElement = $("<div>", { class: "sk-cube-grid" });
 for (var i = 1; i <= 9; i++)
 {
-    loadingElement.append($("<div>", { class: ("sk-cube sk-cube" + i) }))
+    loadingElement.append($("<div>", { class: ("sk-cube sk-cube" + i) }));
 }
 
-//char that is placed where a close button should be
-var closeChar = '✖';
+//default user profile notes
+var defaultNotes = [
+    { id: 967488, content: "רק דברים טובים" },
+    { id: 30976, content: "אושיית רשת וזוכת האירוויזיון עם השיר המקורי מיוטיוב: מור הראפרית FXP" } //it's epic.
+];
 
 //id:username pairs that are known
 var globalKnownIds = {};
 chrome.storage.local.get("knownIds", function (data)
 {
     globalKnownIds = data.knownIds;
-    if (globalKnownIds == undefined) //reset if needed
+    if (globalKnownIds === undefined) //reset if needed
         globalKnownIds = {};
 });
 
@@ -153,7 +149,7 @@ if (localStorage.getItem("nightmodeEnabled") == "true")
         mutations.forEach(function (mutation)
         {
             if (mutation.addedNodes.length > 0)
-                if (mutation.addedNodes[0].tagName == "BODY") //body added
+                if (mutation.addedNodes[0].tagName === "BODY") //body added
                 {
                     //append the style
                     activateNightmode();
@@ -165,7 +161,7 @@ if (localStorage.getItem("nightmodeEnabled") == "true")
                     }, 200);
                     observers.htmlTree.disconnect();
                 }
-        })
+        });
     });
     observers.htmlTree.observe(document.documentElement, { childList: true });
 }
@@ -214,7 +210,7 @@ chrome.storage.sync.get("settings", function (data)
             ".trc_related_container",
             ".trc_spotlight_widget",
             ".videoyoudiv"
-        ]
+        ];
 
         var taboolaString = taboolaSelectors[0];
         for (var i = 1; i < taboolaSelectors.length; i++)
@@ -251,17 +247,17 @@ chrome.storage.sync.get("settings", function (data)
         //add settings button in FxP toolbar
         $("#settings_pop .popupbody").append($("<div>", { class: "fxpSpopupSeperator" })) //add seperator
             .append(
-            $("<div>", { style: "text-align: center;" }).append(
-                $("<a>", { class: "niceButton darkBlueBtn", style: "font-size: 1em; color: #fff; margin-top: 0", target: "_blank", href: chrome.extension.getURL("html/settings.html") })
-                    .text("הגדרות +FxPlus").click(function ()
+                $("<div>", { style: "text-align: center;" }).append(
+                    $("<a>", { class: "niceButton darkBlueBtn", style: "font-size: 1em; color: #fff; margin-top: 0", target: "_blank", href: chrome.extension.getURL("html/settings.html") })
+                        .text("הגדרות +FxPlus").click(function ()
+                        {
+                            chrome.runtime.sendMessage({ event: { cat: "Click", type: "Settings site" } });
+                        })
+                ).append(
+                    $("<a>", { target: "_blank", href: chrome.extension.getURL("html/settings.html") + "#multiuser" }).text("החלף משתמש").click(function ()
                     {
-                        chrome.runtime.sendMessage({ event: { cat: "Click", type: "Settings site" } });
+                        chrome.runtime.sendMessage({ event: { cat: "Click", type: "User Settings site" } });
                     })
-            ).append(
-                $("<a>", { target: "_blank", href: chrome.extension.getURL("html/settings.html") + "#multiuser" }).text("החלף משתמש").click(function ()
-                {
-                    chrome.runtime.sendMessage({ event: { cat: "Click", type: "User Settings site" } });
-                })
                 )
             ); //add button itself
 
@@ -282,11 +278,11 @@ chrome.storage.sync.get("settings", function (data)
             {
                 mutations.forEach(function (mutation)
                 {
-                    if (mutation.attributeName == "src")
+                    if (mutation.attributeName === "src")
                     { //the src of the image has changed
                         //resize the container of the mutated image
                         resizeSignature($(mutation.target).parents(".signaturecontainer"));
-                        if ($(".signaturecontainer img[src='clear.gif']").length == 0) //there are no images in signatures that can change their src
+                        if ($(".signaturecontainer img[src='clear.gif']").length === 0) //there are no images in signatures that can change their src
                         {
                             debug.notice("signature mutation observers disconnected");
                             observers.signatures.disconnect(); //disconnect signature observer
@@ -294,7 +290,7 @@ chrome.storage.sync.get("settings", function (data)
 
                     }
 
-                })
+                });
             });
 
             //handle all signatures
@@ -327,7 +323,7 @@ chrome.storage.sync.get("settings", function (data)
             {
                 if ($(this).parentsUntil("table", "[style*='background-color']").length <= 0) //the spoiler is not in a table that has a color
                     $(this).addClass("whiteSpoiler");
-            })
+            });
         }
 
         //there are threads in the page
@@ -385,7 +381,7 @@ chrome.storage.sync.get("settings", function (data)
                 {
                     line.append($("<span>").text("המפרסם הדומיננטי ביותר הוא "));
                     //add names until the count is not the largest
-                    for (var i = 0; i < publishersDict.length && (publishersDict[i].count == publishersDict[0].count); i++)
+                    for (var i = 0; i < publishersDict.length && (publishersDict[i].count === publishersDict[0].count); i++)
                     {
                         if (i > 0)
                             line.append($("<span>").text(" או "));
@@ -413,7 +409,7 @@ chrome.storage.sync.get("settings", function (data)
                 if (commentorsDict.length > 1 && commentorsDict[0].count > 1)
                 {
                     line.append($("<span>").text("המגיב האחרון הדומיננטי ביותר הוא "));
-                    for (var i = 0; i < commentorsDict.length && (commentorsDict[i].count == commentorsDict[0].count); i++)
+                    for (var i = 0; i < commentorsDict.length && (commentorsDict[i].count === commentorsDict[0].count); i++)
                     {
                         if (i > 0)
                             line.append($("<span>").text(" או "));
@@ -433,7 +429,7 @@ chrome.storage.sync.get("settings", function (data)
                 $("#threads .title").each(function ()
                 {
                     var titleWords = $(this).text().match(regex.fullWord); //get words in title
-                    if (titleWords != null)
+                    if (titleWords !== null)
                     {
                         titleWords.forEach(function (word)
                         {
@@ -449,7 +445,7 @@ chrome.storage.sync.get("settings", function (data)
                 if (wordsDict.length > 1 && wordsDict[0].count > 1)
                 {
                     line.append($("<span>").text("המילה הנפוצה ביותר בכותרות היא "));
-                    for (var i = 0; i < wordsDict.length && (wordsDict[i].count == wordsDict[0].count); i++)
+                    for (var i = 0; i < wordsDict.length && (wordsDict[i].count === wordsDict[0].count); i++)
                     {
                         if (i > 0)
                             line.append($("<span>").text(" או "));
@@ -480,7 +476,7 @@ chrome.storage.sync.get("settings", function (data)
                 if (prefixesDict.length > 1 && prefixesDict[0].count > 1) 
                 {
                     line.append($("<span>").text("התיוג הנפוץ ביותר הוא "));
-                    for (var i = 0; i < prefixesDict.length && (prefixesDict[i].count == prefixesDict[0].count); i++)
+                    for (var i = 0; i < prefixesDict.length && (prefixesDict[i].count === prefixesDict[0].count); i++)
                     {
                         if (i > 0)
                             line.append($("<span>").text(" או "));
@@ -550,7 +546,7 @@ chrome.storage.sync.get("settings", function (data)
                                 $("<th>").text("מפרסם")
                             ).append(
                                 $("<th>").text("אשכולות")
-                                ))
+                            ))
                         );
 
                         flexTableContainer.append($("<table>", { class: "statTable", id: "commentorsStatTable" }).append(
@@ -558,7 +554,7 @@ chrome.storage.sync.get("settings", function (data)
                                 $("<th>").text("מגיב")
                             ).append(
                                 $("<th>").text("תגובות אחרונות")
-                                ))
+                            ))
                         );
 
                         flexTableContainer.append($("<table>", { class: "statTable", id: "wordsStatTable" }).append(
@@ -566,7 +562,7 @@ chrome.storage.sync.get("settings", function (data)
                                 $("<th>").text("מילה")
                             ).append(
                                 $("<th>").text("אזכורים")
-                                ))
+                            ))
                         );
 
                         flexTableContainer.append($("<table>", { class: "statTable", id: "prefixesStatTable" }).append(
@@ -574,7 +570,7 @@ chrome.storage.sync.get("settings", function (data)
                                 $("<th>").text("תיוג")
                             ).append(
                                 $("<th>").text("אשכולות")
-                                ))
+                            ))
                         );
 
                         //add table content
@@ -585,8 +581,8 @@ chrome.storage.sync.get("settings", function (data)
                                     $("<td>").text(publishersDict[i].value)
                                 ).append(
                                     $("<td>").text(publishersDict[i].count)
-                                    )
-                            )
+                                )
+                            );
                         }
 
                         for (var i = 0; i < commentorsDict.length; i++)
@@ -596,8 +592,8 @@ chrome.storage.sync.get("settings", function (data)
                                     $("<td>").text(commentorsDict[i].value)
                                 ).append(
                                     $("<td>").text(commentorsDict[i].count)
-                                    )
-                            )
+                                )
+                            );
                         }
 
                         for (var i = 0; i < wordsDict.length; i++)
@@ -607,8 +603,8 @@ chrome.storage.sync.get("settings", function (data)
                                     $("<td>").text(wordsDict[i].value)
                                 ).append(
                                     $("<td>").text(wordsDict[i].count)
-                                    )
-                            )
+                                )
+                            );
                         }
 
                         for (var i = 0; i < prefixesDict.length; i++)
@@ -618,8 +614,8 @@ chrome.storage.sync.get("settings", function (data)
                                     $("<td>").text(prefixesDict[i].value)
                                 ).append(
                                     $("<td>").text(prefixesDict[i].count)
-                                    )
-                            )
+                                )
+                            );
                         }
 
                         //append all the tables in their container
@@ -684,7 +680,7 @@ chrome.storage.sync.get("settings", function (data)
 
                     }
 
-                })
+                });
             });
             //track when new threads appear in the threadlist
             observers.threadsList.observe($("#threads")[0], { childList: true });
@@ -735,7 +731,7 @@ chrome.storage.sync.get("settings", function (data)
 
                     //make subnick quickly editable
                     addedComment.find(".usertitle").click(function () { quickEditSubnick($(this)) }).attr("data-balloon", "לחץ כדי לערוך").attr("data-balloon-pos", "left").addClass("balloonNoBorder");
-                })
+                });
             });
             //track when new comments appear in the comments list
             observers.commentList.observe($("#posts")[0], { childList: true });
@@ -748,17 +744,17 @@ chrome.storage.sync.get("settings", function (data)
                 var userName = $(this).find(".username").text().trim();
 
                 if (userId > 0)
-                    if (globalKnownIds[userId] != userName && globalKnownIds[userId] != undefined) //id and name do not match, update
+                    if (globalKnownIds[userId] !== userName && globalKnownIds[userId] !== undefined) //id and name do not match, update
                     {
                         updateKnownIds(userId, userName);
                     }
-            })
+            });
         }
 
         //bind all envelopes to peek
         $(".threadstatus, .threadicon").click(function ()
         {
-            peekToThread($(this), settings.peekCloseMethod)
+            peekToThread($(this), settings.peekCloseMethod);
         });
 
         //bind all titles to track comment count when clicked, and check state of loaded threads
@@ -814,7 +810,7 @@ chrome.storage.sync.get("settings", function (data)
                             }
                         }
                     }
-                })
+                });
             });
         }
 
@@ -834,7 +830,7 @@ chrome.storage.sync.get("settings", function (data)
                                 $("<td>").append(
                                     $("<span>", { class: "mdi mdi-bookmark-plus" })
                                 )
-                                )
+                            )
                         ).append(
                             $("<tr>", { id: "toggleTrackThread" }).append(
                                 $("<td>").text("קבל התראות מאשכול זה")
@@ -842,18 +838,18 @@ chrome.storage.sync.get("settings", function (data)
                                 $("<td>").append(
                                     $("<span>", { class: "mdi mdi-comment-alert" })
                                 )
-                                )
-                            ).append(
+                            )
+                        ).append(
                             $("<tr>", { id: "toggleThreadCommentTracking" }).append(
                                 $("<td>").text("בטל מעקב אחר הודעות שלא נקראו")
                             ).append(
                                 $("<td>").append(
                                     $("<span>", { class: "mdi mdi-comment-multiple-outline" })
                                 )
-                                )
                             )
+                        )
                     )
-                    ))
+                ))
             );
 
             //remove option to toggle comment tracking if its not enabled in settings
@@ -918,7 +914,7 @@ chrome.storage.sync.get("settings", function (data)
                     var lastComment = $(".postbit:last");
                     var lastIndex = parseInt(lastComment.find(".postcounter").text().substr(1)); //extract the index of the last post
                     //last comments could be added by fxp's LIVE system and not include the thread's id in the link, so extract from the first comment in the thread
-                    var threadId = getThreadIdFromLink($(".postbit:first").find(".postcounter").attr("href")); //extract the id of the thread
+                    threadId = getThreadIdFromLink($(".postbit:first").find(".postcounter").attr("href")); //extract the id of the thread
                     compareReadCommentsWithLast(threadId, lastIndex);
                 }
             });
@@ -932,15 +928,15 @@ chrome.storage.sync.get("settings", function (data)
                     {
                         $("#quickAccessAddRemove td:first").text("הוסף לגישה מהירה");
                         $("#quickAccessAddRemove td:eq(1) span").attr("class", "mdi").addClass("mdi-bookmark-plus");
-                    })
+                    });
                 }
                 else //thread does not exist, add it
                 {
                     //the first comment has the OP, no need to search for the correct id
-                    if ($(".postbit:first .postcounter").text() == "#1")
+                    if ($(".postbit:first .postcounter").text() === "#1")
                     {
                         var userId = utils.getUserIdFromLink($(".postbit:first a.username").attr("href"));
-                        addThreadToQuickAccess(prefix, title, userId, currentThreadId, changeQuickAccessThreadBtnAdded)
+                        addThreadToQuickAccess(prefix, title, userId, currentThreadId, changeQuickAccessThreadBtnAdded);
                     }
                     else
                     {
@@ -950,8 +946,8 @@ chrome.storage.sync.get("settings", function (data)
                         //the first comment is not the OP, need to search for the correct id
                         getAuthorIdByThreadId(currentThreadId, function (userId)
                         {
-                            addThreadToQuickAccess(prefix, title, userId, currentThreadId, changeQuickAccessThreadBtnAdded)
-                        })
+                            addThreadToQuickAccess(prefix, title, userId, currentThreadId, changeQuickAccessThreadBtnAdded);
+                        });
                     }
                 }
             });
@@ -982,7 +978,7 @@ chrome.storage.sync.get("settings", function (data)
                             $("<div>").text("הפעלת מעקב אחרי אשכול ששייך לך, ולכן תיתכן התנגשות בין ההתראות של התוסף וההתראות של FxP לאשכול זה.")
                         ).append(
                             $("<div>").text("מומלץ שלא לעקוב אחרי אשכולות שאתה כבר מקבל מהם התראות.")
-                            ).append(
+                        ).append(
                             $("<div>").append(
                                 $("<div>", { class: "niceButton redBtn" }).text("בטל מעקב").click(function ()
                                 {
@@ -995,14 +991,14 @@ chrome.storage.sync.get("settings", function (data)
                                 {
                                     removePopupWindow("dontTrackYourself");
                                 })
-                                )
-                            );
+                            )
+                        );
 
                         //just make sure afterwards that its not the user's own thread
-                        if ($(".postbit:first .postcounter").text() == "#1")
+                        if ($(".postbit:first .postcounter").text() === "#1")
                         {
                             var userId = utils.getUserIdFromLink($(".postbit:first a.username").attr("href"));
-                            if (getMyUserId() == userId)
+                            if (getMyUserId() === userId)
                             {
                                 openPopupWindow("dontTrackYourself",
                                     imgUrl,
@@ -1015,14 +1011,14 @@ chrome.storage.sync.get("settings", function (data)
                             //the first comment is not the OP, need to search for the correct id
                             getAuthorIdByThreadId(currentThreadId, function (userId)
                             {
-                                if (getMyUserId() == userId)
+                                if (getMyUserId() === userId)
                                 {
                                     openPopupWindow("dontTrackYourself",
                                         imgUrl,
                                         "שים לב!",
                                         dontTrackYourselfBox, "alertTopPopup");
                                 }
-                            })
+                            });
                         }
                     });
                 }
@@ -1040,7 +1036,7 @@ chrome.storage.sync.get("settings", function (data)
                 $(this).append($("<div>", { class: "thumbnailReadtime mdi mdi-clock" }).text("מחשב..."));
                 $(this).addClass("readTimeThumbnail");
                 pushToReadTimeQueue($(this).find(".thumbnailReadtime"), $(this).parents("a").attr("href"), false);
-            })
+            });
             if (getForumName().indexOf("עדכוני") > -1) //an updates forum, by the forum title
             {
                 $("#threads .threadbit").each(function () //add every thread (that is not stickied) to the readtime queue
@@ -1084,7 +1080,7 @@ chrome.storage.sync.get("settings", function (data)
                 {
                     filterThread(filter, $(this)); //filter the user's threads
                 });
-            })
+            });
         }
 
         //filter threads by keywords
@@ -1102,7 +1098,7 @@ chrome.storage.sync.get("settings", function (data)
                 {
                     filterThread(filter, $(this)); //filter the threads by keywords
                 });
-            })
+            });
         }
 
         //comment filters
@@ -1116,7 +1112,7 @@ chrome.storage.sync.get("settings", function (data)
                 userPostbits = $(".postbit a.username[href$='u=" + filter.id + "']").parents(".postbit"); //all the postbits of the user
 
                 applyCommentsFilter(filter, userPostbits);
-            })
+            });
         }
 
         //bind click on subnick to change it
@@ -1133,7 +1129,7 @@ chrome.storage.sync.get("settings", function (data)
                 if (isNaN(noti))
                     noti = 0;
                 totalNotifications += noti;
-            })
+            });
 
             chrome.runtime.sendMessage({ updateBadge: totalNotifications }); //update the badge
         }
@@ -1159,7 +1155,7 @@ chrome.storage.sync.get("settings", function (data)
             {
                 if (mutation.addedNodes.length > 0)
                 {
-                    if (mutation.addedNodes[0].nodeName == "#text")
+                    if (mutation.addedNodes[0].nodeName === "#text")
                     {
                         var newNode = mutation.addedNodes[0];
                         //new text node, wrap with the style
@@ -1172,7 +1168,7 @@ chrome.storage.sync.get("settings", function (data)
                         }
                     }
                 }
-            })
+            });
         });
 
         //mutation to track when the iframe editor is added
@@ -1184,7 +1180,7 @@ chrome.storage.sync.get("settings", function (data)
                     if (settings.customDefaultStyle.active || settings.classicIcons)
                     {
                         var addedJ = $(mutation.addedNodes[0]);
-                        if (addedJ.parents(".cke_contents").length > 0 && mutation.addedNodes[0].tagName == "IFRAME") //editor iframe added
+                        if (addedJ.parents(".cke_contents").length > 0 && mutation.addedNodes[0].tagName === "IFRAME") //editor iframe added
                         {
                             debug.info("binding to new editor div");
                             var editorFrame = addedJ;
@@ -1214,7 +1210,7 @@ chrome.storage.sync.get("settings", function (data)
                                 bindEditorFrameLoad(editorFrame, settings);
                         }
                     }
-            })
+            });
         });
 
         if ($(".cke_contents iframe").length > 0) //iframe is accessible, observer won't catch it
@@ -1237,7 +1233,7 @@ chrome.storage.sync.get("settings", function (data)
                         observers.insideEditor.observe($(this).contents().find("body")[0], { childList: true });
                     if (settings.classicIcons)
                         addStyle(buildOldIconsStylesheet(), "oldIcons", $(this).contents().find("head")[0]);
-                })
+                });
         }
         //observe new iframes that might appear if the user quotes
         if ($(".editor_textbox").length > 0)
@@ -1277,7 +1273,7 @@ chrome.storage.sync.get("settings", function (data)
             //toggle night mode
             $("#nightmodeShortcut").click(function ()
             {
-                var state = localStorage.getItem("nightmodeEnabled") === "true";
+                var state = localStorage.getItem("nightmodeEnabled") == "true";
                 localStorage.setItem("nightmodeEnabled", !state);
 
                 if (state)
@@ -1288,7 +1284,7 @@ chrome.storage.sync.get("settings", function (data)
                 localStorage.setItem("nightmodeOverride", true); //prevent auto nightmode to change the mode
 
                 chrome.runtime.sendMessage({ nightmodeState: !state, ttl: 1 });
-            })
+            });
         }
 
         //auto night mode enabled
@@ -1311,7 +1307,7 @@ chrome.storage.sync.get("settings", function (data)
             else
                 rangeActive = minutesCurrent <= minutesCurrent && minutesCurrent < minutesEnd;
 
-            if (lastChange == "night") //was changed to night last change
+            if (lastChange === "night") //was changed to night last change
             {
                 if (!rangeActive) //no longer night time
                 {
@@ -1350,37 +1346,37 @@ chrome.storage.sync.get("settings", function (data)
                     $("<img>", { src: "http://i.imgur.com/bsVtJ5o.png" })
                 ).append(
                     $("<span>", { class: "addCreditDesc" }).text("128x128")
-                    ).click(function ()
-                    {
-                        $(".cke_contents iframe").contents().find("body").append(
-                            $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
-                                $("<img>", { border: 0, src: $(this).find("img").attr("src") })
-                            )
+                ).click(function ()
+                {
+                    $(".cke_contents iframe").contents().find("body").append(
+                        $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
+                            $("<img>", { border: 0, src: $(this).find("img").attr("src") })
                         )
-                    })
-                ).append(
+                    );
+                })
+            ).append(
                 $("<div>", { class: "addCreditBtn", id: "addMimg" }).append(
                     $("<img>", { src: "http://i.imgur.com/O7FsbY8.png" })
                 ).append(
                     $("<span>", { class: "addCreditDesc" }).text("48x48")
-                    ).click(function ()
-                    {
-                        $(".cke_contents iframe").contents().find("body").append(
-                            $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
-                                $("<img>", { border: 0, src: $(this).find("img").attr("src") })
-                            )
+                ).click(function ()
+                {
+                    $(".cke_contents iframe").contents().find("body").append(
+                        $("<a>", { href: publishedThreadUrl, target: "_blank" }).append(
+                            $("<img>", { border: 0, src: $(this).find("img").attr("src") })
                         )
-                    })
-                ).append(
+                    );
+                })
+            ).append(
                 $("<div>", { class: "addCreditBtn", id: "addTextCredit" }).append(
                     $("<span>", { class: "addCreditDesc" }).text("טקסט")
                 ).click(function ()
                 {
                     $(".cke_contents iframe").contents().find("body").append(
                         $("<a>", { href: publishedThreadUrl, target: "_blank" }).text("+FxPlus")
-                    )
+                    );
                 })
-                )
+            );
             $('form[action*="signature"] .editor_smiliebox').before(element);
         }
 
@@ -1396,13 +1392,33 @@ chrome.storage.sync.get("settings", function (data)
 
                 //add tab
                 var tabParent = $("#userprof_content_container .tabslight");
-                var sampleTab = tabParent.find(".userprof_module:first").clone();
-                sampleTab.attr("class", "userprof_moduleinactive");
-                sampleTab.find("a")
+                var notesTab = tabParent.find(".userprof_module:first").clone();
+                notesTab.attr("class", "userprof_moduleinactive");
+                notesTab.find("a")
                     .attr("id", "usernotes-tab")
-                    .attr("href", "#usernotes-content")
+                    .removeAttr("href")
+                    .removeAttr("onclick")
                     .text("הערות");
-                sampleTab.appendTo(tabParent);
+
+                //show the notes tab and hide other tabs when clicked
+                notesTab.click(function ()
+                {
+                    $(".selected_view_section").attr("class", "view_section");
+                    $("#view-usernotes-content").attr("class", "selected_view_section");
+
+                    $(".userprof_module").attr("class", "userprof_moduleinactive");
+                    $(this).attr("class", "userprof_module");
+                });
+
+                //make a click on another tab hide the notes tab
+                tabParent.find("dd a").click(function ()
+                {
+                    notesTab.attr("class", "userprof_moduleinactive");
+                    $("#view-usernotes-content").attr("class", "view_section");
+                });
+
+                //add the notes tab to the list
+                notesTab.appendTo(tabParent);
 
                 //add tab content
                 $("#userprof_content_container .profile_content.userprof").append(
@@ -1419,13 +1435,26 @@ chrome.storage.sync.get("settings", function (data)
                             getNoteByUserId(currentProfileId, function (noteText)
                             {
                                 editor.val(noteText);
-                            })
+                            });
                         })
-                        ).append(
-                        $("<span>").text("הערות שיכתבו כאן ישמרו רק עבור דפדפן זה.")
-                        )
-                )
-
+                    ).append(
+                        $("<span>").text("הערות שיכתבו כאן ישמרו אוטומטית, ורק עבור דפדפן זה.")
+                    ).append(
+                        $("<br>")
+                    ).append(
+                        $("<div>", { class: "niceButton inlineBtn grayBtn" }).text("שמור את כל ההערות כקובץ").click(function ()
+                        {
+                            chrome.storage.local.get("userNotes", function (data)
+                            {
+                                var notesObj = data.userNotes || [];
+                                exportAsJsonFile(notesObj, "fxplusplus-notes");
+                            });
+                            chrome.runtime.sendMessage({ event: { cat: "Click", type: "DownloadNotes" } });
+                        })
+                    ).append(
+                        $("<div>", { class: "niceButton inlineBtn grayBtn" }).text("טען הערות מקובץ").click(openLoadNotes)
+                    )
+                );
             }
         });
 
@@ -1435,7 +1464,7 @@ chrome.storage.sync.get("settings", function (data)
 
         setTimeout(function ()
         {
-            if ($("#bottomCard").css("display") == "none") //card not shown, 5 seconds since page is ready
+            if ($("#bottomCard").css("display") === "none") //card not shown, 5 seconds since page is ready
                 cardSlideSteps($("#bottomCard"));
         }, 5000);
 
@@ -1447,11 +1476,11 @@ chrome.storage.sync.get("settings", function (data)
             $("<div>").text("FxPlus+ @ " + chrome.runtime.getManifest().version)
         ).append(
             $("<div>").text("+FxPlus שיפר את דף זה תוך " + elapsed + "ms")
-            ));
+        ));
 
         $(window).on('load', function ()
         {
-            if ($(".signaturecontainer img[src='clear.gif']").length == 0) //there are no images in signatures that can change their src
+            if ($(".signaturecontainer img[src='clear.gif']").length === 0) //there are no images in signatures that can change their src
             {
                 if (observers.hasOwnProperty("signatures"))
                 {
@@ -1460,11 +1489,11 @@ chrome.storage.sync.get("settings", function (data)
                 }
             }
 
-            if ($("#bottomCard").css("display") == "none") //card not shown, page loaded
+            if ($("#bottomCard").css("display") === "none") //card not shown, page loaded
                 cardSlideSteps($("#bottomCard"));
-        })
-    })
-})
+        });
+    });
+});
 
 
 
@@ -1494,9 +1523,9 @@ function getPagination(comments)
 //handler for key combinations
 function keyPress(e)
 {
-    var evtobj = window.event ? event : e
+    var evtobj = window.event ? event : e;
 
-    if (evtobj.keyCode == 81 && evtobj.altKey || evtobj.keyCode == 191 && evtobj.altKey)
+    if (evtobj.keyCode === 81 && evtobj.altKey || evtobj.keyCode === 191 && evtobj.altKey)
     { //check for key combination ALT+Q and activate quick access, 191 for macs.
 
         openQuickAccess();
@@ -1538,7 +1567,7 @@ function openQuickAccess()
                                         $("<span>").text(settings.quickAccessThreads[i].prefix + " ")
                                     ).append(
                                         $("<b>").text(settings.quickAccessThreads[i].title)
-                                        )
+                                    )
                                 ).append(
                                     $("<a>", { class: "qAuthor", href: fxpDomain + "member.php?u=" + settings.quickAccessThreads[i].authorId })
                                         .text("...").each(function ()
@@ -1549,8 +1578,8 @@ function openQuickAccess()
                                                 e.text(name);
                                             });
                                         })
-                                    )
                                 )
+                            )
                         ).append(
                             $("<div>", { class: "deleteQuickThread" }).append(
                                 $("<span>", { class: "mdi mdi-delete" }).click(function ()
@@ -1563,11 +1592,11 @@ function openQuickAccess()
                                         parent.slideUp(300, function () //slide up and remove
                                         {
                                             $(this).remove();
-                                        })
+                                        });
                                     });
                                 })
                             )
-                            )
+                        )
                     );
                 }
 
@@ -1585,7 +1614,7 @@ function openQuickAccess()
                                         $("<span>").text(settings.trackedThreads.list[i].prefix + " ")
                                     ).append(
                                         $("<b>").text(settings.trackedThreads.list[i].title)
-                                        )
+                                    )
                                 ).append(
                                     $("<span>", { class: "qUnread" })
                                         .text("0 הודעות חדשות").each(function ()
@@ -1593,7 +1622,7 @@ function openQuickAccess()
                                             commentNum = 0; //search for the comment number
                                             for (var j = 0; j < threadComments.length; j++)
                                             {
-                                                if (threadComments[j].id == settings.trackedThreads.list[i].threadId)
+                                                if (threadComments[j].id === settings.trackedThreads.list[i].threadId)
                                                 {
                                                     commentNum = settings.trackedThreads.list[i].totalComments - threadComments[j].comments;
 
@@ -1613,7 +1642,7 @@ function openQuickAccess()
                                             }
 
                                             //update text
-                                            if (commentNum == 1)
+                                            if (commentNum === 1)
                                                 $(this).text("תגובה חדשה אחת");
                                             else
                                                 $(this).text(commentNum + " תגובות חדשות");
@@ -1621,8 +1650,8 @@ function openQuickAccess()
                                             if (commentNum > 0)
                                                 $(this).addClass("newCommentsTracked");
                                         })
-                                    )
                                 )
+                            )
                         ).append(
                             $("<div>", { class: "deleteTrackedThread" }).append(
                                 $("<span>", { class: "mdi mdi-message-bulleted-off" }).click(function ()
@@ -1635,11 +1664,11 @@ function openQuickAccess()
                                         parent.slideUp(300, function () //slide up and remove
                                         {
                                             $(this).remove();
-                                        })
+                                        });
                                     });
                                 })
                             )
-                            )
+                        )
                     );
                 }
 
@@ -1656,18 +1685,18 @@ function openQuickAccess()
                                 $("<option>", { value: 5 }).text("5 דקות")
                             ).append(
                                 $("<option>", { value: 15 }).text("15 דקות")
-                                ).append(
+                            ).append(
                                 $("<option>", { value: 30 }).text("30 דקות")
-                                ).append(
+                            ).append(
                                 $("<option>", { value: 60 }).text("שעה")
-                                ).append(
+                            ).append(
                                 $("<option>", { value: 180 }).text("3 שעות")
-                                ).append(
+                            ).append(
                                 $("<option>", { value: 30 }).text("5 שעות")
-                                ).append(
+                            ).append(
                                 $("<option>", { value: 720 }).text("12 שעות")
-                                )
                             )
+                        )
                     );
 
                     content.find("#setTrackedThreadsRefresh").val(settings.trackedThreads.refreshRate).change(function ()
@@ -1688,10 +1717,46 @@ function openQuickAccess()
     }
 }
 
+//opens a popup that allows the user to load their notes from storage
+function openLoadNotes()
+{
+    var content = $("<div>");
+    content.append(
+        $("<span>").text("באפשרותך לטעון קובץ הערות ששמרת בעבר דרך התוסף. ")
+    ).append(
+        $("<b>").text("בטעינת קובץ הערות, כל ההערות הקיימות שלך ימחקו.")
+    ).append(
+        $("<div>").append(
+            $("<input>", { type: "file", accept: ".json", id: "notes-file-input", style: "display: none" }).change(function (event)
+            {
+                importNotesFromJsonInput(event, function (status)
+                {
+                    $("#notes-status").attr("class", status.success ? "success" : "failure").text(status.info);
+
+                    //update the editor if the notes were changed
+                    if (status.success)
+                    {
+                        updateNoteTextContainers();
+                        chrome.runtime.sendMessage({ event: { cat: "Click", type: "UploadNotes" } });
+                    }
+                });
+            })
+        ).append(
+            $("<label>", { for: "notes-file-input" }).append(
+                $("<div>", { class: "niceButton blueBtn" }).text("בחר קובץ")
+            )
+        ).append(
+            $("<div>", { id: "notes-status" })
+        )
+    );
+    var imgUrl = chrome.extension.getURL("images/archive.svg");
+    openPopupWindow("load_notes_popup", imgUrl, "טען הערות מקובץ", content);
+}
+
 //resize signature bigger than 295px
 function resizeSignature(j_signatureElement)
 {
-    if (j_signatureElement.css("display") == "none") //don't process hidden signatures
+    if (j_signatureElement.css("display") === "none") //don't process hidden signatures
         return;
 
     //reset style, in case this signature was already processed
@@ -1726,14 +1791,14 @@ function getDaysSinceComment(threadlistItem)
 {
     var dateElement = threadlistItem.find(".threadlastpost").find("dd:eq(1)"); //finds the element in which the date is in
     var date = dateElement.text().match(/[0-9]{2}-[0-9]{2}-[0-9]{4}/g); //get the date from structure DD-MM-YYYY
-    if (date == null)
+    if (date === null)
         return 3;
     else
     {
         date = date[0].split("-"); //split to day, month, and year
         var nowDate = new Date(); //get the date right now
         var daysSince = 0;
-        daysSince += (nowDate.getDate() - date[0]); //calculate days difference
+        daysSince += nowDate.getDate() - date[0]; //calculate days difference
         daysSince += (nowDate.getMonth() + 1 - date[1]) * 30; //calculate months difference
         daysSince += (nowDate.getFullYear() - date[2]) * 365; //calculate years difference
 
@@ -1744,11 +1809,11 @@ function getDaysSinceComment(threadlistItem)
 //returns the most frequent entry/entries in the array in array form
 function mostFrequent(arr)
 {
-    if (arr.length == 0)
+    if (arr.length === 0)
         return {
             mostFrequent: [],
             count: 0
-        }
+        };
     else
     {
         var frequencies = {},
@@ -1756,7 +1821,7 @@ function mostFrequent(arr)
             mostFrequentCount = 1;
         for (var i = 0; i < arr.length; i++)
         {
-            if (frequencies[arr[i]] == null)
+            if (frequencies[arr[i]] === null)
                 frequencies[arr[i]] = 1;
             else
                 frequencies[arr[i]]++;
@@ -1765,7 +1830,7 @@ function mostFrequent(arr)
                 mostFrequent = [arr[i]];
                 mostFrequentCount = frequencies[arr[i]];
             }
-            else if (frequencies[arr[i]] == mostFrequentCount)
+            else if (frequencies[arr[i]] === mostFrequentCount)
             {
                 mostFrequent.push(arr[i]);
             }
@@ -1773,7 +1838,7 @@ function mostFrequent(arr)
         return {
             mostFrequent: mostFrequent,
             count: mostFrequentCount
-        }
+        };
     }
 }
 
@@ -1791,12 +1856,12 @@ function loadMinithread(threadLink, element, pm)
         element.append($("<div>", { class: "commentsContainer" }));
         var comments = element.find(".commentsContainer");
 
-        if (doc.find(".postbit").length == 0)
+        if (doc.find(".postbit").length === 0)
         {
             comments.append(
                 $("<div>", { class: "miniComment" })
                     .text("לא נמצאו תגובות! ייתכן שהתוכן שאתה מנסה לגשת אליו הוסר.")
-            )
+            );
         }
         else
         {
@@ -1837,7 +1902,7 @@ function loadMinithread(threadLink, element, pm)
                 var author = $(this).find(".username").text().trim();
                 var likes = parseInt($(this).find(".countlike").text());
                 var link;
-                if ($(this).find(".postcounter").length == 0) //no comment id, default to the thread url (mainly for PMs)
+                if ($(this).find(".postcounter").length === 0) //no comment id, default to the thread url (mainly for PMs)
                     link = fullUrl;
                 else
                     link = fxpDomain + $(this).find(".postcounter").attr("href");
@@ -1846,14 +1911,14 @@ function loadMinithread(threadLink, element, pm)
                 content.find(".twitter-tweet a").each(function ()
                 {
                     $(this).text($(this).attr("href"));
-                })
+                });
 
                 //fix for voice comments
                 content.find(".voice_recorder").each(function ()
                 {
                     $(this).find("audio").attr("controls", true);
                     $(this).find(".fxpplayer").remove();
-                })
+                });
 
                 //fix for lazy image loading
                 content.find("img[data-src]").each(function ()
@@ -1930,7 +1995,7 @@ function buildMiniComment(author, content, likes, link)
 
     if (likes > 0)
     {
-        var text = likes + " לייק"
+        var text = likes + " לייק";
         if (likes > 1)
             text += "ים";
 
@@ -1971,10 +2036,10 @@ function buildMiniPoll(title, options, totalVotes, voted)
                 $("<span>").text("סקר: ")
             ).append(
                 $("<span>", { style: "font-weight: bold" }).text(title)
-                )
+            )
         ).append(
             $("<ul>", { class: "minipollOptions" })
-            );
+        );
     var optionsElement = element.find("ul.minipollOptions");
     var percent;
     //add options
@@ -1991,7 +2056,7 @@ function buildMiniPoll(title, options, totalVotes, voted)
                         $("<div>", { class: "voteBar", style: "width: " + percent + "%; background-color: hsla(" + i * 110 + ", 100%, 80%, 1);" }).append(
                             $("<span>", { class: "voteCount" }).text(options[i].votes + " הצבעות (" + percent + "%)")
                         )
-                        )
+                    )
                 )
             );
         }
@@ -2047,14 +2112,14 @@ function peekToThread(e, closeMethod)
 {
     var pm = false;
     var threadbit = e.parents(".threadbit"); //parent thread line
-    if (threadbit.length == 0) //the parent is actually a PM
+    if (threadbit.length === 0) //the parent is actually a PM
     {
         threadbit = e.parents(".pmbit");
         pm = true;
     }
     var threadLink = threadbit.find(".title").attr("href");
     var threadUniqueIdentifier;
-    if (threadLink == null)
+    if (threadLink === null)
     {
         debug.warning("No link for clicked thread!");
         threadLink = "showthread.php?t=1";
@@ -2063,7 +2128,7 @@ function peekToThread(e, closeMethod)
     else
     {
         threadUniqueIdentifier = threadLink.match(/=[0-9]+/g);
-        if (threadUniqueIdentifier != null)
+        if (threadUniqueIdentifier !== null)
             threadUniqueIdentifier = threadUniqueIdentifier[0].substr(1); //remove =
     }
     var id = "mini" + threadUniqueIdentifier;
@@ -2086,8 +2151,7 @@ function peekToThread(e, closeMethod)
             e.parents(".threadbit").after($("<li>", { class: "threadbit minithread", id: id }).append(loadingElement));
         loadMinithread(threadLink, $("#" + id), pm);
         $("#" + id).hide().slideDown(400);
-        //if (settings.peekCloseMethod != "double")
-        if (closeMethod != "double")
+        if (closeMethod !== "double")
         { //close on mouseleave
             $("#" + id).mouseleave(function ()
             {
@@ -2098,7 +2162,6 @@ function peekToThread(e, closeMethod)
             });
         }
     }
-
 }
 
 //generate a "random" (bright) color from a seed
@@ -2110,7 +2173,7 @@ function generateRandomColor(seed)
     var h = Math.floor((Math.abs(Math.cos(seed / 2 * 3) * 3600)) % 3600) / 10;
     var s = (Math.floor((Math.abs(Math.cos(seed / 2 * 3) * 800)) % 800) + 200) / 10;
     var l = (Math.floor((Math.abs(Math.cos(seed / 2 * 3) * 500)) % 500) + 300) / 10;
-    return "hsl(" + h + "," + s + "%," + l + "%)"
+    return "hsl(" + h + "," + s + "%," + l + "%)";
 }
 
 //convert a string to an arbitrary number
@@ -2164,13 +2227,13 @@ function updateThreadCommentCount(threadId, comments)
             {
                 for (var i = 0; i < threadComments.length; i++)
                 {
-                    if (threadComments[i].id == threadId) //remove thread if it's already been tracked
+                    if (threadComments[i].id === threadId) //remove thread if it's already been tracked
                         threadComments.splice(i, 1);
                 }
                 var threadTrack = {
                     id: threadId,
                     comments: comments
-                }
+                };
                 threadComments.unshift(threadTrack); //add the thread to the beginning of the tracked threads list
                 var threadLimit = 300;
                 while (threadComments.length > threadLimit) //limit number of trackers
@@ -2189,13 +2252,13 @@ function updateThreadCommentCount(threadId, comments)
                 debug.warning("the thread id is not a number!");
                 localStorage.removeItem("tempTcount");
             }
-        })
+        });
     }
 }
 
 //handle temporary variable of updateThreadCommentCount
 var tempTcount = localStorage.getItem("tempTcount");
-if (tempTcount != null)
+if (tempTcount !== null)
 {
     tempTcount = JSON.parse(tempTcount);
     updateThreadCommentCount(tempTcount.id, tempTcount.comments);
@@ -2208,7 +2271,7 @@ function getThreadIdFromLink(link)
     if (!link)
         return NaN;
     var id = link.match(/t=[0-9]+/g); //match t=XXXX
-    if (id == null)
+    if (id === null)
         return NaN;
     else
         return parseInt(id[0].substr(2)); //remove t= and return
@@ -2240,7 +2303,7 @@ function checkTrackThreadUnread(threadId)
     //check if the thread should be ignored
     for (var i = 0; i < noTrackThreads.length; i++)
     {
-        if (noTrackThreads[i] == threadId)
+        if (noTrackThreads[i] === threadId)
             return false;
     }
     return true;
@@ -2254,7 +2317,7 @@ function setTrackThreadUnread(threadId, track)
     //remove the thread from the dnt list
     for (var i = 0; i < noTrackThreads.length; i++)
     {
-        if (noTrackThreads[i] == threadId)
+        if (noTrackThreads[i] === threadId)
             noTrackThreads.splice(i, 1);
     }
 
@@ -2284,7 +2347,7 @@ function checkNewComments(threadbit)
             //search for the thread in storage
             for (var i = 0; i < threadComments.length; i++)
             {
-                if (threadComments[i].id == id)
+                if (threadComments[i].id === id)
                 {
                     commentNum = threadComments[i].comments;
                     break;
@@ -2306,7 +2369,7 @@ function checkNewComments(threadbit)
 function tagNewComments(threadbit, num)
 {
     var balloonText = "יש ";
-    if (num == 1)
+    if (num === 1)
         balloonText += "תגובה אחת חדשה ";
     else
         balloonText += num + " תגובות חדשות ";
@@ -2319,7 +2382,7 @@ function tagNewComments(threadbit, num)
             "data-balloon-pos": "left",
             "data-balloon": balloonText,
             "data-balloon-length": "medium"
-        }).text("(" + num + ")").click(function () { removeNewCommentTag($(this)) })
+        }).text("(" + num + ")").click(function () { removeNewCommentTag($(this)); })
     );
 }
 
@@ -2334,7 +2397,7 @@ function getCommentsReadCountOfThread(id, callback)
         //search for the thread in storage
         for (var i = 0; i < threadComments.length; i++)
         {
-            if (threadComments[i].id == id)
+            if (threadComments[i].id === id)
             {
                 commentNum = threadComments[i].comments;
                 break;
@@ -2354,7 +2417,7 @@ function removeNewCommentTag(tagElement)
     tagElement.slideUp(300, function ()
     {
         tagElement.remove();
-    })
+    });
 }
 
 //compares the comment given with the number of read comments already tracked, and updates accordingly
@@ -2366,7 +2429,7 @@ function compareReadCommentsWithLast(threadId, lastIndex)
         var knownComments = -1;
         for (var i = 0; i < threadComments.length; i++) //search for the thread in the storage
         {
-            if (threadComments[i].id == threadId)
+            if (threadComments[i].id === threadId)
             {
                 knownComments = threadComments[i].comments;
                 break;
@@ -2394,7 +2457,7 @@ function getReadComments(threadId, callback)
         var commentNum = -1;
         for (var i = 0; i < threadComments.length; i++)
         {
-            if (threadComments[i].id == threadId)
+            if (threadComments[i].id === threadId)
             {
                 commentNum = threadComments[i].comments;
                 break;
@@ -2435,7 +2498,7 @@ function calcThreadReadTime(threadLink, callback)
     {
         var doc = $(domParser.parseFromString(response, "text/html"));
         var txt = doc.find(".postbit:first .content").text();
-        if (txt.length == 0)
+        if (txt.length === 0)
         {
             callback(-1);
         }
@@ -2448,7 +2511,7 @@ function calcThreadReadTime(threadLink, callback)
 
             //count the full words
             var words = txt.match(regex.fullWord);
-            if (words == null)
+            if (words === null)
                 words = 1;
             else
                 words = words.length;
@@ -2467,15 +2530,15 @@ function formatReadTime(time, short)
         if (time < 1) //less than a minute
         {
             time = Math.round(time * 60);
-            if (time == 0)
-                return (">1 שנ'");
+            if (time === 0)
+                return ">1 שנ'";
             else
-                return (time + " שנ'");
+                return time + " שנ'";
         }
         else
         {
             time = Math.round(time * 10) / 10; //round to 1 decimal digit
-            return (time + " דק'");
+            return time + " דק'";
         }
     }
     else
@@ -2483,15 +2546,15 @@ function formatReadTime(time, short)
         if (time < 1) //less than a minute
         {
             time = Math.round(time * 60);
-            if (time == 0)
-                return (">1 שניות");
+            if (time === 0)
+                return ">1 שניות";
             else
-                return (time + " שניות");
+                return time + " שניות";
         }
         else
         {
             time = Math.round(time * 10) / 10; //round to 1 decimal digit
-            return (time + " דקות");
+            return time + " דקות";
         }
     }
 }
@@ -2503,7 +2566,7 @@ var readTimeKnown = [];
 chrome.storage.local.get("readTimeKnown", function (data)
 {
     readTimeKnown = data.readTimeKnown || [];
-})
+});
 
 //add to known read times
 function newKnownTime(threadId, time)
@@ -2511,7 +2574,7 @@ function newKnownTime(threadId, time)
     var thread = {
         id: threadId,
         time: time
-    }
+    };
     readTimeKnown.unshift(thread);
     var threadLimit = 200;
     while (readTimeKnown.length > threadLimit) //limit number of trackers
@@ -2538,9 +2601,9 @@ function runReadTimeQueue()
         var turn = readTimeQueue[0]; //select the first on queue
         var threadId = getThreadIdFromLink(turn.link);
         var knownTime = -1;
-        for (var i = 0; i < readTimeKnown.length && knownTime == -1; i++) //search for the thread's id in the known read times
+        for (var i = 0; i < readTimeKnown.length && knownTime === -1; i++) //search for the thread's id in the known read times
         {
-            if (readTimeKnown[i].id == threadId)
+            if (readTimeKnown[i].id === threadId)
                 knownTime = readTimeKnown[i].time;
         }
         if (knownTime > -1) //thread is known
@@ -2576,7 +2639,7 @@ function runReadTimeQueue()
 function getForumName()
 {
     var name = $(".pagetitle .ntitle").text().trim(); //try by forum thread list title
-    if (name == "")
+    if (name === "")
     {
         $("#breadcrumb .navbit a[href*='?f=']:last").text().trim(); //try by breadcrumb navigation tree
     }
@@ -2589,18 +2652,18 @@ function filterActiveByForum(filter, forumName)
     forumName = forumName.toLowerCase(); //change forum name to lowercase to ignore case sensitivity
 
     var activeFilter = false;
-    if (filter.type == "everyForum") //filter, forum does not matter
+    if (filter.type === "everyForum") //filter, forum does not matter
         activeFilter = true;
     else
     {
-        if (filter.type == "notForum")
+        if (filter.type === "notForum")
             activeFilter = true;
         for (var i = 0; i < filter.forums.length; i++)
         {
             if (filter.forums[i].length > 0)
                 if (forumName.indexOf(filter.forums[i].toLowerCase()) > -1) //found the current forum in the forum list
                 {
-                    if (filter.type == "notForum") //the rule is except the forum
+                    if (filter.type === "notForum") //the rule is except the forum
                     {
                         activeFilter = false;
                     }
@@ -2637,7 +2700,7 @@ function filterThread(filter, threadElement)
 {
     var basicFilterPass = false;
     var addClass = "yellowMarkedThread";
-    if (filter.words != undefined) //filter by words
+    if (filter.words !== undefined) //filter by words
     {
         addClass = "blueTitleThread";
         var threadTitle = threadElement.find(".threadtitle").text().trim();
@@ -2652,11 +2715,11 @@ function filterThread(filter, threadElement)
                 }
         }
     }
-    else if (filter.id != undefined) //filter by id
+    else if (filter.id !== undefined) //filter by id
     {
         addClass = "yellowMarkedThread";
         var userId = utils.getUserIdFromLink(threadElement.find(".author a").attr("href"));
-        basicFilterPass = (filter.id == userId); //the user fits the filter
+        basicFilterPass = filter.id === userId; //the user fits the filter
     }
 
     if (basicFilterPass)
@@ -2664,7 +2727,7 @@ function filterThread(filter, threadElement)
             if (!threadHasException(filter, threadElement)) //the thread does not fit the exception filter
             {
                 //passed all conditions
-                if (filter.action == "bold")
+                if (filter.action === "bold")
                 {
                     threadElement.removeClass("hideThread").addClass("boldThread");
                     threadElement.addClass(addClass);
@@ -2687,7 +2750,7 @@ function checkAllFilters(userFilters, keywordFilters, threadElement)
     keywordFilters.forEach(function (filter)
     {
         filterThread(filter, threadElement);
-    })
+    });
 }
 
 //returns true if the string given is a url
@@ -2700,17 +2763,17 @@ function isURL(str)
 //disables the style of QUOTES of users
 function disableStyleInComments(userId)
 {
-    if (globalKnownIds[userId] != undefined)
+    if (globalKnownIds[userId] !== undefined)
     {
         var username = globalKnownIds[userId]; //get the username from the id
         $(".quote_container .bbcode_postedby").each(function ()
         {
             var quotedName = $(this).text().trim().substr("פורסם במקור על ידי ".length); //cut the text before the quote
-            if (quotedName == username)
+            if (quotedName === username)
             {
                 $(this).parents(".quote_container").find(".message").find("span, u, i, b, font").contents().unwrap(); //remove all style elements
             }
-        })
+        });
     }
 }
 
@@ -2741,7 +2804,7 @@ function hideComment(comment)
             parentCmnt.find(".postbody").slideDown(400);
             parentCmnt.addClass("active");
         }
-    })
+    });
 }
 
 //applies the filter given to the postbits
@@ -2785,7 +2848,7 @@ function checkCommentFilter(commentFilters, commentElement)
     var userId = utils.getUserIdFromLink(commentElement.find(".username").attr("href")); //get the comment user's id
     for (var i = 0; i < commentFilters.length; i++)
     {
-        if (commentFilters[i].id == userId) //match in filters
+        if (commentFilters[i].id === userId) //match in filters
         {
             applyCommentsFilter(commentFilters[i], commentElement);
         }
@@ -2802,7 +2865,7 @@ function updateSubnick(userId, subnick)
         var createNew = true;
         for (var i = 0; i < settings.commentFilters.length && createNew; i++)
         {
-            if (settings.commentFilters[i].id == userId) //the user is already on record, update the values
+            if (settings.commentFilters[i].id === userId) //the user is already on record, update the values
             {
                 settings.commentFilters[i].subnick = subnick;
                 createNew = false;
@@ -2818,11 +2881,11 @@ function updateSubnick(userId, subnick)
                     hideSignature: false,
                     disableStyle: false,
                     hideComments: false
-                })
+                });
         }
 
         chrome.storage.sync.set({ "settings": settings });
-    })
+    });
 }
 
 //edit a subnick quickly by opening a textbox where the subnick is
@@ -2837,7 +2900,7 @@ function quickEditSubnick(subnickElement)
     });
 
     var prevNick = subnickElement.text().trim();
-    if (prevNick.length == 0) //try to find an image if can't find text
+    if (prevNick.length === 0) //try to find an image if can't find text
     {
         prevNick = subnickElement.find("img").attr("src") ? subnickElement.find("img").attr("src") : "";
     }
@@ -2871,7 +2934,7 @@ function quickEditSubnick(subnickElement)
                 value: $(this).val(),
                 color: utils.convertRgbToHex($(this).css("color")),
                 size: parseInt($(this).css("font-size"))
-            }
+            };
             debug.print(subnick);
             updateSubnick(userId, subnick);
             updateKnownIds(userId, userName);
@@ -3004,11 +3067,116 @@ function bindEditorFrameLoad(editorFrame, settings)
     });
 
     debug.print(editorFrame[0].contentDocument.readyState);
-    if (editorFrame[0].contentDocument.readyState == 'complete')
+    if (editorFrame[0].contentDocument.readyState === 'complete')
     {
         debug.print("already complete");
         editorFrame.load();
     }
+}
+
+//exports an object as a JSON file
+function exportAsJsonFile(obj, filename)
+{
+    var JsonString = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+    var link = document.createElement("a");
+    link.setAttribute("href", JsonString);
+    link.setAttribute("download", filename + ".json");
+    document.body.appendChild(link); // firefox requirement
+    link.click(); // downloads the data
+}
+
+//binds to a file input. When the input is changed, the file is read and its notes are saved.
+function importNotesFromJsonInput(event, callback)
+{
+    var input = event.target;
+
+    var reader = new FileReader();
+    var notesObj; //object that contains the notes in the file
+    var success = true;
+    var addedInfo = "";
+    reader.onload = function ()
+    {
+        try
+        {
+            var data = reader.result;
+            notesObj = JSON.parse(data);
+        }
+        catch (e)
+        {
+            success = false;
+            if (e instanceof SyntaxError)
+                addedInfo = "לא היה ניתן לפענח את תוכן הקובץ. ייתכן שזה אינו קובץ שנוצר על ידי התוסף או שהקובץ ניזוק.";
+            else
+                addedInfo = "אירעה שגיאה: " + e;
+        }
+
+        if (success)
+            if (verifyNotesObject(notesObj)) //verify that the object contains notes
+            {
+                //override the old notes
+                chrome.storage.local.set({ "userNotes": notesObj }, function ()
+                {
+                    addedInfo = "ההערות החדשות נשמרו.";
+                    callback({
+                        success: success,
+                        info: addedInfo
+                    });
+                });
+            }
+            else
+            {
+                success = false;
+                addedInfo = "הקובץ שבחרת אינו קובץ הערות שנוצר על ידי התוסף.";
+                callback({
+                    success: success,
+                    info: addedInfo
+                });
+            }
+        else
+            callback({
+                success: success,
+                info: addedInfo
+            });
+    };
+    if (input.files.length > 0)
+        reader.readAsText(input.files[0]);
+    else
+        callback({
+            success: false,
+            info: "לא בחרת קובץ."
+        });
+}
+
+//returns true if the object is a valid notes object
+function verifyNotesObject(notesObj)
+{
+    if (!(notesObj instanceof Array)) //notes should be an array
+        return false;
+
+    var note;
+    for (var i = 0; i < notesObj.length; i++)
+    {
+        note = notesObj[i];
+        //all notes should have id and content
+        if (!(note.hasOwnProperty("id") && note.hasOwnProperty("content")))
+            return false;
+    }
+
+    return true;
+}
+
+//locates user note containers and updates them according to their assigned user id
+function updateNoteTextContainers()
+{
+    $(".userNotesEditor").each(function ()
+    {
+        var editor = $(this);
+        var userId = parseInt($(this).attr("data-user"));
+        getNoteByUserId(userId, function (noteText)
+        {
+            editor.val(noteText);
+        });
+    });
 }
 
 var saveNotesTimeout;
@@ -3025,7 +3193,7 @@ function userNotesEditorSaveChanges(editor, id)
             var notes = data.userNotes || defaultNotes;
             for (var i = 0; i < notes.length; i++)
             {
-                if (notes[i].id == id) //remove dupes
+                if (notes[i].id === id) //remove dupes
                 {
                     debug.print("removing:");
                     debug.print(notes[i]);
@@ -3049,7 +3217,7 @@ function getNoteByUserId(id, callback)
         var notes = data.userNotes || defaultNotes;
         for (var i = 0; i < notes.length && !foundNote; i++) //search for the note
         {
-            if (notes[i].id == id)
+            if (notes[i].id === id)
             {
                 callback(notes[i].content);
                 foundNote = true;
@@ -3082,7 +3250,7 @@ function fixMinithreadOrdring()
         parent = $(".threadbit#thread_" + threadId);
 
         if (parent.length > 0)
-            if (parent.index() != $(this).index() - 1) //check if reordering is really necessary
+            if (parent.index() !== $(this).index() - 1) //check if reordering is really necessary
                 $(this).insertAfter(parent)[0].scrollTop = scrollPos;
     });
 }
@@ -3104,7 +3272,7 @@ function getDupeSortedDictionary(arr)
     }
     sortedArr.sort(function (a, b) //sort the array according to the counts or alphabetically
     {
-        if (b.count == a.count)
+        if (b.count === a.count)
         {
             if (b.value < a.value)
                 return 1;
@@ -3146,7 +3314,7 @@ function addThreadToQuickAccess(prefix, title, author, id, callback)
         //remove dupes
         for (var i = 0; i < settings.quickAccessThreads.length; i++)
         {
-            if (settings.quickAccessThreads[i].threadId == id)
+            if (settings.quickAccessThreads[i].threadId === id)
             {
                 settings.quickAccessThreads.splice(i, 1); //remove dupe
                 i--;
@@ -3181,7 +3349,7 @@ function checkThreadExistsQuickAccess(id)
 {
     for (var i = 0; i < settings.quickAccessThreads.length; i++)
     {
-        if (settings.quickAccessThreads[i].threadId == id)
+        if (settings.quickAccessThreads[i].threadId === id)
         {
             return true; //thread exists
         }
@@ -3201,15 +3369,15 @@ function updateQuickAccessTitle(prefix, title, id)
         //search and update 
         for (var i = 0; i < settings.quickAccessThreads.length && !changed; i++)
         {
-            if (settings.quickAccessThreads[i].threadId == id)
+            if (settings.quickAccessThreads[i].threadId === id)
             {
                 //update titles
-                if (settings.quickAccessThreads[i].prefix != prefix)
+                if (settings.quickAccessThreads[i].prefix !== prefix)
                 {
                     settings.quickAccessThreads[i].prefix = prefix;
                     changed = true;
                 }
-                if (settings.quickAccessThreads[i].title != title)
+                if (settings.quickAccessThreads[i].title !== title)
                 {
                     settings.quickAccessThreads[i].title = title;
                     changed = true;
@@ -3236,7 +3404,7 @@ function removeThreadFromQuickAccess(id, callback)
         //remove 
         for (var i = 0; i < settings.quickAccessThreads.length; i++)
         {
-            if (settings.quickAccessThreads[i].threadId == id)
+            if (settings.quickAccessThreads[i].threadId === id)
             {
                 settings.quickAccessThreads.splice(i, 1); //remove dupe
                 i--;
@@ -3262,7 +3430,7 @@ function addThreadToTrackList(id, prefix, title, comments, lastCommentor)
         //remove dupes
         for (var i = 0; i < settings.trackedThreads.list.length; i++)
         {
-            if (settings.trackedThreads.list[i].threadId == id)
+            if (settings.trackedThreads.list[i].threadId === id)
             {
                 settings.trackedThreads.list.splice(i, 1); //remove dupe
                 i--;
@@ -3287,7 +3455,7 @@ function checkThreadExistsTrackList(id)
 {
     for (var i = 0; i < settings.trackedThreads.list.length; i++)
     {
-        if (settings.trackedThreads.list[i].threadId == id)
+        if (settings.trackedThreads.list[i].threadId === id)
         {
             return true; //thread exists
         }
@@ -3305,7 +3473,7 @@ function removeThreadFromTrackList(id, callback)
         //remove 
         for (var i = 0; i < settings.trackedThreads.list.length; i++)
         {
-            if (settings.trackedThreads.list[i].threadId == id)
+            if (settings.trackedThreads.list[i].threadId === id)
             {
                 settings.trackedThreads.list.splice(i, 1); //remove dupe
                 i--;
@@ -3329,7 +3497,7 @@ function changeTrackedThreadsRefresh(refresh)
         var uptodateSettings = data2.settings || {};
         uptodateSettings.trackedThreads.refreshRate = refresh;
         chrome.storage.sync.set({ "settings": uptodateSettings });
-    })
+    });
 }
 
 
@@ -3363,7 +3531,7 @@ function timeInMinutes(timeStr)
     var hours = parseInt(parts[0]);
     var minutes = parseInt(parts[1]);
 
-    return (hours * 60) + (minutes);
+    return hours * 60 + minutes;
 }
 
 //toggles the manage thread topdown that appears next to titles
@@ -3384,7 +3552,7 @@ function toggleManageThreadDropdown(open)
 //returns true if the manage thread dropdown is opened
 function getManageThreadDropdownOpened()
 {
-    return $(".manageThreadDropdown .dropdownLContent").css("display") != "none";
+    return $(".manageThreadDropdown .dropdownLContent").css("display") !== "none";
 }
 
 //slides a card up from the bottom of the screen, shows only the title and shortly afterwards the rest of the card
@@ -3406,7 +3574,7 @@ function cardSlideSteps(cardElement)
     fixSpaceChat();
     cardElement.show(); //make element visible, (but still under the screen)
     var delay = 1000;
-    if (titleHeight == 0) //remove delay if there is no title
+    if (titleHeight === 0) //remove delay if there is no title
         delay = 0;
 
     //show card title
@@ -3418,7 +3586,6 @@ function cardSlideSteps(cardElement)
         fixSpaceChat();
         cardElement.css({
             "margin-bottom": "0"
-            //"transition": "0.6s cubic-bezier(0.075, 0.82, 0.165, 1)"
         });
 
         if (cardElement.find(".progressBg.shortAutoClose").length > 0)
@@ -3432,16 +3599,16 @@ function cardSlideSteps(cardElement)
             {
                 var completeAction = cardElement.find(".progressBg.shortAutoClose").attr("data-completeAction");
 
-                if (completeAction == "updateVersion")
+                if (completeAction === "updateVersion")
                 {
                     changeNotificationValue("lastKnownVersion", chrome.runtime.getManifest().version);
                     if (cardElement.find(".progressBg.shortAutoClose").length > 0)
                         chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update Auto" } });
                 }
                 closeBottomCard();
-            }, closeAfterMs)
+            }, closeAfterMs);
         }
-    }, delay)
+    }, delay);
 }
 
 //closes the bottom card 
@@ -3451,7 +3618,7 @@ function closeBottomCard()
     $("#bottomCard").css({
         "transition": "0.2s ease-in",
         "margin-bottom": (-1 * $("#bottomCard").outerHeight()) + "px"
-    })
+    });
     //remove after slide out
     setTimeout(function ()
     {
@@ -3473,7 +3640,7 @@ function handleRatingSuggestion()
             var backupDataRestored = data2.backupDataRestored || false; //data was already restored
             var backupData = data2.backupData || []; //the data
 
-            if (notificationStorage == null || notificationStorage == undefined || !notificationStorage) //reset to default if variable does not exist
+            if (notificationStorage === null || notificationStorage === undefined || !notificationStorage) //reset to default if variable does not exist
             {
                 notificationStorage = {
                     welcome: false,
@@ -3497,9 +3664,9 @@ function handleRatingSuggestion()
                     $("<span>").text("תודה על שהורדת את +FxPlus!")
                 ).append($("<br>")).append(
                     $("<span>", { style: "font-weight: bold" }).text("כדי לפתוח את הגדרות התוסף, לחץ על כפתור גלגל השיניים בבר העליון.")
-                    ).append(
+                ).append(
                     $("<img>", { id: "howToSettingsImg", src: chrome.extension.getURL("images/howtoSettings.png"), height: 44 })
-                    );
+                );
 
                 $("body").append($("<div>", { class: "bottomFloat" }).append(
                     $("<div>", { id: "bottomCard", style: "display: none" }).append(
@@ -3515,7 +3682,7 @@ function handleRatingSuggestion()
                 )
                 );
             }
-            else if (versionNew != notificationStorage.lastKnownVersion)
+            else if (versionNew !== notificationStorage.lastKnownVersion)
             {
                 if (versionBig) //version deserves big notification
                 {
@@ -3523,7 +3690,7 @@ function handleRatingSuggestion()
                         $("<div>", { class: "quotedHeavy" }).text("”" + versionDescription + "”")
                     ).append(
                         $("<div>", { class: "quotedBtw" }).text("(מידע נוסף על עדכוני גרסה מופיע בבלוג של התוסף)")
-                        );
+                    );
 
 
                     $("body").append($("<div>", { class: "bottomFloat" }).append(
@@ -3542,7 +3709,7 @@ function handleRatingSuggestion()
                                     closeBottomCard();
                                     chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Update" } });
                                 })
-                                ))
+                            ))
                     )
                     );
 
@@ -3606,7 +3773,7 @@ function handleRatingSuggestion()
                     localStorage.removeItem("ratingBuffer"); //remove buffer (if it even exists)
 
                     var ratingLink;
-                    if (chrome.runtime.getManifest().browser == "firefox")
+                    if (chrome.runtime.getManifest().browser === "firefox")
                     {
                         ratingLink = $("<a>", { style: "display: block", target: "_blank", href: "https://addons.mozilla.org/firefox/addon/fxplusplus/" }).append(
                             $("<img>", { src: chrome.extension.getURL("images/firefoxStore.png"), height: 128 })
@@ -3623,11 +3790,11 @@ function handleRatingSuggestion()
                         $("<b>").text("כבר עברו " + daysSince + " ימים מאז שהורדת את התוסף +FxPlus. אני מקווה שאתה מרוצה ממנו ושהוא עמד בציפיות שלך.")
                     ).append(
                         $("<div>", { style: "margin-top: 1em" }).text("אשמח אם תדרג את התוסף בחנות. הדירוג שלך יעזור למשתמשים אחרים לגלות ולהוריד את התוסף, וזה גם אומר לי שמה שאני עושה שווה את זה.")
-                        ).append(
+                    ).append(
                         ratingLink.click(function () { chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Rate" } }); })
-                        ).append(
+                    ).append(
                         $("<div>", { style: "margin: 0.2em 0 1em 0; font-weight: bold;" }).text("תודה!")
-                        );
+                    );
 
                     $("body").append($("<div>", { class: "bottomFloat" }).append(
                         $("<div>", { id: "bottomCard", style: "display: none" }).append(
@@ -3647,13 +3814,13 @@ function handleRatingSuggestion()
                                     closeBottomCard();
                                     chrome.runtime.sendMessage({ event: { cat: "Popup", type: "Close Rate" } });
                                 })
-                                ))
+                            ))
                     )
                     );
                 }
             }
-        })
-    })
+        });
+    });
 }
 
 //changes the value of a notification handler
@@ -3671,7 +3838,7 @@ function changeNotificationValue(key, value)
 function fixSpaceChat()
 {
     //the chat is expanded, need to add space to the bottom of the flex
-    if ($("#cometchat").css("display") == "block")
+    if ($("#cometchat").css("display") === "block")
     {
         $(".bottomFloat").css("bottom", "25px");
     }
@@ -3684,13 +3851,13 @@ function fixSpaceChat()
 //adds a window with a specific id and dims the background
 function openPopupWindow(id, img, title, content, additionalClass)
 {
-    if ($("#popupBox").length == 0)
+    if ($("#popupBox").length === 0)
     {
         $("body").append($("<div>", { id: "popupBox" }));
     }
 
     //do not open a popup if one already exists
-    if ($(".popupContainer").length == 0)
+    if ($(".popupContainer").length === 0)
     {
         $("body").append($("<div>", { class: "dimScreen", id: "dim_" + id }).click(function ()
         {
@@ -3705,10 +3872,10 @@ function openPopupWindow(id, img, title, content, additionalClass)
                     )
                 ).append(
                     $("<div>", { class: "popupTitle" }).append(title)
-                    )
+                )
             ).append(
                 $("<div>", { class: "popupBottom" }).append(content)
-                );
+            );
 
         if (additionalClass)
             popup.addClass(additionalClass);
@@ -3731,7 +3898,7 @@ function removePopupWindow(id)
         $("#dim_" + id).fadeOut(300, function ()
         {
             $(this).remove();
-        })
+        });
         return true;
     }
     return false;
@@ -3747,7 +3914,7 @@ function getTimeStr(time)
         hours: 0,
         days: 0,
         months: 0
-    }
+    };
     times.minutes += Math.floor((time / 1000 / 60) % 60);
     if (time / 1000 / 60 >= 60) //more or an hour
     {
@@ -3762,7 +3929,7 @@ function getTimeStr(time)
         }
     }
 
-    if (times.minutes == 0 || time / 1000 / 60 < 1)
+    if (times.minutes === 0 || time / 1000 / 60 < 1)
     {
         str = "פחות מדקה";
     }
@@ -3771,22 +3938,22 @@ function getTimeStr(time)
         var parts = [];
         if (times.minutes > 0)
         {
-            if (times.minutes == 1) parts.push("דקה אחת");
+            if (times.minutes === 1) parts.push("דקה אחת");
             else parts.push(times.minutes + " דקות");
         }
         if (times.hours > 0)
         {
-            if (times.hours == 1) parts.push("שעה אחת");
+            if (times.hours === 1) parts.push("שעה אחת");
             else parts.push(times.hours + " שעות");
         }
         if (times.days > 0)
         {
-            if (times.days == 1) parts.push("יום אחד");
+            if (times.days === 1) parts.push("יום אחד");
             else parts.push(times.days + " ימים");
         }
         if (times.months > 0)
         {
-            if (times.months == 1) parts.push("חודש אחד");
+            if (times.months === 1) parts.push("חודש אחד");
             else parts.push(times.months + " חודשים");
         }
 

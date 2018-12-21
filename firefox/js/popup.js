@@ -30,7 +30,7 @@ var fxpDomain = "https://www.fxp.co.il/";
 
 var domParser = new DOMParser();
 
-$(".switch").click(function () { $(this).removeClass("noAnimation") })
+$(".switch").click(function () { $(this).removeClass("noAnimation"); });
 $(".counter").hide();
 $("#settingsLink").attr("href", chrome.extension.getURL("html/settings.html")).click(function ()
 {
@@ -69,21 +69,21 @@ chrome.storage.sync.get("settings", function (data)
             {
                 console.info("settings saved");
             });
-        })
-    })
-})
+        });
+    });
+});
 
 utils.getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (safe id)
 {
     console.log(id);
-    if (id == null) //the user is not logged in
+    if (id === null) //the user is not logged in
     {
         $("#countersContainer").empty().append(
             $("<div>", { class: "counter fullWidth" }).append(
                 $("<div>", { class: "counterNum" }).text("אופס!")
             ).append(
                 $("<div>", { class: "counterName" }).text("אתה לא מחובר ל-FxP.")
-                )
+            )
         );
         $("#notifications").append($("<div>", { class: "del_noti" }).append(
             $("<a>", {
@@ -133,7 +133,7 @@ utils.getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (
                             appendToNotifications(doc);
 
                             addExtraNotifications(requestsSent, requestsComplete, normal.pms, tracked);
-                        })
+                        });
                     }
                     if (normal.notifications > 0)
                     {
@@ -147,7 +147,7 @@ utils.getDomainCookies(fxpDomain, "bb_livefxpext", function (id) //get user ID (
                             appendToNotifications(doc);
 
                             addExtraNotifications(requestsSent, requestsComplete, normal.pms, tracked);
-                        })
+                        });
                     }
                     addExtraNotifications(requestsSent, requestsComplete, normal.pms, tracked);
                 });
@@ -163,17 +163,17 @@ function appendToNotifications(doc)
     doc.find(newNotificationSelector).parent().each(function ()
     {
         formatNoti($(this));
-        $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) });
+        $(this).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }); });
         $("#notifications").append($(this))
             .append($("<div>", { class: "seperator" }));
-    })
+    });
 }
 
 //adds the https: prefix to images
 function addHttpsToImage(img)
 {
     var src = img.attr("src");
-    if (src.indexOf("//") == 0)
+    if (src.indexOf("//") === 0)
     {
         src = "https:" + src;
     }
@@ -194,7 +194,7 @@ function formatNoti(element)
         href = $(this).attr("href");
         $(this).attr("href", fxpDomain + href);
         $(this).attr("target", "_blank");
-    })
+    });
 }
 
 //adds the new pm notification and tracked threads notification if all requests have been completed
@@ -210,7 +210,7 @@ function addExtraNotifications(sent, complete, pmCount, tracked)
                     href: "https://www.fxp.co.il/chat.php",
                     target: "_blank",
                     style: "text-align: center"
-                }).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) })
+                }).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }); })
                     .text(pmCount + " הודעות פרטיות שלא נקראו"));
             setTimeout(function ()
             {
@@ -233,7 +233,7 @@ function addExtraNotifications(sent, complete, pmCount, tracked)
                     {
                         additional = " הגיב באשכול במעקב ";
                     }
-                    else if (tracked[i].newComments == 2)
+                    else if (tracked[i].newComments === 2)
                     {
                         additional = " ומשתמש נוסף הגיבו באשכול במעקב ";
                     }
@@ -251,15 +251,15 @@ function addExtraNotifications(sent, complete, pmCount, tracked)
                             href: tracked[i].url,
                             target: "_blank",
                             style: "font-size:11px; padding-right: 25px;"
-                        }).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }) })
+                        }).click(function () { chrome.runtime.sendMessage({ event: { cat: "Click", type: "Notification" } }); })
                             .append($("<span>").text("המשתמש "))
                             .append($("<span>", { style: "font-weight: bold" }).text(tracked[i].lastCommentor))
                             .append($("<span>").text(additional))
                             .append($("<span>", { style: "font-weight: bold" }).text(tracked[i].threadTitle))
-                            );
+                        );
 
                     $("#notifications").append(notification)
-                        .append($("<div>", { class: "seperator" }))
+                        .append($("<div>", { class: "seperator" }));
                 }
             }, 700);
         }

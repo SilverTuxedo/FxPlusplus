@@ -21,7 +21,7 @@
 var num = 0;
 var num2 = 0;
 
-var fxpDomain = "https://www.fxp.co.il/"
+var fxpDomain = "https://www.fxp.co.il/";
 
 //if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
@@ -33,7 +33,7 @@ chrome.storage.sync = (function ()
 var customBg = {
     day: "",
     night: ""
-}
+};
 
 var tipBox = [
     'אפשר להפעיל ולכבות את מצב הלילה ידנית גם כאשר מצב הלילה הוגדר באופן אוטומטי על-ידי הפעלת קיצור הדרך למצב לילה ולחיצה עליו',
@@ -56,7 +56,7 @@ var tipBox = [
     'נהנה מהתוסף? תוכל להוסיף לו קרדיט בקלות דרך הכפתורים בדף עריכת החתימה',
     'גם אם פורום מסוים לא מוצע לך בחוקי הדגשת והסתרת אשכולות, עדיין תוכל להזין ידנית את הפורום שאתה רוצה (למשל היכל התהילה)',
     'לחיצה על תת-ניק בתגובות מאפשרת לערוך אותו בזריזות, גם בלי להיכנס להגדרות'
-]
+];
 showTip(true);
 
 var forumCompleteCooldown; //cooldown object for inputs of forum names
@@ -82,7 +82,7 @@ function showTip(allowSame)
     var randomTip = tipBox[randomIndex];
     if (!allowSame)
     {
-        if (randomTip == $("#tip").text())
+        if (randomTip === $("#tip").text())
         {
             showTip(allowSame);
             return;
@@ -107,7 +107,7 @@ var globalKnownIds = {};
 chrome.storage.local.get("knownIds", function (data)
 {
     globalKnownIds = data.knownIds;
-    if (globalKnownIds == undefined) //reset if needed
+    if (globalKnownIds === undefined) //reset if needed
         globalKnownIds = {};
 });
 
@@ -135,9 +135,9 @@ function updateIdDisplay(element, commonParentSelector)
 //sets the id display and makes sure that there's a href to the user
 function setIdDisplay(idElement, id)
 {
-    if (id == -1) //user was not found
+    if (id === -1) //user was not found
         idElement.text("המשתמש לא נמצא");
-    else if (id.length == 0) //no id was entered
+    else if (id.length === 0) //no id was entered
         idElement.text("#");
     else
         idElement.empty().append(
@@ -185,8 +185,7 @@ var backgroundNames = [
     "dottedtiles",
     "dirt",
     "marble",
-    "compressedsquashed",
-    "animals"
+    "compressedsquashed"
 ];
 
 var forumPrefixes = [
@@ -207,25 +206,14 @@ var forumPrefixes = [
     "בקשה",
     "השוואה",
     "סיקור"
-]
-
-function confirmLeave()
-{
-    //prevent instant close of the tab if there are any unsaved changes
-    if (unsavedChanges)
-        return "לעזוב? יש שינויים שלא נשמרו!";
-    else
-        return undefined;
-}
-window.onbeforeunload = confirmLeave;
-
+];
 
 //elements that are usually animated but shouldn't be when switching tabs
 var animatedElements = [
     ".userCard",
     ".StyleThreadsLine",
     ".StyleThreadsLine input"
-]
+];
 
 function changeTab(element)
 {
@@ -267,7 +255,7 @@ else
 {
     //check if there are other expressions in the title 
     var exp = location.href.match(/userFilter=[0-9]+/g);
-    if (exp != null)
+    if (exp !== null)
     {
         //userFilter query
         var queryId = parseInt(exp[0].substr("userFilter=".length));
@@ -287,7 +275,7 @@ $("#optionList li").click(function ()
 
 
 var customBgButtonPreview = localStorage.getItem("customBgButtonImage");
-if (customBgButtonPreview != null)
+if (customBgButtonPreview !== null)
 { //show the custom BG image from "cache", since it takes a while to load it from memory
     $("#changeBgBtn").css("background-image", customBgButtonPreview);
 }
@@ -309,9 +297,10 @@ setTabs(); //initial tab setting
 function loadGeneral(settings)
 {
     $("#backgroundNotifications").prop("checked", settings.backgroundNotifications);
+    $("#overviewNotificationBoot").prop("checked", settings.overviewNotificationBoot);
     $("#signatureResize").prop("checked", settings.resizeSignatures);
     $("#unreadComments").prop("checked", settings.trackUnreadComments);
-    if (settings.peekCloseMethod == "double")
+    if (settings.peekCloseMethod === "double")
     {
         $("#manualCollapse").prop("checked", true);
     }
@@ -337,19 +326,19 @@ function loadGeneral(settings)
 
     var customBg = settings.customBg || { day: "", night: "" };
 
-    if (customBg.day != "" && customBg.night != "")
+    if (customBg.day !== "" && customBg.night !== "")
     {
         var dayUrl = 'url("' + customBg.day + '")';
         var nightUrl = 'url("' + customBg.night + '")';
 
         $(".customBackground").each(function ()
         { //check if background is one that id default
-            if ($(this).find(".lightBG").css("background-image") == dayUrl &&
-                $(this).find(".darkBG").css("background-image") == nightUrl)
+            if ($(this).find(".lightBG").css("background-image") === dayUrl &&
+                $(this).find(".darkBG").css("background-image") === nightUrl)
                 $(this).addClass("selected");
         });
 
-        if ($(".customBackground.selected").length == 0)
+        if ($(".customBackground.selected").length === 0)
         { //no background selected after check, it is a custom BG
             $(".bgInput[name='lightBG']").val(customBg.day);
             $("#customBGTile .lightBG").css("background-image", dayUrl);
@@ -395,8 +384,8 @@ function sub_loadThreadFilterLines(settings)
                     excludeTitles: buildCommaSeperatedString(user.exception)
                 },
                 user.action
-            )
-        })
+            );
+        });
     });
 
     //add thread selectors by keywords table lines
@@ -432,7 +421,7 @@ function sub_loadCommentFilters(settings)
             settings.commentFilters[i].subnick.value,
             {
                 color: settings.commentFilters[i].subnick.color,
-                size: settings.commentFilters[i].subnick.size,
+                size: settings.commentFilters[i].subnick.size
             },
             settings.commentFilters[i].hideSignature,
             settings.commentFilters[i].disableStyle,
@@ -440,7 +429,7 @@ function sub_loadCommentFilters(settings)
         );
     }
 
-    if (highlightUser > 0 && $(".userCard.highlight").length == 0)
+    if (highlightUser > 0 && $(".userCard.highlight").length === 0)
     {
         addUserCard(highlightUser, "", { color: "#333333", size: 11 }, false, false, false);
     }
@@ -484,28 +473,28 @@ function loadMultiuser()
         var row;
         for (var i = 0; i < savedUserData.length; i++)
         {
-            row = buildMultiuserRow(savedUserData[i].user)
+            row = buildMultiuserRow(savedUserData[i].user);
             bindMultiuserRow(row);
             table.append(row);
         }
-    })
+    });
 }
 
 $("#addMultiuserRow").click(function ()
 {
-    var row = buildMultiuserRow()
+    var row = buildMultiuserRow();
     bindMultiuserRow(row);
     editMultiuserRow(row);
     $("#userlistContainer tbody").append(row);
-})
+});
 
 function bindMultiuserRow(row)
 {
     row.find(".editMultiuser").unbind().click(function ()
     {
-        editMultiuserRow($(this).parents("tr"))
+        editMultiuserRow($(this).parents("tr"));
         $(this).removeClass("error");
-    })
+    });
 
     row.find(".deleteMultiuser").unbind().click(function ()
     {
@@ -524,7 +513,7 @@ function bindMultiuserRow(row)
     row.find(".actionBtn").unbind().click(function ()
     {
         logIntoUser(row.find(".multiuserName").text(), $(this));
-    })
+    });
 }
 
 function editMultiuserRow(row)
@@ -552,7 +541,7 @@ function editMultiuserRow(row)
 
         saveUserData(username, passmd5, oldUsername);
 
-        if (username.length == 0) //username not given, remove row
+        if (username.length === 0) //username not given, remove row
             row.remove();
         else
         {
@@ -560,7 +549,7 @@ function editMultiuserRow(row)
             row.find("input").each(function ()
             {
                 $(this).css("width", $(this).parent().find(".userDisplay").width() + "px");
-            })
+            });
             var button = $(this);
             setTimeout(function ()
             {
@@ -571,11 +560,11 @@ function editMultiuserRow(row)
                 row.find("input").removeClass("smooth").css("width", "");
             }, 200);
         }
-    })
+    });
 
     row.find("input").keypress(function (e)
     {
-        if (e.which == 13) //blur and save on enter
+        if (e.which === 13) //blur and save on enter
         {
             $(this).blur();
             row.find(".actionBtn").click();
@@ -585,10 +574,10 @@ function editMultiuserRow(row)
     row.find("input").each(function ()
     {
         $(this).css("width", $(this).parent().find(".userDisplay").width() + "px");
-    })
+    });
 
     row.find("input").addClass("smooth");
-    setTimeout(function () { row.find("input").css("width", "") }, 20); //slide into width
+    setTimeout(function () { row.find("input").css("width", ""); }, 20); //slide into width
 
     row.addClass("editMode");
 }
@@ -607,7 +596,7 @@ function logIntoUser(user, btn)
         var changed = false;
         for (var i = 0; i < savedUserData.length && !changed; i++)
         {
-            if (savedUserData[i].user == user)
+            if (savedUserData[i].user === user)
                 passmd5 = savedUserData[i].passmd5;
         }
 
@@ -619,7 +608,7 @@ function logIntoUser(user, btn)
                 btn.text("מתחבר...");
                 login(user, passmd5, function (status)
                 {
-                    if (status == 1)
+                    if (status === 1)
                     {
                         btn.text("מחובר!");
                         $("#rateLimitLoginNotice").slideUp(200); //hide rate limit notice if visible
@@ -628,9 +617,18 @@ function logIntoUser(user, btn)
                             bindMultiuserRow(row);
                             row.removeClass("inProgress");
                         }, 2000);
-                        chrome.runtime.sendMessage({ sendTotalNotifications: true }); //update and notify notification count
+
+                        chrome.storage.sync.get("settings", function (data)
+                        {
+                            var settings = data.settings || {};
+                            if (settings.backgroundNotifications)
+                                chrome.runtime.sendMessage({ forceUpdateBadge: true }); //update the badge
+                            if (settings.overviewNotificationBoot)
+                                chrome.runtime.sendMessage({ sendTotalNotifications: true }); //notify on boot
+                        });
+                        
                     }
-                    else if (status == 0)
+                    else if (status === 0)
                     {
                         row.removeClass("inProgress");
                         btn.text("שגיאת התחברות!");
@@ -649,7 +647,7 @@ function logIntoUser(user, btn)
                         }, 5000);
                     }
                 });
-            })
+            });
         }
     });
     chrome.runtime.sendMessage({ event: { cat: "Click", type: "MultiUser" } });
@@ -666,9 +664,9 @@ function saveUserData(username, passmd5, oldUsername)
         {
             for (var i = 0; i < savedUserData.length && !changed; i++)
             {
-                if (savedUserData[i].user == oldUsername)
+                if (savedUserData[i].user === oldUsername)
                 {
-                    if (username.length == 0) //remove user
+                    if (username.length === 0) //remove user
                     {
                         savedUserData.splice(i, 1);
                         i--;
@@ -749,7 +747,7 @@ function login(username, passmd5, callback)
 $("#logoutCurrent").click(function ()
 {
     logoutCurrent($(this));
-})
+});
 
 function logoutCurrent(btn)
 {
@@ -769,8 +767,8 @@ function logoutCurrent(btn)
             {
                 logoutCurrent($(this));
             }).text(originalText);
-        }, 2000)
-    })
+        }, 2000);
+    });
 }
 
 //suggests forums for tags in the filtering section
@@ -791,7 +789,7 @@ function suggestForumTag(inputElement)
                 var suggContainer = inputElement.parent().find(".tagSuggestionsContainer");
 
                 var singleSuggestion;
-                if (data.length == 0)
+                if (data.length === 0)
                 {
                     suggContainer.hide();
                     console.log("warning: no suggestions for entered forum");
@@ -863,7 +861,7 @@ for (var i = 0; i < forumPrefixes.length; i++)
 {
     addPrefixTag(forumPrefixes[i], true);
 }
-var newsForumToggleName = "כתבות מפורומי עדכונים"
+var newsForumToggleName = "כתבות מפורומי עדכונים";
 addPrefixTag(newsForumToggleName, false);
 
 //add backgrounds to background lists in background popup
@@ -874,15 +872,15 @@ for (var i = 0; i < backgroundNames.length; i++)
             $("<div>", { class: "lightBG", style: "background-image: url(" + chrome.extension.getURL("images/bgs/light/" + backgroundNames[i] + ".png") + ");" })
         ).append(
             $("<div>", { class: "darkBG", style: "background-image: url(" + chrome.extension.getURL("images/bgs/dark/" + backgroundNames[i] + ".png") + ");" })
-            )
-    )
+        )
+    );
 }
 
 function updateBackgroundButtonImg()
 {
-    var button = $("#changeBgBtn")
+    var button = $("#changeBgBtn");
     var activeBg = $(".customBackground.selected");
-    if (activeBg.length == 0)
+    if (activeBg.length === 0)
     {
         button.css("background-image", "");
     }
@@ -905,7 +903,7 @@ $("#resetCustomBG").click(function ()
     $(".customBackground.selected").removeClass("selected");
     updateBackgroundButtonImg();
     closePopups();
-})
+});
 
 $(".bgInput").change(function ()
 {
@@ -921,13 +919,12 @@ $(".toggleStyle").click(function ()
 {
     $(this).toggleClass("selected");
     updateDefaultStyleAppearance();
-})
+});
 //update style editor when a value is changed
 $(".changeStyle").change(function ()
 {
     updateDefaultStyleAppearance();
-})
-
+});
 
 //change the editor in the comments section when needed
 function updateDefaultStyleAppearance()
@@ -969,13 +966,13 @@ function buildPrefixTag(name, addLine)
 { //builds a tag for read time
     var displayName = name;
     if (addLine)
-        displayName += "|"
+        displayName += "|";
     var tag =
         $("<label>").append(
             $("<input>", { type: "checkbox", class: "prefixControl", name: name })
         ).append(
             $("<div>", { class: "prefixItem" }).text(displayName)
-            )
+        );
     return tag;
 }
 
@@ -992,9 +989,9 @@ function buildGeneralTag(name)
     ).append(
         $("<span>", { class: "tagRemove mdi mdi-close" }).click(function ()
         {
-            $(this).parents(".tagBody").fadeOut(200, function () { $(this).remove() }); //fade out and remove
+            $(this).parents(".tagBody").fadeOut(200, function () { $(this).remove(); }); //fade out and remove
         })
-        );
+    );
 }
 
 //builds an element for adding tags
@@ -1024,9 +1021,9 @@ function buildGeneralTagAdder()
             $(this).parent().find(".tagSuggestionsContainer").hide();
         }).keypress(function (e)
         {
-            if (e.which == 13) //blur on enter
+            if (e.which === 13) //blur on enter
                 $(this).blur();
-            else if (forumCompleteCooldown == -1) //first edit, ignore
+            else if (forumCompleteCooldown === -1) //first edit, ignore
             {
                 var inputElement = $(this);
                 forumCompleteCooldown = setTimeout(function ()
@@ -1038,14 +1035,14 @@ function buildGeneralTagAdder()
         })
     ).append(
         $("<span>", { class: "tagAdd mdi mdi-plus" })
-        ).append(
+    ).append(
         $("<div>", { class: "tagSuggestionsContainer" })
-        );;
+    );
 }
 
 function showSaveSuccess()
 {
-    console.info("settings saved")
+    console.info("settings saved");
     $("#savedIndicator").show();
     setTimeout(function ()
     {
@@ -1073,7 +1070,7 @@ $("#sendTestNotification").click(function ()
                 url: ""
             }
         });
-})
+});
 
 //save settings
 $(".saveSettings").click(function ()
@@ -1084,9 +1081,10 @@ $(".saveSettings").click(function ()
         var settings = data.settings || {};
 
         //save settings in general
-        if (category == "general")
+        if (category === "general")
         {
             settings.backgroundNotifications = $("#backgroundNotifications").prop("checked");
+            settings.overviewNotificationBoot = $("#overviewNotificationBoot").prop("checked");
             settings.resizeSignatures = $("#signatureResize").prop("checked");
             settings.trackUnreadComments = $("#unreadComments").prop("checked");
             if ($("#manualCollapse").prop("checked"))
@@ -1114,11 +1112,11 @@ $(".saveSettings").click(function ()
             var customBg = {
                 day: "",
                 night: ""
-            }
+            };
             if ($(".customBackground.selected").length > 0)
             {
                 var selectedBgElement = $(".customBackground.selected");
-                if (selectedBgElement.attr("id") == "customBGTile")
+                if (selectedBgElement.attr("id") === "customBGTile")
                 { //custom bg
                     customBg.day = $(".bgInput[name='lightBG']").val();
                     customBg.night = $(".bgInput[name='darkBG']").val();
@@ -1141,13 +1139,13 @@ $(".saveSettings").click(function ()
             chrome.storage.sync.set({ "settings": settings }, showSaveSuccess);
 
         }
-        else if (category == "threads")
+        else if (category === "threads")
         { //save settings in threads
             settings.readtime.activePrefixes = [];
             $(".prefixControl[name!='" + newsForumToggleName + "']:checked").each(function ()
             {
                 settings.readtime.activePrefixes.push($(this).attr("name"));
-            })
+            });
             settings.readtime.newsForums = $(".prefixControl[name='" + newsForumToggleName + "']").prop("checked");
 
             settings.threadFilters.users = [];
@@ -1201,7 +1199,7 @@ $(".saveSettings").click(function ()
             //save changes
             chrome.storage.sync.set({ "settings": settings }, showSaveSuccess);
         }
-        else if (category == "comments")
+        else if (category === "comments")
         { //save settings in comments
             //style of default style editor
             settings.customDefaultStyle.active = $("#enableDefaultStyle").prop("checked");
@@ -1226,7 +1224,7 @@ $(".saveSettings").click(function ()
                         value: $(this).find(".subnick").val(),
                         color: $(this).find(".subnickColor").val(),
                         size: $(this).find(".subnickSize").val()
-                    }
+                    };
                     var hideSignature = $(this).find("[name='hideSignature']").prop("checked");
                     var disableStyle = $(this).find("[name='disableStyle']").prop("checked");
                     var hideComments = $(this).find("[name='hideComments']").prop("checked");
@@ -1240,7 +1238,7 @@ $(".saveSettings").click(function ()
                     });
                     utils.getUserNameById(id, globalKnownIds); //make sure the name is known now
                 }
-            })
+            });
 
             //save changes
             chrome.storage.sync.set({ "settings": settings }, showSaveSuccess);
@@ -1248,7 +1246,7 @@ $(".saveSettings").click(function ()
 
         chrome.runtime.sendMessage({ event: { cat: "Click", type: "Save settings" } });
     });
-})
+});
 
 //reset changes
 $(".resetChanges").click(function ()
@@ -1278,7 +1276,7 @@ $(".resetChanges").click(function ()
         showResetSuccess();
         chrome.runtime.sendMessage({ event: { cat: "Click", type: "Reset settings" } });
     });
-})
+});
 
 //sets the version number in the about page
 $("#versionNum").text(chrome.runtime.getManifest().version);
@@ -1301,7 +1299,7 @@ var comboAction = [
     {
         $("body").toggleClass("rotateColor");
     }
-]
+];
 
 var maxComboLength = combos[0].length;
 for (var i = 1; i < combos.length; i++)
@@ -1320,7 +1318,7 @@ $(document).on('keydown', function (e)
 {
     var tag = e.target.tagName.toLowerCase();
     var contenteditable = e.target.getAttribute("contenteditable") == "true";
-    if (tag != 'input' && tag != 'textarea' && !contenteditable)
+    if (tag !== 'input' && tag !== 'textarea' && !contenteditable)
     {
         var keycode = e.which; //get key code
 
@@ -1336,7 +1334,7 @@ $(document).on('keydown', function (e)
             pass = true;
             for (var j = 1; j < combos[i].length && pass; j++)
             {
-                if (combos[i][combos[i].length - j] != currentCombo[currentCombo.length - j])
+                if (combos[i][combos[i].length - j] !== currentCombo[currentCombo.length - j])
                     pass = false;
             }
             if (pass) //matches, activate combo action
@@ -1385,18 +1383,18 @@ function addUserCard(id, subnick, subnickStyle, hideSignature, disableStyle, hid
         card.find("span.delete").click(function ()
         { //delete button
             var card = $(this).parents(".userCard");
-            card.removeClass("noAnimation").css({ animation: "sizedownfade 0.4s forwards" })
+            card.removeClass("noAnimation").css({ animation: "sizedownfade 0.4s forwards" });
             setTimeout(function ()
             {
-                card.remove()
+                card.remove();
             }, 400);
         });
 
-        if (id == highlightUser)
+        if (id === highlightUser)
             card.addClass("highlight");
 
         $("#commentsCards").append(card);
-    })
+    });
 }
 
 //add style row for the threads section
@@ -1424,7 +1422,7 @@ function addStyleThreadsRow(type, selector, validation, action)
     }
     row.find(".tagsContainer").append(buildGeneralTagAdder());
     row.find("input[name=excludeTitles]").val(validation.excludeTitles); //exclude titles text
-    if (action == "bold")
+    if (action === "bold")
     {
         row.find("input[name=boldPost]").prop("checked", true);
     }
@@ -1449,12 +1447,12 @@ function addStyleThreadsRow(type, selector, validation, action)
     row.find("span.delete").click(function ()
     { //delete button
         var row = $(this).parents("tr");
-        row.css({ transition: "font-size 0.3s", fontSize: 0 })
-        row.find("input").css({ transition: "font-size 0.3s", fontSize: 0 })
-        row.find("textarea").css({ transition: "font-size 0.3s", fontSize: 0 })
+        row.css({ transition: "font-size 0.3s", fontSize: 0 });
+        row.find("input").css({ transition: "font-size 0.3s", fontSize: 0 });
+        row.find("textarea").css({ transition: "font-size 0.3s", fontSize: 0 });
         setTimeout(function ()
         {
-            row.remove()
+            row.remove();
         }, 250);
     });
 
@@ -1464,9 +1462,9 @@ function addStyleThreadsRow(type, selector, validation, action)
     }).blur(function ()
     {
         $(this).parent().removeAttr("data-balloon");
-    })
+    });
 
-    if (type == "user")
+    if (type === "user")
     {
         row.find("input[name=username]").val(selector.name);
         setIdDisplay(row.find(".userNumber"), selector.id);
@@ -1509,13 +1507,13 @@ function buildArrayFromCommaString(str)
 $("#addCardComments").click(function ()
 {
     addUserCard("", "", { color: "#333333", size: 11 }, false, false, false);
-})
+});
 
 $(".addStyleThreadsLine").click(function ()
 {
     var type = $(this).parents(".StyleThreads").attr("data-tag");
     addStyleThreadsRow(type, { name: "", id: "", words: "" }, { type: "everyForum", forums: "", excludeTitles: "" }, "bold");
-})
+});
 
 $("#recalcReadSpeed").click(function ()
 {
@@ -1526,9 +1524,9 @@ $("#recalcReadSpeed").click(function ()
         $("<span>").text('בעוד רגעים ספורים יוצג בפניך קטע קצר שלקוח מויקיפדיה. קרא אותו עד סופו, ובסיום הקריאה לחץ על הכפתור בתחתית הדף.')
     ).append(
         $("<br>")
-        ).append(
+    ).append(
         $("<span>").text('התוסף יחלק את מספר המילים בקטע בזמן שלקח לך לקרוא אותו, ובכך יקבע את מהירות הקריאה שלך.')
-        )
+    );
     popup.find(".button:first").attr({ class: "button blue", id: "startReadtime" }).text("התחל");
     $("#cancelReadtime").show();
     $("#startReadtime").unbind().click("presentText", function ()
@@ -1545,7 +1543,7 @@ $("#recalcReadSpeed").click(function ()
             'לפני החדרת מחט מזרק או עירוי לזרוע, נהוג לחטא באלכוהול את העור באזור המיועד לדקירה, על מנת למנוע זיהום. באופן לכאורה פרדוקסלי, חיטוי שכזה הוא חובה בארצות הברית גם לפני הוצאה להורג באמצעות זריקת רעל, על אף שבגוף הנידון למוות לא יכול להתפתח נזק מזיהום חיידקי או נגיפי בזמן הקצר שנותר לו לחיות, ועל אף שההוצאה להורג מיועדת לפגוע בעליל בבריאותו. אחת הסיבות לנוהל זה היא שייתכן כי בפרק הזמן שבין החדרת המחט לבין תחילת הזרקת הרעל יורה בית המשפט לעכב את ביצוע גזר הדין, כפי שאכן קרה בטקסס ב-1983, בעת ההוצאה להורג של הרוצח ג\'יימס אוטרי. אוטרי הוחזר חי ובריא לתאו, אך הוצא להורג מספר חודשים לאחר מכן.',
             'הנפת דגל בחצי התורן היא ביטוי לאבל במדינות רבות. אחד ההסברים למקור המנהג הוא מתן קדימות לדגל הסמלי הבלתי נראה של המוות. הנס המלכותי של הממלכה המאוחדת, אשר משמש את ריבון הממלכה המאוחדת, להבדיל מדגל הממלכה המאוחדת אשר משמש את המדינה, אינו מורכן לעולם לחצי התורן, אפילו לאות אבל על מותו של הריבון, משום שאף על פי שהריבון מת, תמיד יהיה מי שימלוך תחתיו, לפי העיקרון של "המלך מת, יחי המלך!". גם דגל ערב הסעודית אינו מורכן לחצי התורן, אך מסיבה אחרת – הוא נושא את השהאדה, הכרזת האמונה האסלאמית, ולכן הרכנתו עלולה להיחשב לכפירה.',
             'על אף שלא ניתן למדוד בדיוק רב את מיקומן של חלליות הוויאג\'ר, אפשר לקבוע בוודאות שוויאג\'ר 1 רחוקה יותר מכדור הארץ מאשר וויאג\'ר 2 למרות שהיא שוגרה אחריה, מכיוון שמסלולה של וויאג\'ר 1 נשא אותה מהר יותר לכיוון כוכב הלכת צדק. לעומת זאת, את מיקומן של החלליות פיוניר 10 ופיוניר 11 ניתן למדוד בדיוק רב אך התוצאה המתקבלת לא תואמת את התחזיות. ייתכן שתופעה זו, המכונה האנומליה של פיוניר, מצביעה על טעות בתורת היחסות הכללית, אך יכולים להיות הסברים פשוטים יותר כגון דליפת גז.',
-            '"הכפר הירוק ע"ש לוי אשכול" נקרא בטעות על שמם של שניים מראשי ממשלת ישראל. מייסד הכפר, גרשון זק, קרא לו "כפר הירוק",‏‏‏ ללא ה"א הידיעה לפני המילה כפר, מתוך כוונה לקרוא לו על שם דוד בן גוריון, ששם משפחתו המקורי היה "גרין", ירוק ביידיש. משמעות השם לפיכך הייתה "הכפר על שם הירוק".‏ ברבות השנים, וכתוצאה מכך שרבים לא הבינו את הרמז הטמון בשם המוסד, הוספה בטעות ה"א הידיעה לשם והוא נקרא "הכפר הירוק". כ-20 שנה מאוחר יותר, לאחר פטירת ראש הממשלה השלישי לוי אשכול, נקרא המקום גם על שמו, כנראה משכחת המקור לשם הראשוני.',
+            '"הכפר הירוק ע"ש לוי אשכול" נקרא בטעות על שמם של שניים מראשי ממשלת ישראל. מייסד הכפר, גרשון זק, קרא לו "כפר הירוק",‏‏‏ ללא ה"א הידיעה לפני המילה כפר, מתוך כוונה לקרוא לו על שם דוד בן גוריון, ששם משפחתו המקורי היה "גרין", ירוק ביידיש. משמעות השם לפיכך הייתה "הכפר על שם הירוק".‏ ברבות השנים, וכתוצאה מכך שרבים לא הבינו את הרמז הטמון בשם המוסד, הוספה בטעות ה"א הידיעה לשם והוא נקרא "הכפר הירוק". כ-20 שנה מאוחר יותר, לאחר פטירת ראש הממשלה השלישי לוי אשכול, נקרא המקום גם על שמו, כנראה משכחת המקור לשם הראשוני.'
         ];
         var randomIndex = Math.floor(Math.random() * readTimeTexts.length);
         var randomPassage = readTimeTexts[randomIndex];
@@ -1567,9 +1565,9 @@ $("#recalcReadSpeed").click(function ()
                 $("<span>").text("מהירות הקריאה שלך היא:")
             ).append(
                 $("<div>", { id: "timeResult" }).text(speed)
-                ).append(
+            ).append(
                 $("<b>").text("מילים לדקה.")
-                )
+            );
 
             $(this).attr("id", "")
                 .removeClass("red").addClass("blue").text("סגור");
@@ -1585,11 +1583,11 @@ $("#recalcReadSpeed").click(function ()
             $("#readSpeed").text(speed);
 
             $(this).unbind("click").click(closePopups);
-        })
+        });
 
     });
     openPopup("readtimePopup");
-})
+});
 
 $(".closePopupButton").click(closePopups);
 
@@ -1606,7 +1604,7 @@ function buildUserCard()
                 )
             ).append(
                 $("<td>", { class: "userNumber" }).text("#")
-                )
+            )
         ).append(
             $("<tr>").append(
                 $("<td>").append(
@@ -1616,67 +1614,67 @@ function buildUserCard()
                 $("<td>", { class: "styleSubnick" }).append(
                     $("<span>", { class: "mdi mdi-format-size" })
                 )
-                )
-            ).append(
+            )
+        ).append(
             $("<tr>").append(
                 $("<td>", { colspan: "2" }).append(
                     $("<div>", { class: "subnickStyleEditor" }).append(
                         $("<span>").text("px")
                     ).append(
                         $("<input>", { type: "number", value: "11", class: "subnickSize" })
-                        ).append(
+                    ).append(
                         $("<input>", { type: "color", class: "subnickColor" })
-                        )
+                    )
                 )
             )
-            ).append(
+        ).append(
             $("<tr>").append(
                 $("<td>", { class: "option" }).append(
                     $("<div>", { class: "switch" }).append(
                         $("<input>", { type: "checkbox", name: "hideSignature", id: "swtc" + num })
                     ).append(
                         $("<label>", { for: "swtc" + (num++) })
-                        )
+                    )
                 ).append(
                     $("<span>").text("הסתר חתימה")
-                    )
+                )
             ).append(
                 $("<td>", { rowspan: "3", class: "delete" }).append(
                     $("<span>", { class: "mdi mdi-delete delete" })
                 )
-                )
-            ).append(
+            )
+        ).append(
             $("<tr>").append(
                 $("<td>", { class: "option" }).append(
                     $("<div>", { class: "switch" }).append(
                         $("<input>", { type: "checkbox", name: "disableStyle", id: "swtc" + num })
                     ).append(
                         $("<label>", { for: "swtc" + (num++) })
-                        )
+                    )
                 ).append(
                     $("<span>").text("נטרל עיצוב תגובות")
-                    )
+                )
             )
-            ).append(
+        ).append(
             $("<tr>").append(
                 $("<td>", { class: "option" }).append(
                     $("<div>", { class: "switch" }).append(
                         $("<input>", { type: "checkbox", name: "hideComments", id: "swtc" + num })
                     ).append(
                         $("<label>", { for: "swtc" + (num++) })
-                        )
+                    )
                 ).append(
                     $("<span>").text("הסתר תגובות")
-                    )
+                )
             )
-            )
+        );
     return card;
 }
 
 function buildHelperThreadsRow(type)
 {
     var obj;
-    if (type == "user")
+    if (type === "user")
     {
         obj = $("<td>").append(
             $("<input>", { type: "text", name: "username" }).change(function ()
@@ -1685,7 +1683,7 @@ function buildHelperThreadsRow(type)
             })
         ).append(
             $("<div>", { class: "userNumber" }).text("#")
-            );
+        );
     }
     else
     {
@@ -1710,42 +1708,42 @@ function buildStyleThreadsRow(type)
                         $("<input>", { type: "radio", class: "forumTarget", name: "forumTarget" + num2, value: "everyForum", id: "forumSel" + num, checked: "checked" })
                     ).append(
                         $("<label>", { for: "forumSel" + num++ })
-                        )
+                    )
                 ).append(
                     $("<span>").text(" בכל פורום")
-                    )
+                )
             ).append(
                 $("<div>", { class: "flex" }).append(
                     $("<div>", { class: "switch radio" }).append(
                         $("<input>", { type: "radio", class: "forumTarget", name: "forumTarget" + num2, value: "justForum", id: "forumSel" + num })
                     ).append(
                         $("<label>", { for: "forumSel" + num++ })
-                        )
-                ).append(
-                    $("<span>").text(" רק ב:")
                     )
                 ).append(
+                    $("<span>").text(" רק ב:")
+                )
+            ).append(
                 $("<div>", { class: "flex" }).append(
                     $("<div>", { class: "switch radio" }).append(
                         $("<input>", { type: "radio", class: "forumTarget", name: "forumTarget" + num2++, value: "notForum", id: "forumSel" + num })
                     ).append(
                         $("<label>", { for: "forumSel" + num++ })
-                        )
+                    )
                 ).append(
                     $("<span>").text(" לא ב:")
-                    )
                 )
-            ).append(
+            )
+        ).append(
             $("<td>").append(
                 $("<div>", { class: "tagsContainer forums" })
             )
-            ).append(
+        ).append(
             $("<td>").append(
                 $("<div>", { class: "balloonInputContainer", "data-balloon-pos": "down", "data-balloon-visible": true }).append(
                     $("<input>", { class: "seperateByCommaText", type: "text", name: "excludeTitles" })
                 )
             )
-            ).append(
+        ).append(
             $("<td>").append(
                 $("<label>").append(
                     $("<input>", { type: "checkbox", name: "boldPost", checked: "checked" })
@@ -1754,20 +1752,20 @@ function buildStyleThreadsRow(type)
                         $("<span>", { class: "mdi mdi-eye boldHideIcon" })
                     ).append(
                         $("<div>", { class: "boldHideText" }).text("הדגש")
-                        )
-                    ).append(
+                    )
+                ).append(
                     $("<div>", { class: "showHideToggle hideOn" }).append(
                         $("<span>", { class: "mdi mdi-eye-off boldHideIcon hideIcon" })
                     ).append(
                         $("<div>", { class: "boldHideText" }).text("הסתר")
-                        )
                     )
+                )
             )
-            ).append(
+        ).append(
             $("<td>").append(
                 $("<span>", { class: "mdi mdi-delete delete" })
             )
-            )
+        );
     return row;
 }
 function buildMultiuserRow(username)
@@ -1778,18 +1776,18 @@ function buildMultiuserRow(username)
                 $("<span>", { class: "userDisplay multiuserName" }).text(username)
             ).append(
                 $("<input>", { type: "text", class: "userInput", name: "multiuserName", autocomplete: "off" })
-                )
+            )
         ).append(
             $("<td>").append(
                 $("<span>", { class: "userDisplay multiuserPass" }).text("********")
             ).append(
                 $("<input>", { type: "password", class: "userInput", name: "multiuserPass" })
-                )
-            ).append(
+            )
+        ).append(
             $("<td>").append(
                 $("<div>", { class: "button darkGreen inline actionBtn" }).text("התחבר")
             )
-            ).append(
+        ).append(
             $("<td>").append(
                 $("<div>", { class: "editMultiuser" }).append(
                     $("<span>", { class: "mdi mdi-account-edit" })
@@ -1798,8 +1796,8 @@ function buildMultiuserRow(username)
                 $("<div>", { class: "deleteMultiuser" }).append(
                     $("<span>", { class: "mdi mdi-delete" })
                 )
-                )
-            );
+            )
+        );
     return row;
 }
 
@@ -1808,25 +1806,25 @@ $("#clearLocalStorage").click(function ()
 {
     if (confirm("בטוח?"))
         chrome.storage.local.clear();
-})
+});
 $("#clearSyncStorage").click(function ()
 {
     if (confirm("בטוח?"))
         chrome.storage.sync.clear();
-})
+});
 $("#printSettingsToConsole").click(function ()
 {
     chrome.storage.sync.get("settings", function (data)
     {
         console.log(data.settings);
-    })
-})
+    });
+});
 $("#editSettingsJson").click(function ()
 {
     chrome.storage.sync.get("settings", function (data)
     {
         var dataJson = JSON.stringify(data.settings);
-        if ($("button#saveJsonBtn").length == 0)
+        if ($("button#saveJsonBtn").length === 0)
         {
             $("#editSettingsJson").after($("<button>", { id: "saveJsonBtn" }).text("שמור").click(function ()
             {
@@ -1847,7 +1845,7 @@ $("#editSettingsJson").click(function ()
                             $("#saveJsonBtn").remove();
                             $("#settingsJsonBox").remove();
                         }
-                    })
+                    });
                 }
                 catch (err)
                 {
@@ -1856,8 +1854,8 @@ $("#editSettingsJson").click(function ()
             }));
             $("#editSettingsJson").after($("<textarea>", { id: "settingsJsonBox", style: "display: block; direction: ltr; width: 50%; height: 200px;" }).val(dataJson));
         }
-    })
-})
+    });
+});
 
 //restore option for old users
 chrome.storage.sync.get(["backupDataRestored", "backupData"], function (data)
@@ -1914,7 +1912,7 @@ chrome.storage.sync.get(["backupDataRestored", "backupData"], function (data)
                     newSettings.showSpoilers = oldSettings.showSpoilers;
                     newSettings.showForumStats = oldSettings.showStats;
                     newSettings.resizeSignatures = oldSettings.signatureResize;
-                    newSettings.peekCloseMethod = oldSettings.peekCloseMethod == "doublePress" ? "double" : "auto";
+                    newSettings.peekCloseMethod = oldSettings.peekCloseMethod === "doublePress" ? "double" : "auto";
                     if (oldSettings.daysPinned > 90)
                         newSettings.hideSticky.active = false;
                     else
@@ -2027,7 +2025,7 @@ chrome.storage.sync.get(["backupDataRestored", "backupData"], function (data)
                                     window.location.hash = ' ';
                                     window.location.reload();
                                 });
-                            })
+                            });
                         });
                     });
                 }
@@ -2035,7 +2033,7 @@ chrome.storage.sync.get(["backupDataRestored", "backupData"], function (data)
                 {
                     console.log("no old settings to restore");
                 }
-            })
+            });
         });
 
         //user clicked don't restore
@@ -2046,14 +2044,14 @@ chrome.storage.sync.get(["backupDataRestored", "backupData"], function (data)
                 window.location.hash = ' ';
                 window.location.reload();
             });
-        })
+        });
     }
-})
+});
 
 //converts bool to text 
 function boolToStr(bool)
 {
-    if (bool == undefined)
+    if (bool === undefined)
         return "ברירת המחדל";
     if (bool)
         return "פעיל";
@@ -2094,10 +2092,10 @@ function getRestoreList(callback)
             list.push("הצג סטטיסטיקות פורומים: " + boolToStr(oldSettings.showStats));
             list.push("הקטן חתימות גדולות: " + boolToStr(oldSettings.signatureResize));
 
-            if (oldSettings.peekCloseMethod == "doublePress")
-                list.push("סגירת הצצה לאשכולות: בלחיצה חוזרת")
+            if (oldSettings.peekCloseMethod === "doublePress")
+                list.push("סגירת הצצה לאשכולות: בלחיצה חוזרת");
             else
-                list.push("סגירת הצצה לאשכולות: אוטומטית")
+                list.push("סגירת הצצה לאשכולות: אוטומטית");
 
             list.push("הסתר נעוצים ישנים: " + boolToStr(oldSettings.daysPinned <= 90));
             list.push("הסתר גם אשכולות חוקים נעוצים: " + boolToStr(oldSettings.hideRules));

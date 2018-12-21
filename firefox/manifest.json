@@ -4,7 +4,7 @@
   "short_name": "FxPlus+",
   "author": "SilverTuxedo",
   "description": "מעולם לא היה קל יותר לגלוש ב-FxP.",
-  "version": "1.5.1a",
+  "version": "1.5.2",
 
   "browser": "firefox",
 
@@ -32,7 +32,6 @@
     "storage",
     "notifications",
     "cookies",
-    "background",
     "alarms"
   ],
 
