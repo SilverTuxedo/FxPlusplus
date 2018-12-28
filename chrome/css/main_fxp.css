@@ -1349,7 +1349,21 @@ CSS loader from SpinKit: http://tobiasahlin.com/spinkit/
         color: #e4e4e4;
     }
 
-.nightmodeActive .borderelssSelect {
-    color: #fff;
+.nightmodeActive #view-usernotes-content {
     background: #0e0e0e;
+    color: #eee;
+}
+
+.nightmodeActive .userprof_content_border {
+    border-color: #0e0e0e;
+}
+
+.nightmodeActive .niceButton.grayBtn {
+    background-color: #333333;
+    border-color: #464646;
+    color: #d6d5d5;
+}
+
+.nightmodeActive .niceButton.grayBtn:hover {
+    background-color: #565656;
 }

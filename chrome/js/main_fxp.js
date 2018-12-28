@@ -17,9 +17,9 @@
 
 "use strict";
 
-var versionDescription = "נוספה אפשרות לייצוא הערות, הפרדה בין התראות ברקע ובהפעלה, ותיקוני באגים";
+var versionDescription = "תיקוני באגים במצב לילה והערות";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2018/12/152.html";
+var versionHref = "https://fxplusplus.blogspot.com/2018/12/153.html";
 
 //if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
@@ -1622,7 +1622,7 @@ function openQuickAccess()
                                             commentNum = 0; //search for the comment number
                                             for (var j = 0; j < threadComments.length; j++)
                                             {
-                                                if (threadComments[j].id === settings.trackedThreads.list[i].threadId)
+                                                if (threadComments[j].id == settings.trackedThreads.list[i].threadId)
                                                 {
                                                     commentNum = settings.trackedThreads.list[i].totalComments - threadComments[j].comments;
 
@@ -2227,7 +2227,7 @@ function updateThreadCommentCount(threadId, comments)
             {
                 for (var i = 0; i < threadComments.length; i++)
                 {
-                    if (threadComments[i].id === threadId) //remove thread if it's already been tracked
+                    if (threadComments[i].id == threadId) //remove thread if it's already been tracked
                         threadComments.splice(i, 1);
                 }
                 var threadTrack = {
@@ -2347,7 +2347,7 @@ function checkNewComments(threadbit)
             //search for the thread in storage
             for (var i = 0; i < threadComments.length; i++)
             {
-                if (threadComments[i].id === id)
+                if (threadComments[i].id == id)
                 {
                     commentNum = threadComments[i].comments;
                     break;
@@ -2397,7 +2397,7 @@ function getCommentsReadCountOfThread(id, callback)
         //search for the thread in storage
         for (var i = 0; i < threadComments.length; i++)
         {
-            if (threadComments[i].id === id)
+            if (threadComments[i].id == id)
             {
                 commentNum = threadComments[i].comments;
                 break;
@@ -2429,7 +2429,7 @@ function compareReadCommentsWithLast(threadId, lastIndex)
         var knownComments = -1;
         for (var i = 0; i < threadComments.length; i++) //search for the thread in the storage
         {
-            if (threadComments[i].id === threadId)
+            if (threadComments[i].id == threadId)
             {
                 knownComments = threadComments[i].comments;
                 break;
@@ -2457,7 +2457,7 @@ function getReadComments(threadId, callback)
         var commentNum = -1;
         for (var i = 0; i < threadComments.length; i++)
         {
-            if (threadComments[i].id === threadId)
+            if (threadComments[i].id == threadId)
             {
                 commentNum = threadComments[i].comments;
                 break;
@@ -2603,7 +2603,7 @@ function runReadTimeQueue()
         var knownTime = -1;
         for (var i = 0; i < readTimeKnown.length && knownTime === -1; i++) //search for the thread's id in the known read times
         {
-            if (readTimeKnown[i].id === threadId)
+            if (readTimeKnown[i].id == threadId)
                 knownTime = readTimeKnown[i].time;
         }
         if (knownTime > -1) //thread is known
@@ -2719,7 +2719,7 @@ function filterThread(filter, threadElement)
     {
         addClass = "yellowMarkedThread";
         var userId = utils.getUserIdFromLink(threadElement.find(".author a").attr("href"));
-        basicFilterPass = filter.id === userId; //the user fits the filter
+        basicFilterPass = filter.id == userId; //the user fits the filter
     }
 
     if (basicFilterPass)
@@ -2848,7 +2848,7 @@ function checkCommentFilter(commentFilters, commentElement)
     var userId = utils.getUserIdFromLink(commentElement.find(".username").attr("href")); //get the comment user's id
     for (var i = 0; i < commentFilters.length; i++)
     {
-        if (commentFilters[i].id === userId) //match in filters
+        if (commentFilters[i].id == userId) //match in filters
         {
             applyCommentsFilter(commentFilters[i], commentElement);
         }
@@ -2865,7 +2865,7 @@ function updateSubnick(userId, subnick)
         var createNew = true;
         for (var i = 0; i < settings.commentFilters.length && createNew; i++)
         {
-            if (settings.commentFilters[i].id === userId) //the user is already on record, update the values
+            if (settings.commentFilters[i].id == userId) //the user is already on record, update the values
             {
                 settings.commentFilters[i].subnick = subnick;
                 createNew = false;
@@ -3193,7 +3193,7 @@ function userNotesEditorSaveChanges(editor, id)
             var notes = data.userNotes || defaultNotes;
             for (var i = 0; i < notes.length; i++)
             {
-                if (notes[i].id === id) //remove dupes
+                if (notes[i].id == id) //remove dupes
                 {
                     debug.print("removing:");
                     debug.print(notes[i]);
@@ -3217,7 +3217,7 @@ function getNoteByUserId(id, callback)
         var notes = data.userNotes || defaultNotes;
         for (var i = 0; i < notes.length && !foundNote; i++) //search for the note
         {
-            if (notes[i].id === id)
+            if (notes[i].id == id)
             {
                 callback(notes[i].content);
                 foundNote = true;
@@ -3234,7 +3234,8 @@ function getNoteByUserId(id, callback)
 function getUserIdInProfile()
 {
     var userLinkElement = $("a[href*='userid='"); //look for a URL with the user's id
-    return userLinkElement.attr("href").match(/userid=[0-9]+/g)[0].substr("userid=".length); //extract the ID from the url
+    var idStr = userLinkElement.attr("href").match(/userid=[0-9]+/g)[0].substr("userid=".length); //extract the ID from the url
+    return parseInt(idStr);
 }
 
 //fixes the ordering of minithreads so each minithread appears below its parent
@@ -3314,7 +3315,7 @@ function addThreadToQuickAccess(prefix, title, author, id, callback)
         //remove dupes
         for (var i = 0; i < settings.quickAccessThreads.length; i++)
         {
-            if (settings.quickAccessThreads[i].threadId === id)
+            if (settings.quickAccessThreads[i].threadId == id)
             {
                 settings.quickAccessThreads.splice(i, 1); //remove dupe
                 i--;
@@ -3349,7 +3350,7 @@ function checkThreadExistsQuickAccess(id)
 {
     for (var i = 0; i < settings.quickAccessThreads.length; i++)
     {
-        if (settings.quickAccessThreads[i].threadId === id)
+        if (settings.quickAccessThreads[i].threadId == id)
         {
             return true; //thread exists
         }
@@ -3369,7 +3370,7 @@ function updateQuickAccessTitle(prefix, title, id)
         //search and update 
         for (var i = 0; i < settings.quickAccessThreads.length && !changed; i++)
         {
-            if (settings.quickAccessThreads[i].threadId === id)
+            if (settings.quickAccessThreads[i].threadId == id)
             {
                 //update titles
                 if (settings.quickAccessThreads[i].prefix !== prefix)
@@ -3404,7 +3405,7 @@ function removeThreadFromQuickAccess(id, callback)
         //remove 
         for (var i = 0; i < settings.quickAccessThreads.length; i++)
         {
-            if (settings.quickAccessThreads[i].threadId === id)
+            if (settings.quickAccessThreads[i].threadId == id)
             {
                 settings.quickAccessThreads.splice(i, 1); //remove dupe
                 i--;
@@ -3430,7 +3431,7 @@ function addThreadToTrackList(id, prefix, title, comments, lastCommentor)
         //remove dupes
         for (var i = 0; i < settings.trackedThreads.list.length; i++)
         {
-            if (settings.trackedThreads.list[i].threadId === id)
+            if (settings.trackedThreads.list[i].threadId == id)
             {
                 settings.trackedThreads.list.splice(i, 1); //remove dupe
                 i--;
@@ -3455,7 +3456,7 @@ function checkThreadExistsTrackList(id)
 {
     for (var i = 0; i < settings.trackedThreads.list.length; i++)
     {
-        if (settings.trackedThreads.list[i].threadId === id)
+        if (settings.trackedThreads.list[i].threadId == id)
         {
             return true; //thread exists
         }
@@ -3473,7 +3474,7 @@ function removeThreadFromTrackList(id, callback)
         //remove 
         for (var i = 0; i < settings.trackedThreads.list.length; i++)
         {
-            if (settings.trackedThreads.list[i].threadId === id)
+            if (settings.trackedThreads.list[i].threadId == id)
             {
                 settings.trackedThreads.list.splice(i, 1); //remove dupe
                 i--;
