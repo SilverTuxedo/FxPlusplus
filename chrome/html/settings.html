@@ -75,11 +75,14 @@
             </div>
         </div>
     </div>
-    <div id="siderbarContainer">
-        <div id="sidebar">
+
+    <div id="mainGrid">
+        <div id="header">
             <div id="barTop">
                 הגדרות <span class="ltr">FxPlus+</span>
             </div>
+        </div>
+        <div id="sidebar">
             <ul id="optionList">
                 <li data-tab="general" class="selected">
                     <span class="mdi mdi-wrench optionIcon"></span>
@@ -110,7 +113,7 @@
                     <span class="optionDesc">שחזר הגדרות ישנות</span>
                 </li>
             </ul>
-            <div id="indicatorsContainer">
+            <div id="indicators">
                 <div id="savedIndicator">
                     <span class="mdi mdi-check savedIndicatorLogo"></span><br />
                     השינויים נשמרו.
@@ -121,15 +124,14 @@
                 </div>
             </div>
         </div>
-
-        <div id="contentContainer">
-            <div id="settingsUpperBar">
-                <span class="mdi mdi-lightbulb-on topBarIcon" id="tipIcon"></span>
-                <span>
-                    <b>טיפ: </b>
-                    <span id="tip"></span>
-                </span>
-            </div>
+        <div id="tips">
+            <span class="mdi mdi-lightbulb-on topBarIcon" id="tipIcon"></span>
+            <span>
+                <b>טיפ: </b>
+                <span id="tip"></span>
+            </span>
+        </div>
+        <div id="content">
             <div id="settingsContent">
                 <!--
                     General
@@ -184,7 +186,7 @@
                                 <div class="switch radio" style="width: 2em;"><input type="radio" checked name="peekCollapse" id="manualCollapse" /><label for="manualCollapse"></label></div>
                                 בלחיצה חוזרת
                             </div>
-                            <div style="display: flex;">
+                            <div class="flex">
                                 <div class="switch radio" style="width: 2em"><input type="radio" name="peekCollapse" id="automaticCollapse" /><label for="automaticCollapse"></label></div>
                                 אוטומטית
                             </div>
@@ -211,7 +213,7 @@
                                 <div class="switch" style="width: 2em;"><input type="checkbox" id="hidePinned" /><label for="hidePinned"></label></div>
                                 <span>הסתר אשכולות נעוצים בני יותר מ-<input type="number" id="hidePinnedDays" class="noArrows" style="width: 2em" value="14" min="5" max="365" /> ימים</span>
                             </div>
-                            <div style="display: flex;">
+                            <div class="flex">
                                 <div class="switch" style="width: 2em; margin-right: 2em"><input type="checkbox" id="hideIncludingRules" /><label for="hideIncludingRules"></label></div>
                                 כולל אשכולות חוקים
                             </div>
@@ -300,7 +302,7 @@
                                 <div class="switch" style="width: 2em;"><input type="checkbox" id="disableLiveTyping" /><label for="disableLiveTyping"></label></div>
                                 <span>אל תודיע שאני מקליד</span>
                             </div>
-                            <div style="display: flex;">
+                            <div class="flex">
                                 <div class="switch" style="width: 2em; margin-right: 2em"><input type="checkbox" id="disableLiveTypingPm" /><label for="disableLiveTypingPm"></label></div>
                                 כולל בצ'אט הפרטי
                             </div>
@@ -371,7 +373,7 @@
                         </tr>
                     </table>
                     <br />
-                    <div style="display: flex;">
+                    <div class="flex">
                         <div class="optionToggle">
                             <div class="switch"><input type="checkbox" id="filterSticky" /><label for="filterSticky"></label></div>
                         </div>
@@ -631,8 +633,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
     <script src="../js/jquery.min.js"></script>

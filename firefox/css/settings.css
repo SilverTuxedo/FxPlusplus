@@ -24,28 +24,68 @@ body {
     font-size: 100%;
 }
 
-@media (max-width: 500px) {
-    #sidebar {
-        width: 3.5em !important;
+#mainGrid {
+    display: grid;
+    grid-template-columns: 13em auto;
+    grid-template-rows: 4.1em auto;
+    grid-template-areas:
+        "header tips"
+        "sidebar content";
+    min-height: 100vh;
+}
+
+@media (max-width: 650px) {
+    #mainGrid {
+        grid-template-columns: auto;
+        grid-template-rows: auto auto auto 4.1em;
+        grid-template-areas:
+            "header"
+            "sidebar"
+            "content"
+            "tips";
     }
 
-    #indicatorsContainer {
-        width: 3.5em !important;
+    #optionList li {
+        justify-content: center !important;
+        font-size: 1.1em !important;
+        padding: 0.4em !important;
+        border-left: 0.2em solid transparent;
     }
 
-    #contentContainer {
-        width: calc(100% - 3.5em) !important;
-    }
-
-    .optionDesc {
-        display: none;
-    }
-
-    #barTop {
-        opacity: 0;
-        pointer-events: none;
+    #tips {
+        border-bottom: none !important;
+        border-top: 1px solid #d4d4d4;
     }
 }
+
+#header, #sidebar {
+    background-color: #2C3238;
+    color: #fff;
+}
+
+#header {
+    grid-area: header;
+}
+
+#sidebar {
+    grid-area: sidebar;
+}
+
+#tips {
+    grid-area: tips;
+    display: flex;
+    align-items: center;
+    padding: 0 3em;
+    background-color: #eef4f7;
+    font-weight: 600;
+    font-size: 1em;
+    border-bottom: 1px solid #d4d4d4;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #555e65;
+}
+
 
 h1, h2, h3, h4, h5, h6 {
     margin: 0.2em 0;
@@ -70,13 +110,6 @@ h1, h2, h3, h4, h5, h6 {
 
 span.ltr {
     display: inline-block;
-}
-
-#sidebar {
-    width: 13em;
-    min-height: 100vh;
-    background-color: #2C3238;
-    color: #fff;
 }
 
 #barTop {
@@ -112,12 +145,12 @@ span.ltr {
     }
 
         #optionList li.unsavedChanges {
-            border-right-color: #ff9438;
+            border-color: #ff9438;
         }
 
         #optionList li.selected {
             color: #fff;
-            border-right-color: #8CD5F6;
+            border-color: #8CD5F6;
         }
 
         #optionList li.redTab {
@@ -126,24 +159,8 @@ span.ltr {
 
             #optionList li.redTab.selected {
                 color: #f66;
-                border-right-color: #f68c8c;
+                border-color: #f68c8c;
             }
-
-#settingsUpperBar {
-    display: block;
-    padding: 0 3em;
-    height: 4.1em;
-    background-color: #eef4f7;
-    font-weight: 600;
-    font-size: 1em;
-    border-bottom: 1px solid #d4d4d4;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    color: #555e65;
-    display: flex;
-    align-items: center;
-}
 
 #privateSect {
     color: #000;
@@ -1970,7 +1987,7 @@ input.prefixControl:checked ~ .prefixItem {
     }
 
 
-#indicatorsContainer {
+#indicators {
     position: fixed;
     width: 13em;
     bottom: 0;

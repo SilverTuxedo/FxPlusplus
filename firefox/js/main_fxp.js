@@ -17,9 +17,9 @@
 
 "use strict";
 
-var versionDescription = "תיקוני באגים במצב לילה והערות";
+var versionDescription = "הצצה לאשכולות מציגה גם תאריך, ותיקוני באגים";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2018/12/153.html";
+var versionHref = "https://fxplusplus.blogspot.com/2019/05/154.html";
 
 //if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
@@ -1900,6 +1900,7 @@ function loadMinithread(threadLink, element, pm)
             {
                 var content = $(this).find(".content");
                 var author = $(this).find(".username").text().trim();
+                var postDate = $(this).find(".posthead-date .date").text();
                 var likes = parseInt($(this).find(".countlike").text());
                 var link;
                 if ($(this).find(".postcounter").length === 0) //no comment id, default to the thread url (mainly for PMs)
@@ -1928,7 +1929,7 @@ function loadMinithread(threadLink, element, pm)
                     $(this).removeClass("lazy");
                 });
 
-                var comment = buildMiniComment(author, content, likes, link);
+                var comment = buildMiniComment(author, postDate, content, likes, link);
                 //add comments to new element
                 comments.append(comment);
             });
@@ -1977,7 +1978,7 @@ function loadMinithread(threadLink, element, pm)
 }
 
 //helper function that builds a comment for the loadMinithread function
-function buildMiniComment(author, content, likes, link)
+function buildMiniComment(author, postDate, content, likes, link)
 {
     content.find(".videoyoudiv").parent().css("width", "auto");
     content.find(".videoyoudiv").remove();
@@ -1987,6 +1988,10 @@ function buildMiniComment(author, content, likes, link)
             $("<a>", { class: "linkToComment", href: link, target: "_blank" }).append(
                 $("<div>", { class: "miniUser" }).append(
                     $("<b>").text(author)
+                )
+            ).append(
+                $("<div>", { class: "miniPostDate" }).append(
+                    $("<i>").text(postDate)
                 )
             )
         ).append(content);

@@ -223,9 +223,26 @@
         max-width: 100%;
     }
 
+    .miniComment a.linkToComment {
+        position: relative;
+        display: block;
+    }
+
+    .miniComment:hover .miniPostDate {
+        opacity: 0.5;
+    }
 
 .miniUser {
     margin-bottom: 6px;
+}
+
+.miniPostDate {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    font-size: 0.7em;
+    transition: opacity 0.2s;
 }
 
 .endingComment {
@@ -1327,6 +1344,29 @@ CSS loader from SpinKit: http://tobiasahlin.com/spinkit/
     .nightmodeActive .minithread .sk-cube-grid .sk-cube {
         background: #3c3c3c;
     }
+
+
+.nightmodeActive .miniComment {
+    background: #242424;
+}
+
+.nightmodeActive .miniComment:nth-child(2n+1) {
+    background: #1d1d1d;
+}
+
+.nightmodeActive .miniComment a {
+    color: #ccc;
+}
+
+
+.nightmodeActive .minipoll {
+    background: #0d213a;
+    color: #b9b9b9;
+}
+
+.nightmodeActive .minipoll .voteBar {
+    color: #404040;
+}
 
 
 .nightmodeActive .yellowMarkedThread .rating0, .nightmodeActive .yellowMarkedThread .nonsticky, .nightmodeActive .yellowMarkedThread .sticky {
