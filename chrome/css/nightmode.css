@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2018 SilverTuxedo
+    Copyright 2015-2019 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -147,11 +147,40 @@ h1 {
     background: #0e0e0e;
 }
 
+#topmenunew .first {
+    background-color: #093d71;
+}
+
+#topmenunew .topbluew {
+    background-color: #093d71 !important;
+    background: #093d71 !important;
+}
+
+#top-menu li a {
+    color: #d9ebfc;
+}
+
+    #top-menu li a:hover, #showsr:hover {
+        background-color: #062647;
+    }
+
+#top-menu .popupbody li a, #top-menu .popupbody li label {
+    background: #04294e !important;
+}
+
+#top-menu .popupbody {
+    background: linear-gradient(#313131, #0a0a0a);
+    color: #fff;
+}
+
+#top-menu td a {
+    border-color: #2b2b2b;
+}
+
 /*
 FRONT PAGE
 */
-#statinfo,
-.greengrnew {
+#statinfo, .greengrnew {
     background: #c0cc3a !important;
 }
 
@@ -479,6 +508,10 @@ span.cke_skin_kama {
     border-color: #000 !important;
 }
 
+    .posthead-date .date {
+        color: #ccc !important;
+    }
+
 
 .user-picture-holder img {
     border-color: #000 !important;
@@ -527,6 +560,19 @@ span.cke_skin_kama {
 .follow-btn span {
     color: #5f78d2;
 }
+
+.button-newreply, .button-multiquote {
+    background-color: #1f1e1d;
+}
+
+    .button-newreply:hover, .button-multiquote:hover {
+        background-color: #353432;
+    }
+
+    .button-newreply span, .button-multiquote span {
+        color: #a5a5a5;
+    }
+
 
 
 /*

@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2018 SilverTuxedo
+    Copyright 2015-2019 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -2086,7 +2086,7 @@ function getRestoreList(callback)
             }
             console.log(oldSettings);
 
-            list.push("הסר את Taboola: " + boolToStr(oldSettings.hideOutbrain));
+            list.push("הסר את Outbrain: " + boolToStr(oldSettings.hideOutbrain));
             list.push("הצג את מספר התגובות שלא נקראו: " + boolToStr(oldSettings.newMessages));
             list.push("הצג ספוילרים: " + boolToStr(oldSettings.showSpoilers));
             list.push("הצג סטטיסטיקות פורומים: " + boolToStr(oldSettings.showStats));

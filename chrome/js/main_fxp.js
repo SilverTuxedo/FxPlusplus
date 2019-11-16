@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright 2015-2018 SilverTuxedo
+    Copyright 2015-2019 SilverTuxedo
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 
 "use strict";
 
-var versionDescription = "הצצה לאשכולות מציגה גם תאריך, ותיקוני באגים";
+var versionDescription = "תיקונים ושיפורים כלליים.";
 var versionBig = false;
-var versionHref = "https://fxplusplus.blogspot.com/2019/05/154.html";
+var versionHref = "https://fxplusplus.blogspot.com/2019/11/155.html";
 
 //if sync storage not supported, fallback to local.
 chrome.storage.sync = (function ()
@@ -196,29 +196,19 @@ chrome.storage.sync.get("settings", function (data)
         addStyle(bgStyle, "customBg");
     }
 
-    //remove taboola
+    //remove outbrain
     if (settings.hideSuggested)
     {
         debug.info("hideSuggested is enabled");
-        var taboolaSelectors = [
-            "script[src*='taboola.com']",
-            "#taboola-above-article-thumbnails",
-            "#taboola-bottom-of-page-thumbnails",
+        var suggestedContentSelectors = [
             "#related_main",
-            "#taboola-above-forum-thumbnails",
-            "#taboola-below-forum-thumbnails",
             ".trc_related_container",
             ".trc_spotlight_widget",
-            ".videoyoudiv"
+            ".videoyoudiv",
+            ".OUTBRAIN"
         ];
 
-        var taboolaString = taboolaSelectors[0];
-        for (var i = 1; i < taboolaSelectors.length; i++)
-        {
-            taboolaString += ", " + taboolaSelectors[i];
-        }
-        taboolaString += " { display: none !important }";
-        addStyle(taboolaString);
+        addStyle(suggestedContentSelectors.join(", ") + " { display: none !important }");
     }
 
     //use classic icons
@@ -1148,6 +1138,12 @@ chrome.storage.sync.get("settings", function (data)
             styleWrapper = utils.buildStyleWrapper(settings.customDefaultStyle, noFontsPage, false);
         }
 
+        var shouldStyle = true;
+        var isPmPage = window.location.href.indexOf("private.php") > -1;
+        if (isPmPage && !settings.customDefaultStyle.activePrivateChat) {
+            shouldStyle = false;
+        }
+
         //observer to new text, to wrap with style
         observers.insideEditor = new MutationObserver(function (mutations)
         {
@@ -1177,7 +1173,7 @@ chrome.storage.sync.get("settings", function (data)
             mutations.forEach(function (mutation)
             {
                 if (mutation.addedNodes.length > 0)
-                    if (settings.customDefaultStyle.active || settings.classicIcons)
+                    if (settings.customDefaultStyle.active && shouldStyle || settings.classicIcons)
                     {
                         var addedJ = $(mutation.addedNodes[0]);
                         if (addedJ.parents(".cke_contents").length > 0 && mutation.addedNodes[0].tagName === "IFRAME") //editor iframe added
@@ -1193,7 +1189,7 @@ chrome.storage.sync.get("settings", function (data)
                                 {
                                     if (editorFrame.contents().find("body.forum, body.content").length > 0)
                                     {
-                                        if (settings.customDefaultStyle.active)
+                                        if (settings.customDefaultStyle.active && shouldStyle)
                                         {
                                             observers.insideEditor.observe(editorFrame.contents().find("body.forum, body.content")[0], { childList: true });
                                         }
@@ -1221,7 +1217,7 @@ chrome.storage.sync.get("settings", function (data)
             //bind observer for new children (text)
             if (qtnts.length > 0) //the contents are available, iframe loaded
             {
-                if (settings.customDefaultStyle.active)
+                if (settings.customDefaultStyle.active && shouldStyle)
                     observers.insideEditor.observe(editorFrame.contents().find("body")[0], { childList: true });
                 if (settings.classicIcons)
                     addStyle(buildOldIconsStylesheet(), "oldIcons", editorFrame.contents().find("head")[0]);
@@ -1229,7 +1225,7 @@ chrome.storage.sync.get("settings", function (data)
             else //iframe not loaded yet
                 editorFrame.load(function ()
                 {
-                    if (settings.customDefaultStyle.active)
+                    if (settings.customDefaultStyle.active && shouldStyle)
                         observers.insideEditor.observe($(this).contents().find("body")[0], { childList: true });
                     if (settings.classicIcons)
                         addStyle(buildOldIconsStylesheet(), "oldIcons", $(this).contents().find("head")[0]);
@@ -1240,7 +1236,7 @@ chrome.storage.sync.get("settings", function (data)
             observers.texteditor.observe($(".editor_textbox")[0], { childList: true, subtree: true });
 
         //apply the observer for styling also to the quick comment minimal editor, if possible
-        if (settings.customDefaultStyle.active && settings.customDefaultStyle.activeQuickComment)
+        if (settings.customDefaultStyle.active && shouldStyle && settings.customDefaultStyle.activeQuickComment)
         {
             if ($(".chat-text-input .send-element div#input-textarea").length > 0)
                 observers.insideEditor.observe($(".chat-text-input .send-element div#input-textarea")[0], { childList: true });
@@ -1948,7 +1944,7 @@ function loadMinithread(threadLink, element, pm)
                 if (doc.find(".pagination").length > 0)
                 { //multiple pages
                     comments.append($("<a>", {
-                        href: fullUrl + "#quick_reply",
+                        href: fullUrl + "&page=2",
                         target: "_blank",
                         class: "miniComment endingComment balloonNoBorder",
                         "data-balloon-pos": "up",
